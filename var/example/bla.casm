@@ -1,0 +1,10 @@
+CASM bla init foo
+
+//function x : Int(-32 .. 32) -> Int(-128 .. 127)
+
+function x : Int -> Int
+
+rule foo =
+{
+    x( 10 ) := 20
+}
