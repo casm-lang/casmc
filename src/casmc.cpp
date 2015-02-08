@@ -13,6 +13,8 @@
 #include "libsyntax/driver.h"
 #include "libsyntax/ast_dump_visitor.h"
 
+#include "PassAstToCasmIR.h"
+
 /**
     @brief TODO
 
@@ -56,12 +58,24 @@ int main( int argc, char *argv[] )
         res = EXIT_SUCCESS;
     }
 	
+	if( res != EXIT_SUCCESS )
+	{
+		return res;
+	}
+	
 	assert( global_driver && "invalid pointer" );
 	
 	AstDumpVisitor dump;
 	AstWalker< AstDumpVisitor, bool > dump_walker( dump );
 	dump_walker.walk_specification( ast );
 	std::cout << dump.get_dump() << std::endl;
+	
+	// ---
+	
+	PassAstToCasmIR ast_to_casm_ir( *global_driver );
+	AstWalker< PassAstToCasmIR, bool > ast_to_casm_ir_walker( ast_to_casm_ir );
+	ast_to_casm_ir_walker.walk_specification( ast );
+	
 	
     casm_frontend_destroy();
 	
