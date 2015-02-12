@@ -20,16 +20,16 @@ OBJECTS += obj/casmc.o
 OBJECTS += obj/PassAstToCasmIR.o
 
 INCLUDE += -I src
-INCLUDE += -I lib/casm-fontend/src
-INCLUDE += -I lib/casm-fontend/build/src
+INCLUDE += -I lib/casm-frontend/src
+INCLUDE += -I lib/casm-frontend/build/src
 
-LIBRARY += lib/casm-fontend/build/libfrontend.a
+LIBRARY += lib/casm-frontend/build/libfrontend.a
 LIBRARY += -lstdc++
 
 
 default: obj $(TARGET)
 #	$(CC) $(CF) $(CI) -c src/casmc.cpp -o obj/casmc.o
-#	$(CC) $(CF) -o casmc obj/casmc.o lib/casm-fontend/build/libfrontend.a -lstdc++
+#	$(CC) $(CF) -o casmc obj/casmc.o lib/casm-frontend/build/libfrontend.a -lstdc++
 
 obj:
 	mkdir -p obj
