@@ -3,3 +3,4 @@
 casmc
 lib
 obj
+var/example/*.dot*

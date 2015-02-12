@@ -26,6 +26,7 @@
    @date     2015-02-08
 */
 
+#define T bool
 
 class PassAstToCasmIR : public AstInterface< bool >
 {
@@ -46,7 +47,55 @@ public:
 	*/
 	
     PassAstToCasmIR( Driver& driver );
-		
+	
+	void visit_init( UnaryNode* node );
+	void visit_specification( AstNode* node );	
+	void visit_body_elements( AstNode* node );
+    void visit_function_def( FunctionDefNode* node, const std::vector<std::pair<T, T>>& inits );
+    void visit_derived_function_atom_pre( FunctionAtom* node, T args[], uint16_t argc );
+    void visit_derived_def_pre( FunctionDefNode* node );
+    void visit_derived_def( FunctionDefNode* node, T expr );
+    void visit_rule( RuleNode* node );
+	void visit_statements( AstNode* node );
+	void visit_parblock( AstNode* node );
+	void visit_seqblock( AstNode* node );
+	void visit_forall_pre( AstNode* node );
+	void visit_forall_post( AstNode* node );
+	void visit_iterate( AstNode* node );
+    void visit_update( UpdateNode* node, T func, T expr );
+    void visit_update_dumps( UpdateNode* node, T func, T expr );
+	void visit_update_subrange( UpdateNode* node, T func, T expr);
+    void visit_call_pre( CallNode* node );
+    void visit_call_pre( CallNode* node, T expr );
+    void visit_call( CallNode* node, std::vector< T >& args );
+    void visit_call_post( CallNode* node );
+    void visit_print( PrintNode* node, std::vector< T >& args );
+	void visit_diedie( DiedieNode* node, T msg );
+    void visit_impossible( AstNode* node );
+	void visit_assert( UnaryNode* node, T expr );
+    void visit_assure( UnaryNode* node, T expr );
+    void visit_let( LetNode* node, T var );
+    void visit_let_post( LetNode* node );
+	void visit_push( PushNode* node, T expr, T atom );
+    void visit_pop( PopNode* node );
+	void visit_ifthenelse( IfThenElseNode* node, T cond );
+	void visit_case( CaseNode* node, T val, const std::vector< T >& case_labels );
+    T visit_expression( Expression* node, T lhs, T rhs );
+	T visit_expression_single( Expression* node, T val );
+	T visit_function_atom( FunctionAtom* node, T args[], uint16_t argc );
+	T visit_function_atom_subrange( FunctionAtom* node, T args[], uint16_t argc	);
+	T visit_derived_function_atom( FunctionAtom* node, T expr );
+	T visit_int_atom( IntAtom* node );
+	T visit_float_atom( FloatAtom* node );
+	T visit_rational_atom( RationalAtom* node );
+	T visit_undef_atom( UndefAtom* node );
+	T visit_self_atom( SelfAtom* node );
+	T visit_rule_atom( RuleAtom* node );
+	T visit_boolean_atom( BooleanAtom* node );
+	T visit_string_atom( StringAtom* node );
+	T visit_list_atom( ListAtom* node, std::vector< T >& args );
+	T visit_number_range_atom( NumberRangeAtom* node );
+	T visit_builtin_atom( BuiltinAtom* node, T args[], uint16_t argc );
 };
 
 #endif /* _PASSASTTOCASMIR_H_ */

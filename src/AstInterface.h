@@ -38,7 +38,7 @@ public:
 	   @retval   TODO
 	*/
 	
-	void visit_init( UnaryNode* node ) 
+	void visit_init( UnaryNode* node )
 	{
 	}
 	
@@ -50,23 +50,23 @@ public:
 	{
 	}
 	
-    void visit_function_def
-	( FunctionDefNode* def
-	, const std::vector<std::pair<T
-	, T>>& initializers
-	)
+    void visit_function_def( FunctionDefNode* node, const std::vector<std::pair<T, T>>& inits )
 	{
 	}
 	
-    void visit_derived_def_pre( FunctionDefNode* def )
+    void visit_derived_function_atom_pre( FunctionAtom* node, T args[], uint16_t argc )
+	{
+	}
+
+    void visit_derived_def_pre( FunctionDefNode* node )
 	{
 	}
 	
-    void visit_derived_def( FunctionDefNode* def, T expr )
+    void visit_derived_def( FunctionDefNode* node, T expr )
 	{
 	}
 	
-    void visit_rule(RuleNode *rule)
+    void visit_rule( RuleNode* node )
 	{
 	}
 	
@@ -94,115 +94,99 @@ public:
 	{
 	}
 	
-    void visit_update(UpdateNode *update, T func, T expr)
+    void visit_update( UpdateNode* node, T func, T expr )
 	{
 	}
 	
-    void visit_update_dumps(UpdateNode *update, T func, T expr)
+    void visit_update_dumps( UpdateNode* node, T func, T expr )
 	{
 	}
 	
-	void visit_update_subrange(UpdateNode *update, T func, T expr)
+	void visit_update_subrange( UpdateNode* node, T func, T expr)
 	{
 	}
 	
-    void visit_call_pre(CallNode *call)
+    void visit_call_pre( CallNode* node )
 	{
 	}
 	
-    void visit_call_pre(CallNode *call, T expr)
+    void visit_call_pre( CallNode* node, T expr )
 	{
 	}
 	
-    void visit_call(CallNode *call, std::vector<T>& argument_results)
+    void visit_call( CallNode* node, std::vector< T >& args )
 	{
 	}
 	
-    void visit_call_post(CallNode *call)
+    void visit_call_post( CallNode* node )
 	{
 	}
 	
-    void visit_print(PrintNode*, std::vector<T>&)
+    void visit_print( PrintNode* node, std::vector< T >& args )
 	{
 	}
     
-	void visit_diedie(DiedieNode *node, T msg)
+	void visit_diedie( DiedieNode* node, T msg )
 	{
 	}
 	
-    void visit_impossible(AstNode *node)
+    void visit_impossible( AstNode* node )
 	{
 	}
 	
-	void visit_assert(UnaryNode *assert, T t)
+	void visit_assert( UnaryNode* node, T expr )
 	{
 	}
 	
-    void visit_assure(UnaryNode *assert, T t)
+    void visit_assure( UnaryNode* node, T expr )
 	{
 	}
     
-    void visit_let(LetNode *node, T v)
+    void visit_let( LetNode* node, T var )
 	{
 	}
 	
-    void visit_let_post(LetNode *node)
+    void visit_let_post( LetNode* node )
 	{
 	}
     
-	void visit_push(PushNode *node, T expr, T atom)
+	void visit_push( PushNode* node, T expr, T atom )
 	{
 	}
 	
-    void visit_pop(PopNode *node)
+    void visit_pop( PopNode* node )
 	{
 	}
     
-	void visit_ifthenelse(IfThenElseNode *node, T cond)
+	void visit_ifthenelse( IfThenElseNode* node, T cond )
 	{
 	}
 	
-    void visit_case
-	( CaseNode *node
-	, T val
-	, const std::vector<T>& case_labels
-	)
+	void visit_case( CaseNode* node, T val, const std::vector< T >& case_labels )
 	{
 	}
 	
-    T visit_expression(Expression *expr, T left_val, T right_val)
+    T visit_expression( Expression* node, T lhs, T rhs )
 	{
 		return 0;
 	}
     
-	T visit_expression_single(Expression *expr, T val)
+	T visit_expression_single( Expression* node, T val )
 	{
 		return 0;
 	}
     
-	T visit_function_atom(FunctionAtom *atom, T arguments[], uint16_t num_arguments)
+	T visit_function_atom( FunctionAtom* node, T args[], uint16_t argc )
 	{ 
 		return 0;
 	}
     
-	T visit_function_atom_subrange
-	( FunctionAtom *atom
-	, T arguments[]
-	, uint16_t num_arguments
-	)
+	T visit_function_atom_subrange( FunctionAtom* node, T args[], uint16_t argc	)
 	{
 		return 0;
 	}
-	
-    void visit_derived_function_atom_pre
-	( FunctionAtom *atom
-	, T arguments[]
-	, uint16_t num_arguments
-	)
-	{
-	}
     
-	T visit_derived_function_atom(FunctionAtom *atom, T expr)
+	T visit_derived_function_atom( FunctionAtom* node, T expr )
 	{
 		return 0;
 	}
@@ -247,7 +231,7 @@ public:
 		return 0;
 	}
 	
-	T visit_list_atom(ListAtom *atom, std::vector<T> &vals)
+	T visit_list_atom( ListAtom* node, std::vector< T >& args )
 	{ 
 		return 0;
 	}
@@ -257,11 +241,10 @@ public:
 		return 0; 
 	}
 	
-	T visit_builtin_atom( BuiltinAtom* node, T arguments[], uint16_t num_arguments ) 
+	T visit_builtin_atom( BuiltinAtom* node, T args[], uint16_t argc ) 
 	{
 		return 0;
 	}
-
 };
 
 #endif /* _ASTINTERFACE_H_ */

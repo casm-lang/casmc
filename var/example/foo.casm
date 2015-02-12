@@ -1,0 +1,17 @@
+CASM foo 
+
+function x : Int -> Int
+
+rule bla =
+{
+    x( 10 ) := 20
+}
+
+init bla
+
+function y : Int -> Int
+
+rule baz =
+{
+    y( 20 ) := 30
+}

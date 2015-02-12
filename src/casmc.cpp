@@ -40,7 +40,9 @@ int main( int argc, char *argv[] )
         return EXIT_FAILURE;
     }
 	
-	AstNode* ast = casm_frontend_pass_1_parse( argv[1] );
+	const char* file_name = argv[1];
+	
+	AstNode* ast = casm_frontend_pass_1_parse( file_name );
 	
     if( ast == nullptr ) 
 	{
@@ -69,6 +71,23 @@ int main( int argc, char *argv[] )
 	AstWalker< AstDumpVisitor, bool > dump_walker( dump );
 	dump_walker.walk_specification( ast );
 	std::cout << dump.get_dump() << std::endl;
+	
+	std::string fn( file_name );
+	fn += ".dot";
+	
+	std::ofstream fd;
+    fd.open( fn );
+	fd << dump.get_dump();
+	fd.close();
+	
+	std::string cmd;
+	cmd += "dot -Tpdf ";
+	cmd += fn;
+	cmd += " -o ";
+	cmd += fn;
+	cmd += ".pdf";
+	
+	system( cmd.c_str() );
 	
 	// ---
 	
