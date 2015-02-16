@@ -10,7 +10,8 @@
 #ifndef _ASTINTERFACE_H_
 #define _ASTINTERFACE_H_
 
-// #include ...
+#include "libsyntax/driver.h"
+#include "libsyntax/visitor.h"
 
 /**
    @file     AstInterface.h

@@ -7,16 +7,17 @@
   file in the project root directory.
 */
 
-#ifndef _PASSASTTOCASMIR_H_
-#define _PASSASTTOCASMIR_H_
+#ifndef _ASTTOCASMIRPASS_H_
+#define _ASTTOCASMIRPASS_H_
 
-#include "libsyntax/driver.h"
+#include "Pass.h"
+
 
 #include "AstInterface.h"
 
 /**
-   @file     PassAstToCasmIR.h
-   @class    PassAstToCasmIR
+   @file     AstToCasmIRPass.h
+   @class    AstToCasmIRPass
    
    @brief    TODO
    
@@ -28,11 +29,12 @@
 
 #define T bool
 
-class PassAstToCasmIR : public AstInterface< bool >
+class AstToCasmIRPass : public Pass, AstInterface< bool >
 {
 private:
 	
     Driver& ast_driver;
+	AstNode* ast_node;
 
 public:
 
@@ -46,7 +48,9 @@ public:
 	   @retval   TODO
 	*/
 	
-    PassAstToCasmIR( Driver& driver );
+    AstToCasmIRPass( Driver& driver, AstNode* node );
+	
+	virtual bool run( PassResult& pr );
 	
 	void visit_init( UnaryNode* node );
 	void visit_specification( AstNode* node );	

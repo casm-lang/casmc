@@ -17,7 +17,9 @@ CPPFLAG += -Wall
 TARGET=casmc
 
 OBJECTS += obj/casmc.o
-OBJECTS += obj/PassAstToCasmIR.o
+OBJECTS += obj/PassManager.o
+OBJECTS += obj/AstToCasmIRPass.o
+OBJECTS += obj/ExamplePass.o
 
 INCLUDE += -I src
 INCLUDE += -I lib/casm-frontend/src
@@ -35,14 +37,17 @@ obj:
 	mkdir -p obj
 
 obj/%.o: src/%.cpp
-	$(CPP) $(CPPFLAG) $(INCLUDE) -c $^ -o $@
+	@echo "CC " $^
+	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $^ -o $@
 
 $(TARGET): $(OBJECTS)
-	$(CPP) $(CPPFLAG) -o $@ $^ $(LIBRARY)
+	@echo "LK " $@
+	@$(CPP) $(CPPFLAG) -o $@ $^ $(LIBRARY)
 
 clean:
 	rm -rf obj
 	rm -f casmc
+
 
 # libcasm-frontend
 # libstdhl

@@ -13,7 +13,12 @@
 #include "libsyntax/driver.h"
 #include "libsyntax/ast_dump_visitor.h"
 
-#include "PassAstToCasmIR.h"
+#include "AstToCasmIRPass.h"
+
+#include "Type.h"
+#include "PassInfo.h"
+#include "PassRegistry.h"
+#include "PassResult.h"
 
 /**
     @brief TODO
@@ -91,12 +96,22 @@ int main( int argc, char *argv[] )
 	
 	// ---
 	
-	PassAstToCasmIR ast_to_casm_ir( *global_driver );
-	AstWalker< PassAstToCasmIR, bool > ast_to_casm_ir_walker( ast_to_casm_ir );
-	ast_to_casm_ir_walker.walk_specification( ast );
+	AstToCasmIRPass ast_to_casm_ir( *global_driver, ast );
+	
+	PassResult x;
+	ast_to_casm_ir.run( x );
 	
 	
     casm_frontend_destroy();
+	
+	for( auto& p : PassRegistry::getRegisteredPasses() )
+	{
+		PassId    id = p.first;
+		PassInfo* pi = p.second;
+		
+		printf( "%p, %p, %s, --%s, -%s\n", 
+				id, pi, pi->getPassName(), pi->getPassArgument(), pi->getPassArgumentShort() );
+	}
 	
 	
 	// transform CASM AST -> IR
