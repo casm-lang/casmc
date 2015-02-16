@@ -7,10 +7,11 @@
   file in the project root directory.
 */
 
-#include <assert.h>
+#include "Default.h"
+#include "Args.h"
 
-#include "Type.h"
 #include "Pass.h"
+#include "DataType.h"
 
 #include "AstDumpPass.h"
 #include "AstToCasmIRPass.h"
@@ -24,8 +25,24 @@
     @date     2015-01-27
 */
 
+#include "args.h"
+
+
+//void bla( void (*fun)(int, int) )
+void bla( function< void( int, int ) > fun )
+{
+	fun( 1, 2);
+}
+
 int main( int argc, char *argv[] )
 {
+	args( argc, argv );
+	
+	bla( [](int x, int y)
+	{ 
+		x = x + y; 
+	});
+	
 	for( auto& p : PassRegistry::getRegisteredPasses() )
 	{
 		PassId    id = p.first;

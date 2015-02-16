@@ -7,27 +7,17 @@
   file in the project root directory.
 */
 
-#ifndef _TYPE_H_
-#define _TYPE_H_
+#ifndef _DATATYPE_H_
+#define _DATATYPE_H_
 
-#include <stdint.h>
-#include <assert.h>
-
-#include <set>
-#include <map>
-#include <list>
-#include <vector>
-#include <unordered_set>
-#include <unordered_map>
-
-using namespace std;
+#include "Type.h"
 
 class Pass;
 class PassInfo;
 
 /**
-   @file     Type.h
-   @class    Type
+   @file     DataType.h
+   @class    DataType
    
    @brief    TODO
    
@@ -36,10 +26,6 @@ class PassInfo;
    @author   Philipp Paulweber
    @date     2015-02-14
 */
-
-typedef uint16_t u16;
-typedef uint64_t u64;
-
 
 typedef Pass* (*PassConstructor)();
 typedef void* PassId;
@@ -50,7 +36,7 @@ typedef unordered_map< PassId, void* > PassId2Ptr;
 typedef unordered_map< PassId, u64 > PassId2u64;
 
 namespace pp {
-class Type  
+class DataType  
 {
 public:
 	
@@ -68,7 +54,7 @@ public:
 
 };
 }
-#endif /* _TYPE_H_ */
+#endif /* _DATATYPE_H_ */
 
 
 /*

@@ -7,10 +7,10 @@
   file in the project root directory.
 */
 
-#include "Type.h"
+#include "DataType.h"
 
 /**
-   @file     Type.cpp
+   @file     DataType.cpp
    @author   Philipp Paulweber
    @date     2015-02-14
 */

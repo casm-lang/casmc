@@ -27,11 +27,12 @@ OBJECTS += obj/AstToCasmIRPass.o
 INCLUDE += -I src
 INCLUDE += -I lib/casm-frontend/src
 INCLUDE += -I lib/casm-frontend/build/src
+INCLUDE += -I lib/stdhl/c
+INCLUDE += -I lib/stdhl/cpp
 
 LIBRARY += lib/casm-frontend/build/libfrontend.a
-LIBRARY += -lstdc++
-
-HEADER = $(wildcard src/*.h)
+LIBRARY += lib/stdhl/libstdhlc.a
+LIBRARY += lib/stdhl/libstdhlcpp.a
 
 default: obj $(TARGET)
 #	$(CC) $(CF) $(CI) -c src/casmc.cpp -o obj/casmc.o
@@ -44,18 +45,26 @@ obj/%.o: src/%.cpp
 	@echo "CC " $<
 	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
 
-$(TARGET): $(OBJECTS)
+obj/%.o: src/%.c
+	@echo "CC " $<
+	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
+
+lib/casm-frontend/build/libfrontend.a: lib/casm-frontend
+	cd $<; make
+
+lib/stdhl/libstdhlc.a: lib/stdhl
+	cd $<; make
+
+lib/stdhl/libstdhlcpp.a: lib/stdhl
+	cd $<; make
+
+$(TARGET): $(LIBRARY) $(OBJECTS)
 	@echo "LK " $@
-	@$(CPP) $(CPPFLAG) -o $@ $^ $(LIBRARY)
+	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++
 
 clean:
 	rm -rf obj
 	rm -f casmc
-
-
-# libcasm-frontend
-# libstdhl
-# libstub
 
 stub:
 	PROJECT=casmc LICENSE=NSCA ./lib/stub/stub.sh cpp $(ARG) src

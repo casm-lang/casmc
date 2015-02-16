@@ -10,7 +10,7 @@
 #ifndef _PASSINFO_H_
 #define _PASSINFO_H_
 
-#include "Type.h"
+#include "DataType.h"
 
 /**
    @file     PassInfo.h

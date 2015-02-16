@@ -10,7 +10,7 @@
 #ifndef _PASSREGISTRY_H_
 #define _PASSREGISTRY_H_
 
-#include "Type.h"
+#include "DataType.h"
 
 #include "PassInfo.h"
 
