@@ -18,8 +18,11 @@ TARGET=casmc
 
 OBJECTS += obj/casmc.o
 OBJECTS += obj/PassManager.o
+
+OBJECTS += obj/SourceToAstPass.o
+OBJECTS += obj/TypeCheckPass.o
+OBJECTS += obj/AstDumpPass.o
 OBJECTS += obj/AstToCasmIRPass.o
-OBJECTS += obj/ExamplePass.o
 
 INCLUDE += -I src
 INCLUDE += -I lib/casm-frontend/src
@@ -28,6 +31,7 @@ INCLUDE += -I lib/casm-frontend/build/src
 LIBRARY += lib/casm-frontend/build/libfrontend.a
 LIBRARY += -lstdc++
 
+HEADER = $(wildcard src/*.h)
 
 default: obj $(TARGET)
 #	$(CC) $(CF) $(CI) -c src/casmc.cpp -o obj/casmc.o
@@ -37,8 +41,8 @@ obj:
 	mkdir -p obj
 
 obj/%.o: src/%.cpp
-	@echo "CC " $^
-	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $^ -o $@
+	@echo "CC " $<
+	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
 
 $(TARGET): $(OBJECTS)
 	@echo "LK " $@

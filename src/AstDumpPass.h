@@ -7,32 +7,30 @@
   file in the project root directory.
 */
 
-#ifndef _PASS_H_
-#define _PASS_H_
+#ifndef _ASTDUMPPASS_H_
+#define _ASTDUMPPASS_H_
 
-#include "PassInfo.h"
-#include "PassUsage.h"
-#include "PassResult.h"
-#include "PassRegistry.h"
-
-class PassUsage;
-class PassResult;
+#include "AstInterface.h"
+#include "Pass.h"
+#include "TypeCheckPass.h"
 
 /**
-   @file     Pass.h
-   @class    Pass
+   @file     AstDumpPass.h
+   @class    AstDumpPass
    
    @brief    TODO
    
    TODO
    
    @author   Philipp Paulweber
-   @date     2015-02-14
+   @date     2015-02-16
 */
 
-class Pass  
+class AstDumpPass : public Pass, AstDumpVisitor
 {
 public:
+	static char id;
+
     /**
 	   @brief    TODO
 
@@ -42,32 +40,11 @@ public:
 	   @return   TODO
 	   @retval   TODO
 	*/
-	
-    virtual void usage(PassUsage& pu)
-	{
-	}
-	
-	virtual void initialize(void)
-	{
-	}
-	
-	virtual bool run(PassResult& pr) = 0;
-	
-	virtual bool verify(void)
-	{
-		return true;
-	}
-	
-	virtual void finalize(void)
-	{
-	}	
-	
-	virtual void dealloc(void* result)
-	{
-	}	
+
+    virtual bool run(PassResult& pr);
 };
 
-#endif /* _PASS_H_ */
+#endif /* _ASTDUMPPASS_H_ */
 
 
 /*

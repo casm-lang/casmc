@@ -7,32 +7,29 @@
   file in the project root directory.
 */
 
-#ifndef _PASS_H_
-#define _PASS_H_
+#ifndef _SOURCETOASTPASS_H_
+#define _SOURCETOASTPASS_H_
 
-#include "PassInfo.h"
-#include "PassUsage.h"
-#include "PassResult.h"
-#include "PassRegistry.h"
-
-class PassUsage;
-class PassResult;
+#include "Pass.h"
+#include "AstInterface.h"
 
 /**
-   @file     Pass.h
-   @class    Pass
+   @file     SourceToAstPass.h
+   @class    SourceToAstPass
    
    @brief    TODO
    
    TODO
    
    @author   Philipp Paulweber
-   @date     2015-02-14
+   @date     2015-02-16
 */
 
-class Pass  
+class SourceToAstPass : public Pass
 {
 public:
+	static char id;
+	
     /**
 	   @brief    TODO
 
@@ -43,31 +40,10 @@ public:
 	   @retval   TODO
 	*/
 	
-    virtual void usage(PassUsage& pu)
-	{
-	}
-	
-	virtual void initialize(void)
-	{
-	}
-	
-	virtual bool run(PassResult& pr) = 0;
-	
-	virtual bool verify(void)
-	{
-		return true;
-	}
-	
-	virtual void finalize(void)
-	{
-	}	
-	
-	virtual void dealloc(void* result)
-	{
-	}	
+	virtual bool run( PassResult& pr );
 };
 
-#endif /* _PASS_H_ */
+#endif /* _SOURCETOASTPASS_H_ */
 
 
 /*

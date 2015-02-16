@@ -10,10 +10,9 @@
 #ifndef _ASTTOCASMIRPASS_H_
 #define _ASTTOCASMIRPASS_H_
 
-#include "Pass.h"
-
-
 #include "AstInterface.h"
+#include "Pass.h"
+#include "TypeCheckPass.h"
 
 /**
    @file     AstToCasmIRPass.h
@@ -31,24 +30,18 @@
 
 class AstToCasmIRPass : public Pass, AstInterface< bool >
 {
-private:
-	
-    Driver& ast_driver;
-	AstNode* ast_node;
-
 public:
-
+	static char id;
+	
     /**
 	   @brief    TODO
-
+	   
 	   TODO
 	   
 	   @param    arg0    TODO
 	   @return   TODO
 	   @retval   TODO
 	*/
-	
-    AstToCasmIRPass( Driver& driver, AstNode* node );
 	
 	virtual bool run( PassResult& pr );
 	

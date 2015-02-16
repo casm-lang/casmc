@@ -181,15 +181,16 @@ public:
 	template<class PassName>
 	void* getResult(void)
 	{
-		DEBUG( __FUNCTION__ << ": " << &PassName::id << " = " << results[ &PassName::id ] << "\n" );
-
+		//DEBUG( __FUNCTION__ << ": " << &PassName::id << " = " << results[ &PassName::id ] 
+		//<< "\n" );
+		
 		return results[ &PassName::id ];
 	}
 	
 	template<class PassName>
 	void setResult(void* passResult)
 	{
-		DEBUG( __FUNCTION__ << ": " << &PassName::id << " = " << passResult << "\n" );
+		//DEBUG( __FUNCTION__ << ": " << &PassName::id << " = " << passResult << "\n" );
 		
 		results[ &PassName::id ] = passResult;
 	}

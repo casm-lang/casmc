@@ -9,16 +9,11 @@
 
 #include <assert.h>
 
-#include "frontend.h"
-#include "libsyntax/driver.h"
-#include "libsyntax/ast_dump_visitor.h"
-
-#include "AstToCasmIRPass.h"
-
 #include "Type.h"
-#include "PassInfo.h"
-#include "PassRegistry.h"
-#include "PassResult.h"
+#include "Pass.h"
+
+#include "AstDumpPass.h"
+#include "AstToCasmIRPass.h"
 
 /**
     @brief TODO
@@ -29,81 +24,8 @@
     @date     2015-01-27
 */
 
-extern Driver *global_driver;
-
 int main( int argc, char *argv[] )
 {
-	// parsing & type-checking
-	
-    int res = 0;
-	
-	casm_frontend_init();
-	
-    if( argc != 2 )
-	{
-        std::cerr << "Error: invalid number of arguments" << std::endl;
-        return EXIT_FAILURE;
-    }
-	
-	const char* file_name = argv[1];
-	
-	AstNode* ast = casm_frontend_pass_1_parse( file_name );
-	
-    if( ast == nullptr ) 
-	{
-        std::cerr << "Error parsing file" << std::endl;
-        res = EXIT_FAILURE;
-    } 
-	else
-	{
-		if( !casm_frontend_pass_2_typecheck( ast ) )
-		{
-			std::cerr << "Error typecheck file" << std::endl;
-			res = EXIT_FAILURE;    
-		}
-		
-        res = EXIT_SUCCESS;
-    }
-	
-	if( res != EXIT_SUCCESS )
-	{
-		return res;
-	}
-	
-	assert( global_driver && "invalid pointer" );
-	
-	AstDumpVisitor dump;
-	AstWalker< AstDumpVisitor, bool > dump_walker( dump );
-	dump_walker.walk_specification( ast );
-	std::cout << dump.get_dump() << std::endl;
-	
-	std::string fn( file_name );
-	fn += ".dot";
-	
-	std::ofstream fd;
-    fd.open( fn );
-	fd << dump.get_dump();
-	fd.close();
-	
-	std::string cmd;
-	cmd += "dot -Tpdf ";
-	cmd += fn;
-	cmd += " -o ";
-	cmd += fn;
-	cmd += ".pdf";
-	
-	system( cmd.c_str() );
-	
-	// ---
-	
-	AstToCasmIRPass ast_to_casm_ir( *global_driver, ast );
-	
-	PassResult x;
-	ast_to_casm_ir.run( x );
-	
-	
-    casm_frontend_destroy();
-	
 	for( auto& p : PassRegistry::getRegisteredPasses() )
 	{
 		PassId    id = p.first;
@@ -113,6 +35,28 @@ int main( int argc, char *argv[] )
 				id, pi, pi->getPassName(), pi->getPassArgument(), pi->getPassArgumentShort() );
 	}
 	
+    if( argc != 2 )
+	{
+        std::cerr << "Error: invalid number of arguments" << std::endl;
+        return EXIT_FAILURE;
+    }
+	
+	const char* file_name = argv[1];
+	
+	// ---
+	
+	PassResult x;
+	x.getResults()[ 0 ] = (void*)file_name;
+	
+	SourceToAstPass a;
+	TypeCheckPass b;
+	AstDumpPass c;
+	AstToCasmIRPass d; 
+	
+	a.run( x );
+	b.run( x );
+	c.run( x );
+	d.run( x );
 	
 	// transform CASM AST -> IR
 	
@@ -124,8 +68,26 @@ int main( int argc, char *argv[] )
 	//                            |
 	//                            +-> LLVM IR (interpretation via lli)
 	
-    return res;
+    return 0;
 }
+
+    // std::string fn( file_name );
+	// fn += ".dot";
+	
+	// std::ofstream fd;
+    // fd.open( fn );
+	// fd << dump.get_dump();
+	// fd.close();
+	
+	// std::string cmd;
+	// cmd += "dot -Tpdf ";
+	// cmd += fn;
+	// cmd += " -o ";
+	// cmd += fn;
+	// cmd += ".pdf";
+	
+	// system( cmd.c_str() );
+	
 
 /*
   Local variables:

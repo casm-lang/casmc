@@ -15,22 +15,30 @@
    @date     2015-02-08
 */
 
-AstToCasmIRPass::AstToCasmIRPass
-( Driver& driver
-, AstNode* node
-)
-: ast_driver( driver )
-, ast_node( node )
-{
-}
+char AstToCasmIRPass::id = 0;
+
+static PassRegistration< AstToCasmIRPass > PASS
+( "AST to CASM IR"
+, "internal: translates the AST to the CASM intermeditate representation"
+, 0
+, 0
+);
+
 
 bool AstToCasmIRPass::run( PassResult& pr )
 {
+	AstNode* node = (AstNode*)pr.getResult< TypeCheckPass >();
+	
 	AstWalker< AstToCasmIRPass, bool > walker( *this );
 	
-	walker.walk_specification( ast_node );
+	walker.walk_specification( node );
 	
-	return 0;
+	// TODO: PPA: implement the IR translation!!!
+	
+	casm_frontend_destroy();
+	
+	//return true;
+	return false;
 }
 
 
