@@ -19,9 +19,9 @@ char TypeCheckPass::id = 0;
 
 static PassRegistration< TypeCheckPass > PASS
 ( "Type Check Pass"
-, "internal: checks the AST and translates it to a typed AST"
+, "type check the AST and translate it to a typed AST"
 , 0
-, 0
+, 'T'
 );
 
 bool TypeCheckPass::run( PassResult& pr )

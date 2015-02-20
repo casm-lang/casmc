@@ -84,17 +84,17 @@ template<class PassName>
 class PassRegistration : public PassInfo
 {
 public:
-	PassRegistration(const char* name,
-					 const char* description,
-					 const char* argument,
-					 const char* argument_short
+	PassRegistration(const char* passName,
+					 const char* passDescription,
+					 const char* passArgStr,
+					 const char  passArgChar
 					 )
-		: PassInfo(name,
-				   description,
-				   argument,
-				   argument_short,
-				   &PassName::id,
-				   PassConstructor( defaultConstructor<PassName>) ) 
+		: PassInfo( passName,
+				    passDescription,
+				    passArgStr,
+				    passArgChar,
+				    &PassName::id,
+				    PassConstructor( defaultConstructor<PassName>) ) 
 	{
 		PassRegistry::registerPass(this);
 	}

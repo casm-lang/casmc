@@ -29,8 +29,8 @@ class PassInfo
 private:
 	const char* const name;
 	const char* const description;
-	const char* const argument;
-	const char* const argument_short;
+	const char* const arg_str;
+	const char        arg_char;
 	
 	const PassId  id;
 	
@@ -41,14 +41,14 @@ private:
 public:
     PassInfo(const char* passName, 
 			 const char* passDescription, 
-			 const char* passArgument, 
-			 const char* passArgumentShort, 
+			 const char* passArgStr, 
+			 const char  passArgChar, 
 			 const PassId passID, 
 			 PassConstructor passConstructor)
 		: name(passName),
 		  description(passDescription),
-		  argument(passArgument),
-		  argument_short(passArgumentShort),
+		  arg_str(passArgStr),
+		  arg_char(passArgChar),
 		  id(passID),
 		  constructor(passConstructor)
 	{}
@@ -72,14 +72,14 @@ public:
 		return description; 
 	}
 	
-	const char* getPassArgument(void) const 
+	const char* getPassArgString(void) const 
 	{ 
-		return argument; 
+		return arg_str; 
 	}
 	
-	const char* getPassArgumentShort(void) const 
+	const char getPassArgChar(void) const 
 	{ 
-		return argument_short; 
+		return arg_char; 
 	}
 	
 	const PassId getPassId(void) const

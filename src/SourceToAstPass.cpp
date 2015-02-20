@@ -19,9 +19,9 @@ char SourceToAstPass::id = 0;
 
 static PassRegistration< SourceToAstPass > PASS
 ( "Source To AST Pass"
-, "internal: parses the source code and generates an AST"
+, "parse the source code and generate an AST"
 , 0
-, 0
+, 'P'
 );
 
 bool SourceToAstPass::run( PassResult& pr )

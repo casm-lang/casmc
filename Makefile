@@ -25,6 +25,7 @@ OBJECTS += obj/AstDumpPass.o
 OBJECTS += obj/AstToCasmIRPass.o
 
 INCLUDE += -I src
+INCLUDE += -I obj
 INCLUDE += -I lib/casm-frontend/src
 INCLUDE += -I lib/casm-frontend/build/src
 INCLUDE += -I lib/stdhl/c
@@ -38,33 +39,38 @@ default: obj $(TARGET)
 #	$(CC) $(CF) $(CI) -c src/casmc.cpp -o obj/casmc.o
 #	$(CC) $(CF) -o casmc obj/casmc.o lib/casm-frontend/build/libfrontend.a -lstdc++
 
+.PHONY: obj/version.h
+
 obj:
 	mkdir -p obj
 
 obj/%.o: src/%.cpp
-	@echo "CC " $<
+	@echo "CPP " $<
 	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
 
 obj/%.o: src/%.c
-	@echo "CC " $<
+	@echo "CC  " $<
 	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
 
 lib/casm-frontend/build/libfrontend.a: lib/casm-frontend
-	cd $<; make
+	@cd $<; $(MAKE)
 
-lib/stdhl/libstdhlc.a: lib/stdhl
-	cd $<; make
+lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
+	@cd $<; $(MAKE)
 
-lib/stdhl/libstdhlcpp.a: lib/stdhl
-	cd $<; make
+obj/version.h:
+	@echo "GEN " $@ 
+	@echo "#define VERSION \""`git describe --always --tags --dirty`"\"" > $@
 
-$(TARGET): $(LIBRARY) $(OBJECTS)
-	@echo "LK " $@
+$(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
+	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++
 
 clean:
-	rm -rf obj
-	rm -f casmc
+	@echo "RM  " obj
+	@rm -rf obj
+	@echo "RM " casmc
+	@rm -f casmc
 
 stub:
 	PROJECT=casmc LICENSE=NSCA ./lib/stub/stub.sh cpp $(ARG) src

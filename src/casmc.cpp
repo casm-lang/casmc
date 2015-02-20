@@ -16,6 +16,8 @@
 #include "AstDumpPass.h"
 #include "AstToCasmIRPass.h"
 
+#include "version.h"
+
 /**
     @brief TODO
 
@@ -25,42 +27,84 @@
     @date     2015-01-27
 */
 
-#include "args.h"
-
-
-//void bla( void (*fun)(int, int) )
-void bla( function< void( int, int ) > fun )
+int main( int argc, const char *argv[] )
 {
-	fun( 1, 2);
-}
-
-int main( int argc, char *argv[] )
-{
-	args( argc, argv );
+	const char* file_name = 0;
 	
-	bla( [](int x, int y)
-	{ 
-		x = x + y; 
+	Args options( argc, argv, Args::ALTERNATE, [&file_name,&options]( const char* arg ) 
+	{
+		static int cnt = 0;
+		cnt++;
+		
+		if( cnt > 1 )
+		{
+			options.error( 1, "to many file names passed" );
+		}
+		
+		file_name = arg;
+	});
+	
+	options.add
+	( 'h', "help", Args::NONE, "Display the program usage and synoptis"
+	, [&options]( const char* option )
+	{
+		fprintf( stderr
+		, "Corithian Abstract State Machine (CASM) Compiler\n"
+		  "\n"
+		  "usage: %s [options] <file>\n"
+		  "\n"
+		  "options:\n"
+		, options.getProgramName()
+		);
+		
+		options.usage();
+		
+		exit( 0 );
+	});
+	
+	options.add( 'v', "-version", Args::NONE, "Display compiler version information"
+	, [&options]( const char* option )
+	{
+		fprintf( stderr
+		, "%s: version: %s [ %s %s ]\n"
+		, options.getProgramName()
+		, VERSION
+		, __DATE__
+		, __TIME__
+		);
+		
+		exit( 0 );
 	});
 	
 	for( auto& p : PassRegistry::getRegisteredPasses() )
 	{
-		PassId    id = p.first;
-		PassInfo* pi = p.second;
+		//PassId    id = p.first;
+		PassInfo& pi = *p.second;
 		
-		printf( "%p, %p, %s, --%s, -%s\n", 
-				id, pi, pi->getPassName(), pi->getPassArgument(), pi->getPassArgumentShort() );
+		if( pi.getPassArgChar() == 0 && pi.getPassArgString() == 0 )
+		{
+			// internal pass, do not register a cmd line flag
+			continue;
+		}
+		
+		options.add
+	   	( pi.getPassArgChar()
+		, pi.getPassArgString()
+		, Args::NONE
+		, pi.getPassDescription()
+		, [&pi]( const char* option )
+		{
+			printf( "add: %s:%s\n", pi.getPassName(), option );
+			// add to PassManager the selected pass to run!
+		});
 	}
 	
-    if( argc != 2 )
+	options.parse();
+	
+	if( !file_name )
 	{
-        std::cerr << "Error: invalid number of arguments" << std::endl;
-        return EXIT_FAILURE;
-    }
-	
-	const char* file_name = argv[1];
-	
-	// ---
+		options.error( 1, "no input file provided" );
+	}
 	
 	PassResult x;
 	x.getResults()[ 0 ] = (void*)file_name;
@@ -70,9 +114,15 @@ int main( int argc, char *argv[] )
 	AstDumpPass c;
 	AstToCasmIRPass d; 
 	
-	a.run( x );
+	if( !a.run( x ) )
+	{
+		return -1;
+	}
+	
 	b.run( x );
+	
 	c.run( x );
+	
 	d.run( x );
 	
 	// transform CASM AST -> IR
