@@ -41,6 +41,10 @@ default: obj $(TARGET)
 
 .PHONY: obj/version.h
 
+all:
+	$(MAKE) clean
+	$(MAKE)
+
 obj:
 	mkdir -p obj
 

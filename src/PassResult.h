@@ -26,67 +26,21 @@
 
 class PassResult  
 {
-// public:
-// 	typedef Type::IruleVector RuleVectorType;
-
-// private:
-// 	static Type::IruleVector& registeredRules(void)
-// 	{
-// 		static Type::IruleVector rules;
-// 		return rules;
-// 	}
-
-// public:
-// 	static void registerRule(irule* passRule)
-// 	{
-// 		assert( passRule != 0 && "invalid pass rule object pointer" );
-// 		registeredRules().push_back( passRule );
-// 	}
-
-// 	static Type::IruleVector& getRegisteredRules(void)
-// 	{
-// 		return registeredRules();
-// 	}
-
 private:
-	// irule* rule;
-	
-	// uint64_t constCounter;
-
-	// uint64_t variableCounter;
 	
 	PassId2Ptr results;
 	
 	PassId2u64 changes;
 	
-	// PassIdUInt64PairVector trace;
-
-	// stringstream traceStream;
-	
 public:
-    PassResult( ) //irule* passRule) 
-		// : rule( passRule ),
-		//   constCounter( 0 ),
-		//   variableCounter( 0 )
+    PassResult()
 	{
-		// assert( passRule != 0 && "invalid pass rule object pointer" );
-		// DEBUG("created new pass phase '" << passRule->name << "'\n");
-		
-		// rule->body_copy = ast_duplicate( rule->body );		
-		// DEBUG("duplicated ast rule body!\n");
-		
-		// ast_label_rule(rule);
-		// DEBUG("labeled the ast\n");
 	}
 	
 	~PassResult()
 	{
-		// ast_label_rule(rule);
-		// DEBUG("labeled the ast (END)\n");
-
-		// results.clear();
-		// changes.clear();
-		// trace.clear();
+		results.clear();
+		changes.clear();
 	}
 	
     /**
@@ -98,85 +52,6 @@ public:
 	   @return   TODO
 	   @retval   TODO
 	*/
- 
-	// uint64_t getConstCounter(void) const
-	// {
-	// 	return constCounter;
-	// }	
-
-	// void incrementConstCounter(void)
-	// {
-	// 	constCounter++;
-	// }	
-	
-	
-	// uint64_t getVariableCounter(void) const
-	// {
-	// 	return variableCounter;
-	// }	
-
-	// void incrementVariableCounter(void)
-	// {
-	// 	variableCounter++;
-	// }
-	
-	
-	
-	// bool isRedundant(PassId id)
-	// {
-	// 	for( int64_t sr = trace.size() - 1; sr >= 0; sr-- )
-	// 	{
-	// 		// AST has changed in another previous Pass 
-	// 		if( trace[ sr ].second != 0 ) return false;
-
-	// 		// this Pass was already perfomed!                     
-	// 		if( trace[ sr ].first == id )
-	// 		{
-	// 			return true;
-	// 		}
-	// 	}
-		
-	// 	return false;
-	// }
-	
-
-	// ast* getAST(void)
-	// {
-	// 	return rule->body;
-	// }
-
-	// void setAST(ast* oldnode, ast* newnode)
-	// {
-	// 	assert(getAST() == oldnode);
-		
-	// 	//AstUtility::dealloc(rule->body);
-		
-	// 	rule->body = newnode;
-		
-	// 	// but rule->body is only a copy, we need to modify the original AST as well
-	// 	// there are 2 variants possible
-			
-	// 	ast* element = rule->ast_position;
-
-	// 	while( element != NULL && element->right != oldnode )
-	// 	{
-	// 		element = element->right;
-	// 	}
-
-	// 	assert( element != NULL );
-                
-	// 	element->right = newnode;
-	// }
-	
-	// const char* getRuleName(void) const
-	// {
-	// 	return rule->name;
-	// }
-	
-	// irule* getIrule(void) const
-	// {
-	// 	return rule;
-	// }	
 	
 	template<class PassName>
 	void* getResult(void)
@@ -220,29 +95,19 @@ public:
 	{
 		changes[ &PassName::id ] = passChanges;
 		
-		//trace.push_back( PassIdUInt64Pair( &PassName::id, passChanges ) );
-		
 		if( passChanges > 0 )
 		{
-			//traceStream << "." << PassRegistry::getPassInfo( &PassName::id ).getPassArgument();
 		} 
 	}
 	
 	void setChanges(PassId id, uint64_t passChanges)
 	{
 		changes[ id ] = passChanges;
-		
-		//trace.push_back( PassIdUInt64Pair( id, passChanges ) );
 	}
-	
-	// string getTrace(void) const
-	// {
-	// 	return traceStream.str();
-	// }	
 	
 	friend ostream& operator<<(ostream& os, PassResult& pr)
 	{
-		return os; // << pr.getRuleName() << ": ";
+		return os;
 	}	
 };
 
