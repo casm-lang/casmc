@@ -29,9 +29,11 @@ INCLUDE += -I src/ir
 INCLUDE += -I obj
 INCLUDE += -I lib/casm-frontend/src
 INCLUDE += -I lib/casm-frontend/build/src
+INCLUDE += -I lib/casm-ir/src
 INCLUDE += -I lib/pass/src
-#INCLUDE += -I lib/stdhl/c
+
 INCLUDE += -I lib
+#INCLUDE += -I lib/stdhl/c
 
 LIBRARY += lib/casm-frontend/build/libfrontend.a
 LIBRARY += lib/stdhl/libstdhlc.a
