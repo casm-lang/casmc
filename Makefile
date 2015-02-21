@@ -10,7 +10,7 @@
 CPP=clang
 
 CPPFLAG += -std=c++11
-CPPFLAG += -g
+CPPFLAG += -g -O0
 CPPFLAG += -Wall
 #CPPFLAG += -Wextra
 
@@ -28,8 +28,8 @@ INCLUDE += -I src
 INCLUDE += -I obj
 INCLUDE += -I lib/casm-frontend/src
 INCLUDE += -I lib/casm-frontend/build/src
-INCLUDE += -I lib/stdhl/c
-INCLUDE += -I lib/stdhl/cpp
+#INCLUDE += -I lib/stdhl/c
+INCLUDE += -I lib
 
 LIBRARY += lib/casm-frontend/build/libfrontend.a
 LIBRARY += lib/stdhl/libstdhlc.a

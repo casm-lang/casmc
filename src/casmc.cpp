@@ -7,8 +7,8 @@
   file in the project root directory.
 */
 
-#include "Default.h"
-#include "Args.h"
+#include "stdhl/cpp/Default.h"
+#include "stdhl/cpp/Args.h"
 
 #include "Pass.h"
 #include "DataType.h"

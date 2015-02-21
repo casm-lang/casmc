@@ -7,40 +7,64 @@
   file in the project root directory.
 */
 
-#ifndef _DATATYPE_H_
-#define _DATATYPE_H_
+#ifndef _VALUE_H_
+#define _VALUE_H_
 
 #include "Type.h"
 
-class Pass;
-class PassInfo;
-
 /**
-   @file     DataType.h
-   @class    DataType
+   @file     Value.h
+   @class    Value
    
    @brief    TODO
    
    TODO
    
    @author   Philipp Paulweber
-   @date     2015-02-14
+   @date     2015-02-20
 */
 
-typedef Pass* (*PassConstructor)();
-typedef void* PassId;
-typedef void* Ptr;
+namespace libcasm_ir
+{
 
-typedef unordered_map< PassId, PassInfo* > PassId2PassInfo;
-typedef unordered_map< PassId, void* > PassId2Ptr;
-typedef unordered_map< PassId, u64 > PassId2u64;
-
-namespace pp {
-class DataType  
+class Value  
 {
 public:
+	enum ValueId
+	{ RULE_VID = 0
+	, SCOPE_VID
+	, BASIC_BLOCK_VID
+	, STATEMENT_VID
+	, INSTRUCTION_VID
+	, CONSTANT_INT_VID
+	  // TODO: PPA: extend here!
+	};
 	
+private:
+	ValueId value_id;
+	Type* type;
 	
+public:
+	
+	Value( ValueId value_id )
+	: value_id( value_id )
+	{
+	}
+	
+    Type* getType( void ) const
+	{
+		return type;
+	}
+	
+	u8 getValueId( void ) const
+	{
+		return value_id;
+	}
+	
+	void dump() const
+	{
+		// GDB dbg function
+	}
 	
     /**
 	   @brief    TODO
@@ -51,10 +75,11 @@ public:
 	   @return   TODO
 	   @retval   TODO
 	*/
+};
 
 };
-}
-#endif /* _DATATYPE_H_ */
+
+#endif /* _VALUE_H_ */
 
 
 /*

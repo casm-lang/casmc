@@ -36,7 +36,11 @@ bool AstToCasmIRPass::run( PassResult& pr )
 	// TODO: PPA: implement the IR translation!!!
 	
 	casm_frontend_destroy();
+
+	libcasm_ir::Value v;
 	
+	assert( 0 );
+
 	//return true;
 	return false;
 }

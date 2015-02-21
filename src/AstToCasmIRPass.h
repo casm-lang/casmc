@@ -14,6 +14,8 @@
 #include "Pass.h"
 #include "TypeCheckPass.h"
 
+#include "Value.h"
+
 /**
    @file     AstToCasmIRPass.h
    @class    AstToCasmIRPass
