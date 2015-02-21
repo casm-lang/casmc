@@ -43,7 +43,7 @@ namespace libcasm_ir
 		bool methodStub(bool arg0)
 		{ return false; };
 	};
-};
+}
 
 #endif /* _LIB_CASMIR_TYPE_H_ */
 

@@ -11,7 +11,6 @@
 #include "stdhl/cpp/Args.h"
 
 #include "Pass.h"
-#include "pass/Type.h"
 
 #include "AstDumpPass.h"
 #include "AstToCasmIRPass.h"

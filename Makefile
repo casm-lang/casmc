@@ -26,10 +26,10 @@ OBJECTS += obj/AstToCasmIRPass.o
 
 INCLUDE += -I src
 INCLUDE += -I src/ir
-INCLUDE += -I src/pass
 INCLUDE += -I obj
 INCLUDE += -I lib/casm-frontend/src
 INCLUDE += -I lib/casm-frontend/build/src
+INCLUDE += -I lib/pass/src
 #INCLUDE += -I lib/stdhl/c
 INCLUDE += -I lib
 
@@ -43,9 +43,7 @@ default: obj $(TARGET)
 
 .PHONY: obj/version.h
 
-all:
-	$(MAKE) clean
-	$(MAKE)
+all: clean default
 
 obj:
 	mkdir -p obj

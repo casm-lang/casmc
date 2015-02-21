@@ -74,7 +74,7 @@ namespace libcasm_ir
 		   @retval   TODO
 		*/
 	};	
-};
+}
 
 #endif /* _LIB_CASMIR_VALUE_H_ */
 
