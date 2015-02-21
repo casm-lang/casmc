@@ -25,6 +25,8 @@ OBJECTS += obj/AstDumpPass.o
 OBJECTS += obj/AstToCasmIRPass.o
 
 INCLUDE += -I src
+INCLUDE += -I src/ir
+INCLUDE += -I src/pass
 INCLUDE += -I obj
 INCLUDE += -I lib/casm-frontend/src
 INCLUDE += -I lib/casm-frontend/build/src

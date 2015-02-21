@@ -2,15 +2,15 @@
 /*
   Copyright (C) 2015 Philipp Paulweber
   
-  This file is part of the 'casmc' project which is released under a NSCA
+  This file is part of the 'libpass' project which is released under a NSCA
   open source software license. For more information, see the LICENSE.txt
   file in the project root directory.
 */
 
-#ifndef _PASSRESULT_H_
-#define _PASSRESULT_H_
+#ifndef _LIB_PASS_PASSRESULT_H_
+#define _LIB_PASS_PASSRESULT_H_
 
-#include "DataType.h"
+#include "Type.h"
 
 /**
    @file     PassResult.h
@@ -24,94 +24,97 @@
    @date     2015-02-14
 */
 
-class PassResult  
+namespace libpass
 {
-private:
-	
-	PassId2Ptr results;
-	
-	PassId2u64 changes;
-	
-public:
-    PassResult()
+	class PassResult  
 	{
-	}
+	private:
 	
-	~PassResult()
-	{
-		results.clear();
-		changes.clear();
-	}
+		PassId2Ptr results;
 	
-    /**
-	   @brief    TODO
-
-	   TODO
-	   
-	   @param    arg0    TODO
-	   @return   TODO
-	   @retval   TODO
-	*/
+		PassId2u64 changes;
 	
-	template<class PassName>
-	void* getResult(void)
-	{
-		//DEBUG( __FUNCTION__ << ": " << &PassName::id << " = " << results[ &PassName::id ] 
-		//<< "\n" );
-		
-		return results[ &PassName::id ];
-	}
-	
-	template<class PassName>
-	void setResult(void* passResult)
-	{
-		//DEBUG( __FUNCTION__ << ": " << &PassName::id << " = " << passResult << "\n" );
-		
-		results[ &PassName::id ] = passResult;
-	}
-	
-	PassId2Ptr& getResults(void)
-	{
-		return results;
-	}
-	
-	void printAllResults(void)
-	{
-		// DEBUG( __FUNCTION__ << ": " << results.size() << "\n" );
-		
-		// for( auto& r : results )
-		// {
-		// 	DEBUG( __FUNCTION__ << ": " << r.first << " = " << r.second << "\n" );
-		// }
-	}
-	
-	uint64_t getChanges(PassId id)
-	{
-		return changes[ id ];
-	}
-	
-	template<class PassName>
-	void setChanges(uint64_t passChanges)
-	{
-		changes[ &PassName::id ] = passChanges;
-		
-		if( passChanges > 0 )
+	public:
+		PassResult()
 		{
-		} 
-	}
+		}
 	
-	void setChanges(PassId id, uint64_t passChanges)
-	{
-		changes[ id ] = passChanges;
-	}
+		~PassResult()
+		{
+			results.clear();
+			changes.clear();
+		}
 	
-	friend ostream& operator<<(ostream& os, PassResult& pr)
-	{
-		return os;
-	}	
+		/**
+		   @brief    TODO
+
+		   TODO
+	   
+		   @param    arg0    TODO
+		   @return   TODO
+		   @retval   TODO
+		*/
+	
+		template<class PassName>
+		void* getResult(void)
+		{
+			//DEBUG( __FUNCTION__ << ": " << &PassName::id << " = " << results[ &PassName::id ] 
+			//<< "\n" );
+		
+			return results[ &PassName::id ];
+		}
+	
+		template<class PassName>
+		void setResult(void* passResult)
+		{
+			//DEBUG( __FUNCTION__ << ": " << &PassName::id << " = " << passResult << "\n" );
+		
+			results[ &PassName::id ] = passResult;
+		}
+	
+		PassId2Ptr& getResults(void)
+		{
+			return results;
+		}
+	
+		void printAllResults(void)
+		{
+			// DEBUG( __FUNCTION__ << ": " << results.size() << "\n" );
+		
+			// for( auto& r : results )
+			// {
+			// 	DEBUG( __FUNCTION__ << ": " << r.first << " = " << r.second << "\n" );
+			// }
+		}
+	
+		uint64_t getChanges(PassId id)
+		{
+			return changes[ id ];
+		}
+	
+		template<class PassName>
+		void setChanges(uint64_t passChanges)
+		{
+			changes[ &PassName::id ] = passChanges;
+		
+			if( passChanges > 0 )
+			{
+			} 
+		}
+	
+		void setChanges(PassId id, uint64_t passChanges)
+		{
+			changes[ id ] = passChanges;
+		}
+	
+		friend ostream& operator<<(ostream& os, PassResult& pr)
+		{
+			return os;
+		}	
+	};
 };
 
-#endif /* _PASSRESULT_H_ */
+#endif /* _LIB_PASS_PASSRESULT_H_ */
 
 
 /*

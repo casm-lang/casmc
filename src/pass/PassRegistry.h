@@ -2,15 +2,15 @@
 /*
   Copyright (C) 2015 Philipp Paulweber
   
-  This file is part of the 'casmc' project which is released under a NSCA
+  This file is part of the 'libpass' project which is released under a NSCA
   open source software license. For more information, see the LICENSE.txt
   file in the project root directory.
 */
 
-#ifndef _PASSREGISTRY_H_
-#define _PASSREGISTRY_H_
+#ifndef _LIB_PASS_PASSREGISTRY_H_
+#define _LIB_PASS_PASSREGISTRY_H_
 
-#include "DataType.h"
+#include "Type.h"
 
 #include "PassInfo.h"
 
@@ -26,82 +26,84 @@
    @date     2015-02-14
 */
 
-class PassRegistry  
+namespace libpass
 {
-private:
-	static PassId2PassInfo& registeredPasses(void)
+	class PassRegistry  
 	{
-		static PassId2PassInfo passes;
-		return passes;
-	}
+	private:
+		static PassId2PassInfo& registeredPasses(void)
+		{
+			static PassId2PassInfo passes;
+			return passes;
+		}
 	
-public:
-    PassRegistry()
-    {
-		assert(0 && "PassRegistry class is a static-only non-object class!");
-    }
+	public:
+		PassRegistry()
+		{
+			assert(0 && "PassRegistry class is a static-only non-object class!");
+		}
 	
-    /**
-	   @brief    TODO
+		/**
+		   @brief    TODO
 
-	   TODO
+		   TODO
 	   
-	   @param    arg0    TODO
-	   @return   TODO
-	   @retval   TODO
-	*/
+		   @param    arg0    TODO
+		   @return   TODO
+		   @retval   TODO
+		*/
 	
-	static void registerPass(PassInfo* passInfo)
-	{
-		assert( passInfo != 0 && "invalid pass info object pointer" );
-		registeredPasses()[ passInfo->getPassId() ] = passInfo;
+		static void registerPass(PassInfo* passInfo)
+		{
+			assert( passInfo != 0 && "invalid pass info object pointer" );
+			registeredPasses()[ passInfo->getPassId() ] = passInfo;
 	
-		// TODO: add checks for redundant argument names etc.
-	}
+			// TODO: add checks for redundant argument names etc.
+		}
 	
-	static PassId2PassInfo& getRegisteredPasses(void)
-	{
-		return registeredPasses();
-	}
+		static PassId2PassInfo& getRegisteredPasses(void)
+		{
+			return registeredPasses();
+		}
 	
-	static PassInfo& getPassInfo( PassId id )
-	{
-		PassInfo* pi  = static_cast<PassInfo*>( getRegisteredPasses()[ id ] );
+		static PassInfo& getPassInfo( PassId id )
+		{
+			PassInfo* pi  = static_cast< PassInfo* >( getRegisteredPasses()[ id ] );
 		
-		assert( pi != 0 && "invalid pass info object" );
+			assert( pi != 0 && "invalid pass info object" );
 		
-		return *pi;
+			return *pi;
+		}
+	};
+
+	template<class PassName>
+	Pass* defaultConstructor()
+	{
+		return new PassName();
 	}
+
+	template<class PassName>
+	class PassRegistration : public PassInfo
+	{
+	public:
+		PassRegistration(const char* passName,
+						 const char* passDescription,
+						 const char* passArgStr,
+						 const char  passArgChar
+			)
+			: PassInfo( passName,
+						passDescription,
+						passArgStr,
+						passArgChar,
+						&PassName::id,
+						PassConstructor( defaultConstructor<PassName>) ) 
+		{
+			PassRegistry::registerPass(this);
+		}
+	};
 };
 
-template<class PassName>
-Pass* defaultConstructor()
-{
-	return new PassName();
-}
-
-template<class PassName>
-class PassRegistration : public PassInfo
-{
-public:
-	PassRegistration(const char* passName,
-					 const char* passDescription,
-					 const char* passArgStr,
-					 const char  passArgChar
-					 )
-		: PassInfo( passName,
-				    passDescription,
-				    passArgStr,
-				    passArgChar,
-				    &PassName::id,
-				    PassConstructor( defaultConstructor<PassName>) ) 
-	{
-		PassRegistry::registerPass(this);
-	}
-};
-
-
-#endif /* _PASSREGISTRY_H_ */
+#endif /* _LIB_PASS_PASSREGISTRY_H_ */
 
 
 /*

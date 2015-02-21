@@ -25,7 +25,7 @@
    @date     2015-02-16
 */
 
-class SourceToAstPass : public Pass
+class SourceToAstPass : public libpass::Pass
 {
 public:
 	static char id;
@@ -40,7 +40,7 @@ public:
 	   @retval   TODO
 	*/
 	
-	virtual bool run( PassResult& pr );
+	virtual bool run( libpass::PassResult& pr );
 };
 
 #endif /* _SOURCETOASTPASS_H_ */

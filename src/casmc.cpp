@@ -11,7 +11,7 @@
 #include "stdhl/cpp/Args.h"
 
 #include "Pass.h"
-#include "DataType.h"
+#include "pass/Type.h"
 
 #include "AstDumpPass.h"
 #include "AstToCasmIRPass.h"
@@ -76,10 +76,10 @@ int main( int argc, const char *argv[] )
 		exit( 0 );
 	});
 	
-	for( auto& p : PassRegistry::getRegisteredPasses() )
+	for( auto& p : libpass::PassRegistry::getRegisteredPasses() )
 	{
 		//PassId    id = p.first;
-		PassInfo& pi = *p.second;
+		libpass::PassInfo& pi = *p.second;
 		
 		if( pi.getPassArgChar() == 0 && pi.getPassArgString() == 0 )
 		{
@@ -106,7 +106,7 @@ int main( int argc, const char *argv[] )
 		options.error( 1, "no input file provided" );
 	}
 	
-	PassResult x;
+	libpass::PassResult x;
 	x.getResults()[ 0 ] = (void*)file_name;
 	
 	SourceToAstPass a;

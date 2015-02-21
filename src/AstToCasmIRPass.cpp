@@ -17,7 +17,7 @@
 
 char AstToCasmIRPass::id = 0;
 
-static PassRegistration< AstToCasmIRPass > PASS
+static libpass::PassRegistration< AstToCasmIRPass > PASS
 ( "AST to CASM IR"
 , "internal: translates the AST to the CASM intermeditate representation"
 , 0
@@ -25,7 +25,7 @@ static PassRegistration< AstToCasmIRPass > PASS
 );
 
 
-bool AstToCasmIRPass::run( PassResult& pr )
+bool AstToCasmIRPass::run( libpass::PassResult& pr )
 {
 	AstNode* node = (AstNode*)pr.getResult< TypeCheckPass >();
 	
@@ -37,7 +37,7 @@ bool AstToCasmIRPass::run( PassResult& pr )
 	
 	casm_frontend_destroy();
 
-	libcasm_ir::Value v;
+	libcasm_ir::Value v( libcasm_ir::Value::RULE_VID );
 	
 	assert( 0 );
 

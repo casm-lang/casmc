@@ -27,7 +27,7 @@
    @date     2015-02-16
 */
 
-class TypeCheckPass : public Pass
+class TypeCheckPass : public libpass::Pass
 {
 public:
 	static char id;
@@ -42,7 +42,7 @@ public:
 	   @retval   TODO
 	*/
 
-	virtual bool run( PassResult& pr );
+	virtual bool run( libpass::PassResult& pr );
 };
 
 #endif /* _TYPECHECKPASS_H_ */

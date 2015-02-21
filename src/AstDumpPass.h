@@ -26,7 +26,7 @@
    @date     2015-02-16
 */
 
-class AstDumpPass : public Pass, AstDumpVisitor
+class AstDumpPass : public libpass::Pass, AstDumpVisitor
 {
 public:
 	static char id;
@@ -41,7 +41,7 @@ public:
 	   @retval   TODO
 	*/
 
-    virtual bool run(PassResult& pr);
+    virtual bool run( libpass::PassResult& pr );
 };
 
 #endif /* _ASTDUMPPASS_H_ */

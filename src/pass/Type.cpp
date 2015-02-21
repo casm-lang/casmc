@@ -2,15 +2,15 @@
 /*
   Copyright (C) 2015 Philipp Paulweber
   
-  This file is part of the 'casmc' project which is released under a NSCA
+  This file is part of the 'libpass' project which is released under a NSCA
   open source software license. For more information, see the LICENSE.txt
   file in the project root directory.
 */
 
-#include "DataType.h"
+#include "Type.h"
 
 /**
-   @file     DataType.cpp
+   @file     Type.cpp
    @author   Philipp Paulweber
    @date     2015-02-14
 */

@@ -7,20 +7,14 @@
   file in the project root directory.
 */
 
-#ifndef _LIB_PASS_PASS_H_
-#define _LIB_PASS_PASS_H_
+#ifndef _LIB_PASS_TYPE_H_
+#define _LIB_PASS_TYPE_H_
 
-#include "PassInfo.h"
-#include "PassUsage.h"
-#include "PassResult.h"
-#include "PassRegistry.h"
-
-class PassUsage;
-class PassResult;
+#include "stdhl/cpp/Type.h"
 
 /**
-   @file     Pass.h
-   @class    Pass
+   @file     Type.h
+   @class    Type
    
    @brief    TODO
    
@@ -30,47 +24,39 @@ class PassResult;
    @date     2015-02-14
 */
 
-namespace libpass
+namespace libpass 
 {
-	class Pass  
+	class Pass;
+	class PassInfo;
+	
+	typedef Pass* (*PassConstructor)();
+	typedef void* PassId;
+	typedef void* Ptr;
+	
+	typedef unordered_map< libpass::PassId, PassInfo* > PassId2PassInfo;
+	typedef unordered_map< libpass::PassId, void* > PassId2Ptr;
+	typedef unordered_map< libpass::PassId, u64 > PassId2u64;
+
+	class Type  
 	{
 	public:
+		
+	
+		
 		/**
 		   @brief    TODO
-
+		   
 		   TODO
-	   
+		   
 		   @param    arg0    TODO
 		   @return   TODO
 		   @retval   TODO
 		*/
-	
-		virtual void usage(PassUsage& pu)
-		{
-		}
-	
-		virtual void initialize(void)
-		{
-		}
-	
-		virtual bool run(PassResult& pr) = 0;
-	
-		virtual bool verify(void)
-		{
-			return true;
-		}
-	
-		virtual void finalize(void)
-		{
-		}	
-	
-		virtual void dealloc(void* result)
-		{
-		}	
+		
 	};
 };
 
-#endif /* _LIB_PASS_PASS_H_ */
+#endif /* _DATATYPE_H_ */
 
 
 /*

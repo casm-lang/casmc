@@ -2,7 +2,7 @@
 /*
   Copyright (C) 2015 Philipp Paulweber
   
-  This file is part of the 'casmc' project which is released under a NSCA
+  This file is part of the 'libcasm-ir' project which is released under a NSCA
   open source software license. For more information, see the LICENSE.txt
   file in the project root directory.
 */

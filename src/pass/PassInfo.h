@@ -2,15 +2,15 @@
 /*
   Copyright (C) 2015 Philipp Paulweber
   
-  This file is part of the 'casmc' project which is released under a NSCA
+  This file is part of the 'libpass' project which is released under a NSCA
   open source software license. For more information, see the LICENSE.txt
   file in the project root directory.
 */
 
-#ifndef _PASSINFO_H_
-#define _PASSINFO_H_
+#ifndef _LIB_PASS_PASSINFO_H_
+#define _LIB_PASS_PASSINFO_H_
 
-#include "DataType.h"
+#include "Type.h"
 
 /**
    @file     PassInfo.h
@@ -24,96 +24,102 @@
    @date     2015-02-14
 */
 
-class PassInfo
+namespace libpass
 {
-private:
-	const char* const name;
-	const char* const description;
-	const char* const arg_str;
-	const char        arg_char;
+	class PassInfo
+	{
+	private:
+		const char* const name;
+		const char* const description;
+		const char* const arg_str;
+		const char        arg_char;
 	
-	const PassId  id;
+		const PassId  id;
 	
-	PassConstructor constructor;
+		PassConstructor constructor;
 	
-	uint64_t changes;
+		uint64_t changes;
 
-public:
-    PassInfo(const char* passName, 
-			 const char* passDescription, 
-			 const char* passArgStr, 
-			 const char  passArgChar, 
-			 const PassId passID, 
-			 PassConstructor passConstructor)
-		: name(passName),
-		  description(passDescription),
-		  arg_str(passArgStr),
-		  arg_char(passArgChar),
-		  id(passID),
-		  constructor(passConstructor)
-	{}
-	
-	/**
-	   @brief    TODO
+	public:
+		PassInfo
+		( const char* passName
+		, const char* passDescription
+		, const char* passArgStr
+		, const char  passArgChar
+		, const PassId passID
+		, PassConstructor passConstructor
+		)
+		: name( passName )
+		, description( passDescription )
+		, arg_str( passArgStr )
+		, arg_char( passArgChar )
+		, id( passID )
+		, constructor( passConstructor )
+		{
+		}
+		
+		/**
+		   @brief    TODO
 
-	   TODO
+		   TODO
 	   
-	   @param    arg0    TODO
-	   @return   TODO
-	   @retval   TODO
-	*/
-	const char* getPassName(void) const 
-	{ 
-		return name; 
-	}
+		   @param    arg0    TODO
+		   @return   TODO
+		   @retval   TODO
+		*/
+		const char* getPassName(void) const 
+		{ 
+			return name; 
+		}
 	
-	const char* getPassDescription(void) const 
-	{ 
-		return description; 
-	}
+		const char* getPassDescription(void) const 
+		{ 
+			return description; 
+		}
 	
-	const char* getPassArgString(void) const 
-	{ 
-		return arg_str; 
-	}
+		const char* getPassArgString(void) const 
+		{ 
+			return arg_str; 
+		}
 	
-	const char getPassArgChar(void) const 
-	{ 
-		return arg_char; 
-	}
+		const char getPassArgChar(void) const 
+		{ 
+			return arg_char; 
+		}
 	
-	const PassId getPassId(void) const
-	{
-		return id;
-	}
+		const PassId getPassId(void) const
+		{
+			return id;
+		}
 
-	bool isPassID(const PassId passID) const
-	{
-		return passID == id;
-	}
+		bool isPassID(const PassId passID) const
+		{
+			return passID == id;
+		}
 	
-	void addChanges(uint64_t change)
-	{
-		changes += change;
-	}
+		void addChanges(uint64_t change)
+		{
+			changes += change;
+		}
 	
-	uint64_t getChanges(void)
-	{
-		return changes;
-	}
+		uint64_t getChanges(void)
+		{
+			return changes;
+		}
 	
-	Pass* constructPass(void) const
-	{
-		return constructor();
-	}
+		Pass* constructPass(void) const
+		{
+			return constructor();
+		}
 	
-	friend ostream& operator<<(ostream& os, PassInfo& pi)
-	{
-		return os; // << pi.getPassName() << ": ";
-	}
+		friend ostream& operator<<(ostream& os, PassInfo& pi)
+		{
+			return os; // << pi.getPassName() << ": ";
+		}
+	};
 };
 
-#endif /* _PASSINFO_H_ */
+#endif /* _LIB_PASS_PASSINFO_H_ */
 
 
 /*

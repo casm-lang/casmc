@@ -17,14 +17,14 @@
 
 char AstDumpPass::id = 0;
 
-static PassRegistration< AstDumpPass > PASS
+static libpass::PassRegistration< AstDumpPass > PASS
 ( "AST Dumping Pass"
 , "generates a DOT graph of the AST"
 , "ast-dump"
 , 0
 );
 
-bool AstDumpPass::run( PassResult& pr )
+bool AstDumpPass::run( libpass::PassResult& pr )
 {
 	AstNode* node = (AstNode*)pr.getResult< TypeCheckPass >();
 	

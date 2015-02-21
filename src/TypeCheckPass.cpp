@@ -17,14 +17,14 @@
 
 char TypeCheckPass::id = 0;
 
-static PassRegistration< TypeCheckPass > PASS
+static libpass::PassRegistration< TypeCheckPass > PASS
 ( "Type Check Pass"
 , "type check the AST and translate it to a typed AST"
 , 0
 , 'T'
 );
 
-bool TypeCheckPass::run( PassResult& pr )
+bool TypeCheckPass::run( libpass::PassResult& pr )
 {
 	AstNode* node = (AstNode*)pr.getResult< SourceToAstPass >();
 	

@@ -30,7 +30,7 @@
 
 #define T bool
 
-class AstToCasmIRPass : public Pass, AstInterface< bool >
+class AstToCasmIRPass : public libpass::Pass, AstInterface< bool >
 {
 public:
 	static char id;
@@ -45,7 +45,7 @@ public:
 	   @retval   TODO
 	*/
 	
-	virtual bool run( PassResult& pr );
+	virtual bool run( libpass::PassResult& pr );
 	
 	void visit_init( UnaryNode* node );
 	void visit_specification( AstNode* node );	

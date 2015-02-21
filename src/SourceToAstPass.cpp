@@ -17,14 +17,14 @@
 
 char SourceToAstPass::id = 0;
 
-static PassRegistration< SourceToAstPass > PASS
+static libpass::PassRegistration< SourceToAstPass > PASS
 ( "Source To AST Pass"
 , "parse the source code and generate an AST"
 , 0
 , 'P'
 );
 
-bool SourceToAstPass::run( PassResult& pr )
+bool SourceToAstPass::run( libpass::PassResult& pr )
 {
 	const char* file_name = (const char*)pr.getResults()[ 0 ];
 	
