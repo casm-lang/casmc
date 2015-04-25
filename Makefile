@@ -1,11 +1,37 @@
+#   
+#   Copyright (c) 2015 Philipp Paulweber
+#   All rights reserved.
+#   
+#   Developed by: Philipp Paulweber
+#                 https://github.com/ppaulweber/casmc
+#   
+#   Permission is hereby granted, free of charge, to any person obtaining a 
+#   copy of this software and associated documentation files (the "Software"), 
+#   to deal with the Software without restriction, including without limitation 
+#   the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+#   and/or sell copies of the Software, and to permit persons to whom the 
+#   Software is furnished to do so, subject to the following conditions:
+#   
+#   * Redistributions of source code must retain the above copyright 
+#     notice, this list of conditions and the following disclaimers.
+#   
+#   * Redistributions in binary form must reproduce the above copyright 
+#     notice, this list of conditions and the following disclaimers in the 
+#     documentation and/or other materials provided with the distribution.
+#   
+#   * Neither the names of the copyright holders, nor the names of its 
+#     contributors may be used to endorse or promote products derived from 
+#     this Software without specific prior written permission.
+#   
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+#   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+#   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+#   CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+#   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+#   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+#   WITH THE SOFTWARE.
+#   
 
-#
-# Copyright (c) 2015 Philipp Paulweber
-# 
-# This file is part of the 'casmc' project which is released under a NCSA
-# open source software license. For more information, see the LICENSE.txt 
-# file in the project root directory.
-#
 
 CPP=clang
 
@@ -38,17 +64,20 @@ INCLUDE += -I lib
 LIBRARY += lib/casm-frontend/build/libfrontend.a
 LIBRARY += lib/stdhl/libstdhlc.a
 LIBRARY += lib/stdhl/libstdhlcpp.a
+LIBRARY += lib/casm-ir/libcasm-ir.a
 
-default: obj $(TARGET)
-#	$(CC) $(CF) $(CI) -c src/casmc.cpp -o obj/casmc.o
-#	$(CC) $(CF) -o casmc obj/casmc.o lib/casm-frontend/build/libfrontend.a -lstdc++
 
 .PHONY: obj/version.h
+
+
+default: $(TARGET)
+
 
 all: clean default
 
 obj:
-	mkdir -p obj
+	@echo "MKD " obj
+	@mkdir -p obj
 
 obj/%.o: src/%.cpp
 	@echo "CPP " $<
@@ -64,7 +93,10 @@ lib/casm-frontend/build/libfrontend.a: lib/casm-frontend
 lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
 	@cd $<; $(MAKE)
 
-obj/version.h:
+lib/casm-ir/libcasm-ir.a: lib/casm-ir
+	@cd $<; $(MAKE)
+
+obj/version.h: obj
 	@echo "GEN " $@ 
 	@echo "#define VERSION \""`git describe --always --tags --dirty`"\"" > $@
 
@@ -73,10 +105,20 @@ $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
 	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++
 
 clean:
-	@echo "RM  " obj
+	@echo "RMD " obj
 	@rm -rf obj
-	@echo "RM " casmc
+	@echo "RM  " casmc
 	@rm -f casmc
 
 stub:
 	PROJECT=casmc LICENSE=NSCA ./lib/stub/stub.sh cpp $(ARG) src
+
+
+
+status:
+	git status
+
+	for i in lib/*; do (echo; echo $$i; cd $$i; git status); done 
+
+
+

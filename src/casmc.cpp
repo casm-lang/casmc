@@ -1,11 +1,36 @@
-
-/*
-  Copyright (c) 2015 Philipp Paulweber
-  
-  This file is part of the 'casmc' project which is released under a NCSA
-  open source software license. For more information, see the LICENSE.txt 
-  file in the project root directory.
-*/
+//  
+//  Copyright (c) 2015 Philipp Paulweber
+//  All rights reserved.
+//  
+//  Developed by: Philipp Paulweber
+//                https://github.com/ppaulweber/casmc
+//  
+//  Permission is hereby granted, free of charge, to any person obtaining a 
+//  copy of this software and associated documentation files (the "Software"), 
+//  to deal with the Software without restriction, including without limitation 
+//  the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+//  and/or sell copies of the Software, and to permit persons to whom the 
+//  Software is furnished to do so, subject to the following conditions:
+//  
+//  * Redistributions of source code must retain the above copyright 
+//    notice, this list of conditions and the following disclaimers.
+//  
+//  * Redistributions in binary form must reproduce the above copyright 
+//    notice, this list of conditions and the following disclaimers in the 
+//    documentation and/or other materials provided with the distribution.
+//  
+//  * Neither the names of the copyright holders, nor the names of its 
+//    contributors may be used to endorse or promote products derived from 
+//    this Software without specific prior written permission.
+//  
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+//  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+//  CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+//  WITH THE SOFTWARE.
+//  
 
 #include "stdhl/cpp/Default.h"
 #include "stdhl/cpp/Args.h"
@@ -21,7 +46,7 @@
     @brief TODO
 
     TODO
-
+	
     @author   Philipp Paulweber
     @date     2015-01-27
 */
@@ -29,8 +54,10 @@
 int main( int argc, const char *argv[] )
 {
 	const char* file_name = 0;
-	
-	Args options( argc, argv, Args::ALTERNATE, [&file_name,&options]( const char* arg ) 
+	const char* output_name = 0;
+
+	Args options( argc, argv, Args::DEFAULT
+	, [&file_name,&options]( const char* arg ) 
 	{
 		static int cnt = 0;
 		cnt++;
@@ -43,12 +70,27 @@ int main( int argc, const char *argv[] )
 		file_name = arg;
 	});
 	
+	options.add( 'o', 0, Args::REQUIRED, "Place the output into <file>"
+	, [&options,&output_name]( const char* option )
+	{
+		static int cnt = 0;
+		cnt++;
+		
+		if( cnt > 1 )
+		{
+			options.error( 1, "to many output names passed" );
+		}
+		
+		output_name = option;
+	}
+	, "file");
+	
 	options.add
 	( 'h', "help", Args::NONE, "Display the program usage and synoptis"
 	, [&options]( const char* option )
 	{
 		fprintf( stderr
-		, "Corithian Abstract State Machine (CASM) Compiler\n"
+		, "Corinthian Abstract State Machine (CASM) Compiler\n"
 		  "\n"
 		  "usage: %s [options] <file>\n"
 		  "\n"
@@ -61,7 +103,7 @@ int main( int argc, const char *argv[] )
 		exit( 0 );
 	});
 	
-	options.add( 'v', "-version", Args::NONE, "Display compiler version information"
+	options.add( 'v', "version", Args::NONE, "Display compiler version information"
 	, [&options]( const char* option )
 	{
 		fprintf( stderr
@@ -107,6 +149,7 @@ int main( int argc, const char *argv[] )
 	
 	libpass::PassResult x;
 	x.getResults()[ 0 ] = (void*)file_name;
+	x.getResults()[ (void*)1 ] = (void*)output_name;
 	
 	SourceToAstPass a;
 	TypeCheckPass b;
@@ -155,12 +198,12 @@ int main( int argc, const char *argv[] )
 	// system( cmd.c_str() );
 	
 
-/*
-  Local variables:
-  mode: c++
-  indent-tabs-mode: t
-  c-basic-offset: 4
-  tab-width: 4
-  End:
-  vim:noexpandtab:sw=4:ts=4:
-*/
+//  
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: t
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//  
