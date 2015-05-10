@@ -117,8 +117,9 @@ stub:
 
 status:
 	git status
-
-	for i in lib/*; do (echo; echo $$i; cd $$i; git status); done 
-
-
-
+	@for i in lib/*; do ( \
+		echo "===----------------------------------------------------==="; \
+		echo $$i; \
+		cd $$i; \
+		git status ); \
+	done 

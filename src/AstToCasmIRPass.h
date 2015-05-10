@@ -71,7 +71,11 @@ public:
 	*/
 	
 	virtual bool run( libpass::PassResult& pr );
+
+private:
+	u1 valid;
 	
+public:
 	void visit_init( UnaryNode* node );
 	void visit_specification( AstNode* node );	
 	void visit_body_elements( AstNode* node );

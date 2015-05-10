@@ -2,16 +2,35 @@ CASM foo
 
 function x : Int -> Int
 
+derived mai = "asdf"
+derived mac = x(0) + 10
+derived mas( a ) = x(a) + 10
+
+rule recursion =
+{
+    call recursion
+}
+
 rule bla =
 {
     x( 10 ) := 20
+    x( 20 ) := 10
+    program( self ) := @baz
 }
 
 init bla
 
-function y : Int -> Int
+function y : Int * Int -> Int
 
 rule baz =
 {
-    y( 20 ) := 30
+    call bla
+    print mac
+    y( 20, 40 ) := 30
+    program( self ) := undef
+}
+
+rule calc( me ) =
+{
+    print me + me
 }

@@ -49,86 +49,133 @@ static libpass::PassRegistration< AstToCasmIRPass > PASS
 , 0
 );
 
+extern Driver* global_driver;
 
 bool AstToCasmIRPass::run( libpass::PassResult& pr )
 {
 	AstNode* node = (AstNode*)pr.getResult< TypeCheckPass >();
 	
 	AstWalker< AstToCasmIRPass, bool > walker( *this );
-	
+
+	walker.suppress_calls = true;
 	walker.walk_specification( node );
 	
 	// TODO: PPA: implement the IR translation!!!
 	
 	casm_frontend_destroy();
-
-	libcasm_ir::Value v( libcasm_ir::Value::RULE_VID );
 	
+	//libcasm_ir::Value v( libcasm_ir::Value::RULE_VID );
+	libcasm_ir::Value v( "dummy!" );
+    
 	assert( 0 );
 
 	//return true;
 	return false;
 }
 
-
-// void AstToCasmIRPass::visit_init( UnaryNode* node )
-// {
-	
-// }
-
-// bool AstToCasmIRPass::visit_int_atom( IntAtom* node )
-// { 
-// 	printf( "%p\n", node ); 
-// 	return 0; 
-// }
-
-
-#define VISIT printf( "%s:%i: %s: %p: %s\n", \
+#define VISIT printf( "===--- %s:%i: %s: %p: %s\n", \
 __FILE__, __LINE__, __FUNCTION__, node, node->to_str().c_str() )
 
 
-void AstToCasmIRPass::visit_init( UnaryNode* node )
-{ VISIT;
-}
-	
 void AstToCasmIRPass::visit_specification( AstNode* node )
-{ VISIT;
+{
+	VISIT;
+
+	printf( "CASM specification\n" );
 }
-	
+
+void AstToCasmIRPass::visit_init( UnaryNode* node )
+{
+	VISIT;
+	printf( "init %s\n", global_driver->init_name.c_str() );
+}
+
 void AstToCasmIRPass::visit_body_elements( AstNode* node )
 { VISIT;
 }
+
+void AstToCasmIRPass::visit_function_def
+( FunctionDefNode* node
+, const std::vector<std::pair<T, T>>& inits
+)
+{
+	VISIT;
+
+	string x;
+	for( auto& a : node->sym->arguments_ )
+	{
+		x.append( a->to_str() );
+	}
 	
-void AstToCasmIRPass::visit_function_def( FunctionDefNode* node, const std::vector<std::pair<T, T>>& inits )
-{ VISIT;
+	printf( "%s, %lu: %s -> %s, \n"
+			, node->sym->name.c_str()
+			, node->sym->id
+			, x.c_str()
+			, node->sym->return_type_->to_str().c_str()
+		);
 }
 
 void AstToCasmIRPass::visit_derived_function_atom_pre( FunctionAtom* node, T args[], uint16_t argc )
-{ VISIT;
+{
+	VISIT;
+	string x;
+	printf( "%s, %s\n"
+			, node->name.c_str()
+		    , x.c_str()
+	    );
 }
     
 void AstToCasmIRPass::visit_derived_def_pre( FunctionDefNode* node )
-{ VISIT;
+{
+	VISIT;
+
+	string x;
+	for( auto& a : node->sym->arguments_ )
+	{
+		x.append( a->to_str() );
+	}
+	
+	printf( "%s, %lu: %s -> %s, \n"
+			, node->sym->name.c_str()
+			, node->sym->id
+			, x.c_str()
+			, node->sym->return_type_->to_str().c_str()
+		);
 }
 	
 void AstToCasmIRPass::visit_derived_def( FunctionDefNode* node, T expr )
-{ VISIT;
+{
 }
 	
 void AstToCasmIRPass::visit_rule( RuleNode* node )
-{ VISIT;
+{
+	VISIT;
+
+	string x;
+	for( auto& a : node->arguments )
+	{
+		x.append( a->to_str() );
+	}
+	
+	printf( "%s, %s\n", node->name.c_str(), x.c_str() );
 }
 	
 void AstToCasmIRPass::visit_statements( AstNode* node )
-{ VISIT;
+{
+	VISIT;
+	printf( "...\n" );
 }
-	
+
 void AstToCasmIRPass::visit_parblock( AstNode* node )
-{ VISIT;
+{
+	VISIT;
+	printf( "{ }\n" );
 }
 	
 void AstToCasmIRPass::visit_seqblock( AstNode* node )
-{ VISIT;
+{
+	VISIT;
+	printf( "{| |}\n" );
 }
 	
 void AstToCasmIRPass::visit_forall_pre( AstNode* node )
@@ -144,7 +191,9 @@ void AstToCasmIRPass::visit_iterate( AstNode* node )
 }
 	
 void AstToCasmIRPass::visit_update( UpdateNode* node, T func, T expr )
-{ VISIT;
+{
+	VISIT;
+	printf( "%p := %p\n", node->func, node->expr_ );
 }
 	
 void AstToCasmIRPass::visit_update_dumps( UpdateNode* node, T func, T expr )
@@ -156,23 +205,40 @@ void AstToCasmIRPass::visit_update_subrange( UpdateNode* node, T func, T expr)
 }
 	
 void AstToCasmIRPass::visit_call_pre( CallNode* node )
-{ VISIT;
+{
+    //VISIT;
 }
 	
 void AstToCasmIRPass::visit_call_pre( CallNode* node, T expr )
-{ VISIT;
+{
+    //VISIT;
 }
-	
+
 void AstToCasmIRPass::visit_call( CallNode* node, std::vector< T >& args )
-{ VISIT;
+{
+	VISIT;
+
+	printf( "call: %s\n", node->rule_name.c_str() );
 }
-	
+
 void AstToCasmIRPass::visit_call_post( CallNode* node )
-{ VISIT;
+{
+	//VISIT;
 }
-	
+
 void AstToCasmIRPass::visit_print( PrintNode* node, std::vector< T >& args )
-{ VISIT;
+{
+	VISIT;
+	string x;
+// 	for( auto& a : node->atoms )
+// 	{
+// //		x.append( a->to_str() );
+// 	}
+	
+	printf( "print: %s\n"
+		    , x.c_str()
+	    );
+	
 }
     
 void AstToCasmIRPass::visit_diedie( DiedieNode* node, T msg )
@@ -216,7 +282,11 @@ void AstToCasmIRPass::visit_case( CaseNode* node, T val, const std::vector< T >&
 }
 	
 T AstToCasmIRPass::visit_expression( Expression* node, T lhs, T rhs )
-{ VISIT;
+{
+	VISIT;
+
+	printf( "%s, %p, %p\n", operator_to_str( node->op ).c_str(), node->left_, node->right_ );
+
 	return 0;
 }
     
@@ -226,7 +296,20 @@ T AstToCasmIRPass::visit_expression_single( Expression* node, T val )
 }
     
 T AstToCasmIRPass::visit_function_atom( FunctionAtom* node, T args[], uint16_t argc )
-{ VISIT; 
+{
+	VISIT;
+	
+	string x;
+// 	for( auto& a : node->arguments )
+// 	{
+// //		x.append( a->to_str() );
+// 	}
+	
+	printf( "%s, %s\n"
+			, node->name.c_str()
+		    , x.c_str()
+	    );
+	
 	return 0;
 }
     
@@ -236,12 +319,22 @@ T AstToCasmIRPass::visit_function_atom_subrange( FunctionAtom* node, T args[], u
 }
 	
 T AstToCasmIRPass::visit_derived_function_atom( FunctionAtom* node, T expr )
-{ VISIT;
+{
+	VISIT;
+	string x;
+	printf( "derived: %s, %s\n"
+			, node->name.c_str()
+		    , x.c_str()
+	    );
 	return 0;
 }
     
 T AstToCasmIRPass::visit_int_atom( IntAtom* node )
-{ VISIT;
+{
+	VISIT;
+
+	printf( "%lu\n", node->val_	);
+	
 	return 0;
 }
 	
@@ -256,27 +349,35 @@ T AstToCasmIRPass::visit_rational_atom( RationalAtom* node )
 }
 	
 T AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
-{ VISIT;
+{
+	VISIT;
+	printf( "undef\n" );
 	return 0;
 }
 	
 T AstToCasmIRPass::visit_self_atom( SelfAtom* node )
-{ VISIT;
+{
+	VISIT;
+	printf( "self\n" );
 	return 0;
 }
 	
 T AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
-{ VISIT;
+{
+	VISIT;
+	printf( "rule: @%s\n", node->name.c_str() );
 	return 0;
 }
-	
+
 T AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
 { VISIT;
 	return 0;
 }
 	
 T AstToCasmIRPass::visit_string_atom( StringAtom* node )
-{ VISIT;
+{
+	VISIT;
+	printf( "%s\n", node->string.c_str() );
 	return 0;
 }
 	
