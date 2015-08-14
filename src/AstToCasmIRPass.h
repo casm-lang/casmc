@@ -40,6 +40,7 @@
 #include "TypeCheckPass.h"
 
 #include "Value.h"
+#include "Rule.h"
 
 /**
    @file     AstToCasmIRPass.h
@@ -84,9 +85,9 @@ public:
     void visit_derived_def_pre( FunctionDefNode* node );
     void visit_derived_def( FunctionDefNode* node, T expr );
     void visit_rule( RuleNode* node );
-	void visit_statements( AstNode* node );
-	void visit_parblock( AstNode* node );
-	void visit_seqblock( AstNode* node );
+	void visit_statements( AstListNode* node );
+	void visit_parblock( UnaryNode* node );
+	void visit_seqblock( UnaryNode* node );
 	void visit_forall_pre( AstNode* node );
 	void visit_forall_post( AstNode* node );
 	void visit_iterate( AstNode* node );

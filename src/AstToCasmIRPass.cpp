@@ -146,9 +146,26 @@ void AstToCasmIRPass::visit_derived_def_pre( FunctionDefNode* node )
 void AstToCasmIRPass::visit_derived_def( FunctionDefNode* node, T expr )
 {
 }
-	
+
+static std::unordered_map< AstNode*, void* >    ast2ir;
+static std::unordered_map< AstNode*, AstNode* > ast2ast;
+
 void AstToCasmIRPass::visit_rule( RuleNode* node )
 {
+	assert( node );
+	
+	libcasm_ir::Rule* ir_rule = new libcasm_ir::Rule( node->name.c_str() );
+	libcasm_ir::ExecutionSemanticsBlock* ir_scope = new libcasm_ir::ParallelBlock();
+	
+	assert( ir_rule );
+	ir_rule->setContext( static_cast< libcasm_ir::ParallelBlock* >( ir_scope ) );
+    ir_scope = ir_rule->getContext();
+
+	ast2ir[ node ]         = ir_rule;
+	ast2ir[ node->child_ ] = ir_scope;
+	
+	printf( "\n\n" );
+	
 	VISIT;
 
 	string x;
@@ -157,25 +174,40 @@ void AstToCasmIRPass::visit_rule( RuleNode* node )
 		x.append( a->to_str() );
 	}
 	
-	printf( "%s, %s\n", node->name.c_str(), x.c_str() );
-}
-	
-void AstToCasmIRPass::visit_statements( AstNode* node )
-{
-	VISIT;
-	printf( "...\n" );
+	printf( "[%p] %s, %s\n", ir_rule, node->name.c_str(), x.c_str() );
+	printf( "%p -> %p\n", node, node->child_ );
 }
 
-void AstToCasmIRPass::visit_parblock( AstNode* node )
+void AstToCasmIRPass::visit_parblock( UnaryNode* node )
 {
+	if( ast2ir.find( node ) == ast2ir.end() )
+	{
+		libcasm_ir::ExecutionSemanticsBlock* ir_scope = new libcasm_ir::ParallelBlock();
+		ast2ir[ node ] = ir_scope;
+	}
+    
 	VISIT;
 	printf( "{ }\n" );
+	printf( "%p -> %p\n", node, node->child_ );
 }
-	
-void AstToCasmIRPass::visit_seqblock( AstNode* node )
+
+void AstToCasmIRPass::visit_seqblock( UnaryNode* node )
 {
+	
 	VISIT;
 	printf( "{| |}\n" );
+	printf( "%p -> %p\n", node, node->child_ );
+}
+	
+void AstToCasmIRPass::visit_statements( AstListNode* node )
+{
+	VISIT;
+    printf( "...\n" );
+
+	for( AstNode *s : node->nodes )
+	{
+		printf( "%p -> %p\n", node, s );
+	}
 }
 	
 void AstToCasmIRPass::visit_forall_pre( AstNode* node )
@@ -193,7 +225,14 @@ void AstToCasmIRPass::visit_iterate( AstNode* node )
 void AstToCasmIRPass::visit_update( UpdateNode* node, T func, T expr )
 {
 	VISIT;
-	printf( "%p := %p\n", node->func, node->expr_ );
+    printf( "%p -> %p\n", node, node->func );
+	printf( "%p -> %p\n", node, node->expr_ );
+
+	// load scope and add the statement
+	
+	// libcasm_ir::Statement* stmt = new libcasm_ir::UpdateStatement();
+
+	
 }
 	
 void AstToCasmIRPass::visit_update_dumps( UpdateNode* node, T func, T expr )
