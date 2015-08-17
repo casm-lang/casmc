@@ -39,8 +39,7 @@
 #include "Pass.h"
 #include "TypeCheckPass.h"
 
-#include "Value.h"
-#include "Rule.h"
+#include "libcasm-ir.h"
 
 /**
    @file     AstToCasmIRPass.h
@@ -75,6 +74,9 @@ public:
 
 private:
 	u1 valid;
+
+	std::unordered_map< AstNode*, void* >    ast2casmir;
+	std::unordered_map< AstNode*, AstNode* > ast2parent;
 	
 public:
 	void visit_init( UnaryNode* node );
@@ -125,6 +127,13 @@ public:
 	T visit_list_atom( ListAtom* node, std::vector< T >& args );
 	T visit_number_range_atom( NumberRangeAtom* node );
 	T visit_builtin_atom( BuiltinAtom* node, T args[], uint16_t argc );
+
+private:
+	template< class C >
+	C* lookupParent( AstNode* node );
+	
+	template< class C >
+	C* lookup( AstNode* node );
 };
 
 #endif /* _PASSASTTOCASMIR_H_ */

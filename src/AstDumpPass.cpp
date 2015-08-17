@@ -59,6 +59,10 @@ bool AstDumpPass::run( libpass::PassResult& pr )
 	dump_walker.walk_specification( node );
 	
 	std::cout << this->get_dump() << std::endl;
+
+	std::ofstream dotfile( "./out.dot" );
+	dotfile << this->get_dump() << "\n";
+	dotfile.close();
 	
 	return true;
 }
