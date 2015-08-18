@@ -78,22 +78,36 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 #define VISIT printf( "===--- %s:%i: %s: %p: %s\n", \
 __FILE__, __LINE__, __FUNCTION__, node, node->to_str().c_str() )
 
+#define FIXME											  \
+	printf( "+++ FIXME +++: '%s:%i' in '%s'\n",			  \
+			__FILE__, __LINE__, __FUNCTION__ );			  \
+	fflush( stdout );									  \
+	assert( 0 );
+
+
 
 void AstToCasmIRPass::visit_specification( AstNode* node )
 {
 	VISIT;
-	
 	printf( "CASM specification\n" );
+	//FIXME;
 }
 
 void AstToCasmIRPass::visit_init( UnaryNode* node )
 {
 	VISIT;
 	printf( "init %s\n", global_driver->init_name.c_str() );
+	//FIXME;TODO ASAP!!!
+	
+	// libcasm_ir::Value* ir_init =
+	// 	new libcasm_ir::Value( global_driver->init_name.c_str(), 0, libcasm_ir::Value::RULE );
+	
 }
 
 void AstToCasmIRPass::visit_body_elements( AstNode* node )
-{ VISIT;
+{
+	VISIT;
+	//FIXME;TODO ASAP!!!
 }
 
 void AstToCasmIRPass::visit_function_def
@@ -115,6 +129,8 @@ void AstToCasmIRPass::visit_function_def
 			, x.c_str()
 			, node->sym->return_type_->to_str().c_str()
 		);
+
+	//FIXME;TODO ASAP!!!
 }
 
 void AstToCasmIRPass::visit_derived_function_atom_pre( FunctionAtom* node, T args[], uint16_t argc )
@@ -125,6 +141,8 @@ void AstToCasmIRPass::visit_derived_function_atom_pre( FunctionAtom* node, T arg
 			, node->name.c_str()
 		    , x.c_str()
 	    );
+
+	FIXME;
 }
     
 void AstToCasmIRPass::visit_derived_def_pre( FunctionDefNode* node )
@@ -143,11 +161,14 @@ void AstToCasmIRPass::visit_derived_def_pre( FunctionDefNode* node )
 			, x.c_str()
 			, node->sym->return_type_->to_str().c_str()
 		);
+
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_derived_def( FunctionDefNode* node, T expr )
 {
 	VISIT;
+	FIXME;
 }
 
 void AstToCasmIRPass::visit_rule( RuleNode* node )
@@ -241,16 +262,19 @@ void AstToCasmIRPass::visit_statements( AstListNode* node )
 void AstToCasmIRPass::visit_forall_pre( AstNode* node )
 {
 	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_forall_post( AstNode* node )
 {
 	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_iterate( AstNode* node )
 {
 	VISIT;
+	FIXME;
 }
 
 void AstToCasmIRPass::visit_update( UpdateNode* node, T func, T expr )
@@ -258,8 +282,6 @@ void AstToCasmIRPass::visit_update( UpdateNode* node, T func, T expr )
 	VISIT;
     printf( "%p -> %p\n", node, node->func );
 	printf( "%p -> %p\n", node, node->expr_ );
-
-	assert( node );
 	
 	libcasm_ir::ExecutionSemanticsBlock* ir_scope =
 		lookupParent< libcasm_ir::ExecutionSemanticsBlock >( node );
@@ -272,20 +294,25 @@ void AstToCasmIRPass::visit_update( UpdateNode* node, T func, T expr )
 	ast2parent[ node->func ]   = node;
 	ast2parent[ node->expr_ ]  = node;
 	
-	libcasm_ir::Value* lhs = lookup< libcasm_ir::Value >( node->func  );
-	libcasm_ir::Value* rhs = lookup< libcasm_ir::Value >( node->expr_ );
+	libcasm_ir::Value* ir_lhs = lookup< libcasm_ir::Value >( node->func  );
+	libcasm_ir::Value* ir_rhs = lookup< libcasm_ir::Value >( node->expr_ );
 	
-	ir_stmt->add( new libcasm_ir::UpdateInstruction( lhs, rhs ) );
+	assert( ir_lhs );
+	assert( ir_rhs );
+	
+	ir_stmt->add( new libcasm_ir::UpdateInstruction( ir_lhs, ir_rhs ) );
 }
 
 void AstToCasmIRPass::visit_update_dumps( UpdateNode* node, T func, T expr )
 {
 	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_update_subrange( UpdateNode* node, T func, T expr)
 {
 	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_call_pre( CallNode* node )
@@ -303,6 +330,8 @@ void AstToCasmIRPass::visit_call( CallNode* node, std::vector< T >& args )
 	VISIT;
 
 	printf( "call: %s\n", node->rule_name.c_str() );
+
+	FIXME;
 }
 
 void AstToCasmIRPass::visit_call_post( CallNode* node )
@@ -323,46 +352,67 @@ void AstToCasmIRPass::visit_print( PrintNode* node, std::vector< T >& args )
 		    , x.c_str()
 	    );
 	
+	FIXME;
 }
     
 void AstToCasmIRPass::visit_diedie( DiedieNode* node, T msg )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_impossible( AstNode* node )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_assert( UnaryNode* node, T expr )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_assure( UnaryNode* node, T expr )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
     
 void AstToCasmIRPass::visit_let( LetNode* node, T var )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_let_post( LetNode* node )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
     
 void AstToCasmIRPass::visit_push( PushNode* node, T expr, T atom )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_pop( PopNode* node )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
     
 void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, T cond )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
 	
 void AstToCasmIRPass::visit_case( CaseNode* node, T val, const std::vector< T >& case_labels )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 }
 
 T AstToCasmIRPass::visit_expression( Expression* node, T lhs, T rhs )
@@ -372,6 +422,10 @@ T AstToCasmIRPass::visit_expression( Expression* node, T lhs, T rhs )
 	
 	libcasm_ir::Value* ir_lhs = lookup< libcasm_ir::Value >( node->left_  );
 	libcasm_ir::Value* ir_rhs = lookup< libcasm_ir::Value >( node->right_ );
+
+	assert( ir_lhs );
+	assert( ir_rhs );
+	
 	libcasm_ir::Value* ir_expr = 0;
 
 	switch( node->op )
@@ -382,6 +436,7 @@ T AstToCasmIRPass::visit_expression( Expression* node, T lhs, T rhs )
 		
 	    default:
 			assert( 0 && "unsupported expression operation" );
+			FIXME;
 	}
 	
 	assert( ir_expr );
@@ -391,14 +446,15 @@ T AstToCasmIRPass::visit_expression( Expression* node, T lhs, T rhs )
 }
     
 T AstToCasmIRPass::visit_expression_single( Expression* node, T val )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 	return 0;
 }
     
 T AstToCasmIRPass::visit_function_atom( FunctionAtom* node, T args[], uint16_t argc )
 {
 	VISIT;
-	
 	printf( "%s, %p", node->name.c_str(), node );
 	
     for( auto a : *(node->arguments) )
@@ -430,7 +486,9 @@ T AstToCasmIRPass::visit_function_atom( FunctionAtom* node, T args[], uint16_t a
 }
     
 T AstToCasmIRPass::visit_function_atom_subrange( FunctionAtom* node, T args[], uint16_t argc	)
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 	return 0;
 }
 	
@@ -442,6 +500,7 @@ T AstToCasmIRPass::visit_derived_function_atom( FunctionAtom* node, T expr )
 			, node->name.c_str()
 		    , x.c_str()
 	    );
+	FIXME;
 	return 0;
 }
     
@@ -460,12 +519,16 @@ T AstToCasmIRPass::visit_int_atom( IntAtom* node )
 }
 	
 T AstToCasmIRPass::visit_float_atom( FloatAtom* node )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 	return 0;
 }
 	
 T AstToCasmIRPass::visit_rational_atom( RationalAtom* node )
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 	return 0;
 }
 	
@@ -473,6 +536,11 @@ T AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
 {
 	VISIT;
 	printf( "undef\n" );
+	
+	libcasm_ir::Value* ir_const	= new libcasm_ir::UndefConstant();
+    assert( ir_const );
+    ast2casmir[ node ] = ir_const;
+	
 	return 0;
 }
 	
@@ -480,6 +548,7 @@ T AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
 	VISIT;
 	printf( "self\n" );
+	FIXME;
 	return 0;
 }
 	
@@ -487,11 +556,15 @@ T AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
 {
 	VISIT;
 	printf( "rule: @%s\n", node->name.c_str() );
+	FIXME;
 	return 0;
 }
 
 T AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
-{ VISIT;
+{
+	VISIT;
+	printf( "%u\n", node->value );
+	FIXME;
 	return 0;
 }
 	
@@ -499,23 +572,32 @@ T AstToCasmIRPass::visit_string_atom( StringAtom* node )
 {
 	VISIT;
 	printf( "%s\n", node->string.c_str() );
+	FIXME;
 	return 0;
 }
 	
 T AstToCasmIRPass::visit_list_atom( ListAtom* node, std::vector< T > &args )
-{ VISIT; 
+{
+	VISIT; 
+	FIXME;
 	return 0;
 }
 	
 T AstToCasmIRPass::visit_number_range_atom( NumberRangeAtom* node )
-{ VISIT; 
+{
+	VISIT; 
+	FIXME;
 	return 0; 
 }
 	
 T AstToCasmIRPass::visit_builtin_atom( BuiltinAtom* node, T args[], uint16_t argc ) 
-{ VISIT;
+{
+	VISIT;
+	FIXME;
 	return 0;
 }
+
+
 
 template<class C>
 C* AstToCasmIRPass::lookupParent( AstNode* node )
