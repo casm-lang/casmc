@@ -275,12 +275,7 @@ void AstToCasmIRPass::visit_update( UpdateNode* node, T func, T expr )
 	libcasm_ir::Value* lhs = lookup< libcasm_ir::Value >( node->func  );
 	libcasm_ir::Value* rhs = lookup< libcasm_ir::Value >( node->expr_ );
 	
-	libcasm_ir::UpdateInstruction* ir_upd = new libcasm_ir::UpdateInstruction( lhs, rhs );
-	assert( ir_upd );
-	
-	// ir_stmt->add( rhs );
-	// ir_stmt->add( lhs );
-	ir_stmt->add( ir_upd );
+	ir_stmt->add( new libcasm_ir::UpdateInstruction( lhs, rhs ) );
 }
 
 void AstToCasmIRPass::visit_update_dumps( UpdateNode* node, T func, T expr )
@@ -369,13 +364,29 @@ void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, T cond )
 void AstToCasmIRPass::visit_case( CaseNode* node, T val, const std::vector< T >& case_labels )
 { VISIT;
 }
-	
+
 T AstToCasmIRPass::visit_expression( Expression* node, T lhs, T rhs )
 {
 	VISIT;
-
 	printf( "%s, %p, %p\n", operator_to_str( node->op ).c_str(), node->left_, node->right_ );
+	
+	libcasm_ir::Value* ir_lhs = lookup< libcasm_ir::Value >( node->left_  );
+	libcasm_ir::Value* ir_rhs = lookup< libcasm_ir::Value >( node->right_ );
+	libcasm_ir::Value* ir_expr = 0;
 
+	switch( node->op )
+	{
+	    case ExpressionOperation::ADD:
+			ir_expr = new libcasm_ir::AddInstruction( ir_lhs, ir_rhs );
+			break;
+		
+	    default:
+			assert( 0 && "unsupported expression operation" );
+	}
+	
+	assert( ir_expr );
+	ast2casmir[ node ] = ir_expr;
+	
 	return 0;
 }
     
