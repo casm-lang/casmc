@@ -75,7 +75,7 @@ public:
 private:
 	u1 valid;
 
-	std::unordered_map< AstNode*, void* >    ast2casmir;
+	std::unordered_map< AstNode*, libcasm_ir::Value* >   ast2casmir;
 	std::unordered_map< AstNode*, AstNode* > ast2parent;
 	
 public:

@@ -73,7 +73,10 @@ LIBRARY += lib/casm-ir/libcasm-ir.a
 default: $(TARGET)
 
 
-all: clean default
+all: clean doxy default
+
+doxy:
+	doxygen
 
 obj:
 	@echo "MKD " obj
@@ -101,6 +104,7 @@ obj/version.h: obj
 	@echo "#define VERSION \""`git describe --always --tags --dirty`"\"" > $@
 
 $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
+	make -C lib/casm-ir
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++
 
@@ -109,6 +113,7 @@ clean:
 	@rm -rf obj
 	@echo "RM  " casmc
 	@rm -f casmc
+	$(MAKE) clean -C lib/casm-ir
 
 stub:
 	PROJECT=casmc LICENSE=NSCA ./lib/stub/stub.sh cpp $(ARG) src

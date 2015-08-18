@@ -5,4 +5,8 @@ function x : Int -> Int
 rule foo =
 {
     x( 3 ) := 20
+    {|
+        x( 3 ) := 20
+    |}
+    x( 60 ) := 20
 }

@@ -63,8 +63,12 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 	// TODO: PPA: implement the IR translation!!!
 	
 	casm_frontend_destroy();
-
 	
+	for( auto foo : (*libcasm_ir::Value::getSymbols())[ "foo" ] )
+	{
+		printf( "dumping 'foo':\n" );
+		foo->dump();
+	}
 	
 	assert( 0 );
     //return true;
@@ -256,26 +260,27 @@ void AstToCasmIRPass::visit_update( UpdateNode* node, T func, T expr )
 	printf( "%p -> %p\n", node, node->expr_ );
 
 	assert( node );
-
+	
 	libcasm_ir::ExecutionSemanticsBlock* ir_scope =
 		lookupParent< libcasm_ir::ExecutionSemanticsBlock >( node );
 	
 	assert( ir_scope );
 	
-	libcasm_ir::BlockStatement* ir_stmt = new libcasm_ir::BlockStatement( ir_scope );
+	libcasm_ir::TrivialStatement* ir_stmt = new libcasm_ir::TrivialStatement( ir_scope );
 	assert( ir_stmt );
     ast2casmir[ node ]         = ir_stmt;
 	ast2parent[ node->func ]   = node;
 	ast2parent[ node->expr_ ]  = node;
 	
-	libcasm_ir::Instruction* lhs = lookup< libcasm_ir::Instruction >( node->func  );
-	libcasm_ir::Instruction* rhs = lookup< libcasm_ir::Instruction >( node->expr_ );
+	libcasm_ir::Value* lhs = lookup< libcasm_ir::Value >( node->func  );
+	libcasm_ir::Value* rhs = lookup< libcasm_ir::Value >( node->expr_ );
 	
 	libcasm_ir::UpdateInstruction* ir_upd = new libcasm_ir::UpdateInstruction( lhs, rhs );
 	assert( ir_upd );
 	
-	ir_stmt->add( rhs );
-	ir_stmt->add( lhs );	
+	// ir_stmt->add( rhs );
+	// ir_stmt->add( lhs );
+	ir_stmt->add( ir_upd );
 }
 
 void AstToCasmIRPass::visit_update_dumps( UpdateNode* node, T func, T expr )
@@ -519,21 +524,20 @@ C* AstToCasmIRPass::lookupParent( AstNode* node )
 template<class C>
 C* AstToCasmIRPass::lookup( AstNode* node )
 {
-	//printf( "%s: %p\n", __FUNCTION__, node );
+	printf( "%s: %p\n", __FUNCTION__, node );
 		
 	auto result = ast2casmir.find( node );
 	if( result != ast2casmir.end() )
 	{
-		// C* res = dynamic_cast< C* >( result->second );
-		// if( res )
-		// {
-		    //printf( "%s: >>> %p\n", __FUNCTION__, result->second );
+		printf( "%s: %p\n", __FUNCTION__, result->second );
+		if( libcasm_ir::Value::isa< C >( result->second ) )
+		{
 			return static_cast< C* >( result->second );
-		// }
-		// else
-		// {
-		// 	assert( 0 );
-		// }
+		}
+		else
+		{
+			assert( 0 );
+		}
 	}
 		
 	return 0;
