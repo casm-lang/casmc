@@ -51,6 +51,18 @@ static libpass::PassRegistration< AstToCasmIRPass > PASS
 
 extern Driver* global_driver;
 
+static libcasm_ir::Type* getType( AstNode* node )
+{
+	switch( node->type_.t )
+	{
+	    case TypeType::INT:
+			return &libcasm_ir::IntegerType;
+	    default:
+			assert( 0 && "not implemented function atom identifier type" );
+			return 0;
+	}
+}
+
 bool AstToCasmIRPass::run( libpass::PassResult& pr )
 {
 	AstNode* node = (AstNode*)pr.getResult< TypeCheckPass >();
@@ -210,19 +222,24 @@ void AstToCasmIRPass::visit_parblock( UnaryNode* node )
     ast2casmir[ node ] = ir_scope;
 	ast2parent[ node->child_ ] = node;
 	
-	libcasm_ir::Rule* ir_rule =	lookupParent< libcasm_ir::Rule >( node );
+	libcasm_ir::Value* parent = lookupParent< libcasm_ir::Value >( node );
+	assert( parent );
 	
-	if( ir_rule )
+	if( libcasm_ir::Value::isa< libcasm_ir::Rule >( parent ) )
 	{
-		ir_rule->setContext( ir_scope );
+		((libcasm_ir::Rule*)parent)->setContext( ir_scope );
+	}
+	else if( libcasm_ir::Value::isa< libcasm_ir::ExecutionSemanticsBlock >( parent ) )
+	{
+		((libcasm_ir::ExecutionSemanticsBlock*)parent)->add( ir_scope );
+	}
+	else if( libcasm_ir::Value::isa< libcasm_ir::Statement >( parent ) )
+	{
+		((libcasm_ir::Statement*)parent)->getScope()->add( ir_scope );
 	}
 	else
 	{
-		libcasm_ir::ExecutionSemanticsBlock* ir_parent_scope =
-			lookupParent< libcasm_ir::ExecutionSemanticsBlock >( node );
-		
-		assert( ir_parent_scope );
-		ir_parent_scope->add( ir_scope );
+		assert( 0 );
 	}
 }
 
@@ -238,12 +255,22 @@ void AstToCasmIRPass::visit_seqblock( UnaryNode* node )
 	assert( ir_scope );
     ast2casmir[ node ] = ir_scope;
 	ast2parent[ node->child_ ] = node;
+
+	libcasm_ir::Value* parent = lookupParent< libcasm_ir::Value >( node );
+	assert( parent );
 	
-	libcasm_ir::ExecutionSemanticsBlock* ir_parent_scope =
-		lookupParent< libcasm_ir::ExecutionSemanticsBlock >( node );
-	
-	assert( ir_parent_scope );
-	ir_parent_scope->add( ir_scope );
+    if( libcasm_ir::Value::isa< libcasm_ir::ExecutionSemanticsBlock >( parent ) )
+	{
+		((libcasm_ir::ExecutionSemanticsBlock*)parent)->add( ir_scope );
+	}
+	else if( libcasm_ir::Value::isa< libcasm_ir::Statement >( parent ) )
+	{
+		((libcasm_ir::Statement*)parent)->getScope()->add( ir_scope );
+	}
+	else
+	{
+		assert( 0 );
+	}
 }
 
 void AstToCasmIRPass::visit_statements( AstListNode* node )
@@ -397,15 +424,59 @@ void AstToCasmIRPass::visit_assure( UnaryNode* node, T expr )
 void AstToCasmIRPass::visit_let( LetNode* node, T var )
 {
 	VISIT;
-	FIXME;
-}
 	
+	ast2parent[ node->expr ] = node;
+	ast2parent[ node->stmt ] = node;
+	
+	libcasm_ir::Value* ir_expr = lookup< libcasm_ir::Value >( node->expr );
+	assert( ir_expr );
+	
+	libcasm_ir::Value* ir_ident =
+		libcasm_ir::Identifier::create( getType( node ), node->identifier.c_str() );
+	assert( ir_ident );
+	
+	libcasm_ir::Value* ir_let = new libcasm_ir::LetInstruction( ir_ident, ir_expr );
+	assert( ir_let );
+    
+	libcasm_ir::ExecutionSemanticsBlock* ir_scope = 0;
+	libcasm_ir::Value* parent = lookupParent< libcasm_ir::Value >( node );
+	assert( parent );
+	if( libcasm_ir::Value::isa< libcasm_ir::ExecutionSemanticsBlock >( parent ) )
+	{
+		ir_scope = (libcasm_ir::ExecutionSemanticsBlock*)parent;
+		if( ir_scope->isParallel() )
+		{
+			libcasm_ir::ExecutionSemanticsBlock* ir_scope_top = ir_scope;
+		    ir_scope = new libcasm_ir::SequentialBlock();
+			assert( ir_scope );
+			ir_scope->setParent( ir_scope_top );
+			ir_scope_top->add( ir_scope );
+		}		
+	}
+	else if( libcasm_ir::Value::isa< libcasm_ir::Statement >( parent ) )
+	{
+		ir_scope = ((libcasm_ir::Statement*)parent)->getScope();
+		printf( "up for %p\n", parent );
+	}
+	else
+	{
+		assert( 0 );
+	}
+	
+	libcasm_ir::TrivialStatement* ir_stmt = new libcasm_ir::TrivialStatement( ir_scope );
+	assert( ir_stmt );
+	ast2casmir[ node ] = ir_stmt;
+	
+	//ir_scope->add( ir_stmt );
+	ir_stmt->add( ir_let );
+}
+
 void AstToCasmIRPass::visit_let_post( LetNode* node )
 {
-	VISIT;
-	FIXME;
+	VISIT;	
+	libcasm_ir::Identifier::forgetSymbol( node->identifier.c_str() );
 }
-    
+
 void AstToCasmIRPass::visit_push( PushNode* node, T expr, T atom )
 {
 	VISIT;
@@ -437,18 +508,57 @@ T AstToCasmIRPass::visit_expression( Expression* node, T lhs, T rhs )
 	
 	libcasm_ir::Value* ir_lhs = lookup< libcasm_ir::Value >( node->left_  );
 	libcasm_ir::Value* ir_rhs = lookup< libcasm_ir::Value >( node->right_ );
-
 	assert( ir_lhs );
 	assert( ir_rhs );
 	
 	libcasm_ir::Value* ir_expr = 0;
-
 	switch( node->op )
 	{
 	    case ExpressionOperation::ADD:
 			ir_expr = new libcasm_ir::AddInstruction( ir_lhs, ir_rhs );
 			break;
-		
+		case ExpressionOperation::SUB:
+			ir_expr = new libcasm_ir::SubInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::MUL:
+			ir_expr = new libcasm_ir::MulInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::DIV:
+			ir_expr = new libcasm_ir::DivInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::RAT_DIV:
+			ir_expr = new libcasm_ir::RivInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::MOD:
+			ir_expr = new libcasm_ir::ModInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::EQ:
+			ir_expr = new libcasm_ir::EquInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::NEQ:
+			ir_expr = new libcasm_ir::NeqInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::LESSER:
+			ir_expr = new libcasm_ir::LesInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::LESSEREQ:
+			ir_expr = new libcasm_ir::LeqInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::GREATER:
+			ir_expr = new libcasm_ir::GreInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::GREATEREQ:
+			ir_expr = new libcasm_ir::GeqInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::OR:
+			ir_expr = new libcasm_ir::OrInstruction(  ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::XOR:
+			ir_expr = new libcasm_ir::XorInstruction( ir_lhs, ir_rhs );
+			break;
+		case ExpressionOperation::AND:
+			ir_expr = new libcasm_ir::AndInstruction( ir_lhs, ir_rhs );
+			break;
 	    default:
 			assert( 0 && "unsupported expression operation" );
 			FIXME;
@@ -456,14 +566,30 @@ T AstToCasmIRPass::visit_expression( Expression* node, T lhs, T rhs )
 	
 	assert( ir_expr );
 	ast2casmir[ node ] = ir_expr;
-	
 	return 0;
 }
-    
+
 T AstToCasmIRPass::visit_expression_single( Expression* node, T val )
 {
 	VISIT;
-	FIXME;
+	printf( "%s, %p\n", operator_to_str( node->op ).c_str(), node->left_ );
+	
+	libcasm_ir::Value* ir_lhs = lookup< libcasm_ir::Value >( node->left_  );
+	assert( ir_lhs );
+	
+	libcasm_ir::Value* ir_expr = 0;
+	switch( node->op )
+	{
+		case ExpressionOperation::NOT:
+			ir_expr = new libcasm_ir::NotInstruction( ir_lhs );
+			break;
+	    default:
+			assert( 0 && "unsupported expression operation" );
+			FIXME;
+	}
+	
+	assert( ir_expr );
+	ast2casmir[ node ] = ir_expr;
 	return 0;
 }
     
@@ -479,8 +605,28 @@ T AstToCasmIRPass::visit_function_atom( FunctionAtom* node, T args[], uint16_t a
 		}
 	}
 	printf( "\n" );
-
-	libcasm_ir::Value* ir_ident = new libcasm_ir::Identifier( &libcasm_ir::FunctionType, node->name.c_str() );
+	
+	if( node->symbol_type == FunctionAtom::SymbolType::PARAMETER )
+	{
+		libcasm_ir::Value* ir_ident = libcasm_ir::Identifier::create( getType( node ), node->name.c_str() );
+		assert( ir_ident );		
+		ast2casmir[ node ] = ir_ident;
+		return 0;
+	}
+	
+	libcasm_ir::Type* ty_ident = 0;
+	switch( node->symbol_type )
+	{
+	    case FunctionAtom::SymbolType::FUNCTION:
+		{
+			ty_ident = &libcasm_ir::FunctionType;
+			break;
+		}
+	    default:
+			assert( 0 && "not implemented function atom identifier symbol type" );
+	}
+	
+	libcasm_ir::Value* ir_ident = libcasm_ir::Identifier::create( ty_ident, node->name.c_str() );
     assert( ir_ident );
 	
 	libcasm_ir::LocationInstruction* ir_loc	= new libcasm_ir::LocationInstruction( ir_ident );
@@ -522,7 +668,7 @@ T AstToCasmIRPass::visit_derived_function_atom( FunctionAtom* node, T expr )
 		    , x.c_str()
 	    );
 	
-	libcasm_ir::Value* ir_ident = new libcasm_ir::Identifier( &libcasm_ir::DerivedType, node->name.c_str() );
+	libcasm_ir::Value* ir_ident = libcasm_ir::Identifier::create( &libcasm_ir::DerivedType, node->name.c_str() );
     assert( ir_ident );
 	
 	libcasm_ir::CallInstruction* ir_call = new libcasm_ir::CallInstruction( ir_ident );

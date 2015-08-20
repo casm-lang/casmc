@@ -4,6 +4,8 @@ CASM bla init foo
 
 function x : Int -> Int
 
+// rule bla = x(1) := 1
+
 rule foo =
 {
     x( 10 ) := undef
@@ -12,5 +14,18 @@ rule foo =
         x( 1 ) := x( 20 )
     |}
 
+    let c = 10 in
+    let C = 10 in
+    {
+        x( c ) := c
+    }      
+    
+    x( 3 ) := 20
+    
+    let c = 20 in
+    {|
+        x( c ) := c
+    |}      
+    
     x( 3 ) := 20
 }

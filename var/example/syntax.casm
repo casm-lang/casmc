@@ -1,0 +1,35 @@
+CASM syntax
+init syntax
+
+function x : -> Int
+function y : Int -> Int
+function z : Int -> Boolean
+
+rule syntax =
+{
+    x := 1
+        
+    y( 0 ) := 7 + 5
+    y( 1 ) := 7 - 5
+    y( 2 ) := 7 * 5
+    y( 3 ) := 7 / 5
+    y( 4 ) := 7 % 5
+ // y( 5 ) := 7 div 5
+
+    z( 0 ) := 7 =  5
+    z( 1 ) := 7 != 5
+    z( 2 ) := 7 <  5
+    z( 3 ) := 7 <= 5
+    z( 4 ) := 7 >  5
+    z( 5 ) := 7 >= 5
+    
+    z( 6 ) := z( 7 ) or  z( 5 )
+    z( 7 ) := z( 7 ) xor z( 5 )
+    z( 8 ) := z( 7 ) and z( 5 )
+    z( 9 ) := not z( 5 )
+    
+    let c = x in
+    {
+        y( c ) := c
+    }
+}
