@@ -60,7 +60,7 @@ bool AstDumpPass::run( libpass::PassResult& pr )
 	
 	std::cout << this->get_dump() << std::endl;
 
-	std::ofstream dotfile( "./out.dot" );
+	std::ofstream dotfile( "./obj/out.dot" );
 	dotfile << this->get_dump() << "\n";
 	dotfile.close();
 	

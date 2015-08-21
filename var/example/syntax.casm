@@ -5,6 +5,8 @@ function x : -> Int
 function y : Int -> Int
 function z : Int -> Boolean
 
+derived macro = 10 + 50
+
 rule syntax =
 {
     x := 1

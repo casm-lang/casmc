@@ -156,8 +156,11 @@ void AstToCasmIRPass::visit_function_def
 			, x.c_str()
 			, node->sym->return_type_->to_str().c_str()
 		);
-
-	//FIXME;TODO ASAP!!!
+	
+	libcasm_ir::Function* ir_function = new libcasm_ir::Function( node->sym->name.c_str() );
+	assert( ir_function );
+	
+	//FIXME; //TODO ASAP!!!
 }
 
     
@@ -646,7 +649,7 @@ T AstToCasmIRPass::visit_function_atom( FunctionAtom* node, T args[], uint16_t a
 	
 	return 0;
 }
-    
+
 T AstToCasmIRPass::visit_function_atom_subrange( FunctionAtom* node, T args[], uint16_t argc	)
 {
 	VISIT;
