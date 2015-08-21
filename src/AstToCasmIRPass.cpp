@@ -560,13 +560,13 @@ T AstToCasmIRPass::visit_expression( Expression* node, T lhs, T rhs )
 			ir_expr = new libcasm_ir::NeqInstruction( ir_lhs, ir_rhs );
 			break;
 		case ExpressionOperation::LESSER:
-			ir_expr = new libcasm_ir::LesInstruction( ir_lhs, ir_rhs );
+			ir_expr = new libcasm_ir::LthInstruction( ir_lhs, ir_rhs );
 			break;
 		case ExpressionOperation::LESSEREQ:
 			ir_expr = new libcasm_ir::LeqInstruction( ir_lhs, ir_rhs );
 			break;
 		case ExpressionOperation::GREATER:
-			ir_expr = new libcasm_ir::GreInstruction( ir_lhs, ir_rhs );
+			ir_expr = new libcasm_ir::GthInstruction( ir_lhs, ir_rhs );
 			break;
 		case ExpressionOperation::GREATEREQ:
 			ir_expr = new libcasm_ir::GeqInstruction( ir_lhs, ir_rhs );
