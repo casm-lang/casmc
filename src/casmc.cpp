@@ -85,13 +85,16 @@ int main( int argc, const char *argv[] )
 		output_name = option;
 	}
 	, "file");
+
+#define DESCRIPTION											\
+	"Corinthian Abstract State Machine (CASM) Compiler\n"
 	
 	options.add
 	( 'h', "help", Args::NONE, "Display the program usage and synoptis"
 	, [&options]( const char* option )
 	{
 		fprintf( stderr
-		, "Corinthian Abstract State Machine (CASM) Compiler\n"
+		, DESCRIPTION
 		  "\n"
 		  "usage: %s [options] <file>\n"
 		  "\n"
@@ -108,7 +111,9 @@ int main( int argc, const char *argv[] )
 	, [&options]( const char* option )
 	{
 		fprintf( stderr
-		, "%s: version: %s [ %s %s ]\n"
+		, DESCRIPTION
+		  "\n"
+		  "%s: version: %s [ %s %s ]\n"
 		, options.getProgramName()
 		, VERSION
 		, __DATE__

@@ -353,8 +353,11 @@ void AstToCasmIRPass::visit_update( UpdateNode* node, T func, T expr )
 	
 	assert( ir_lhs );
 	assert( ir_rhs );
+
+	assert( libcasm_ir::Value::isa< libcasm_ir::LookupInstruction >( ir_lhs ) );
 	
-	ir_stmt->add( new libcasm_ir::UpdateInstruction( ir_lhs, ir_rhs ) );
+	ir_stmt->add( new libcasm_ir::UpdateInstruction(
+					  ((libcasm_ir::Instruction*)ir_lhs)->getValue( 0 ), ir_rhs ) );
 }
 
 void AstToCasmIRPass::visit_update_dumps( UpdateNode* node, T func, T expr )
