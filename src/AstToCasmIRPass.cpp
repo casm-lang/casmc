@@ -57,10 +57,10 @@ static libcasm_ir::Type* getType( Type* type )
 	
 	switch( type->t )
 	{
-	    case TypeType::INT:
-			return new libcasm_ir::Type( libcasm_ir::Type::ID::INTEGER );
 	    case TypeType::BOOLEAN:
 			return new libcasm_ir::Type( libcasm_ir::Type::ID::BOOLEAN );
+	    case TypeType::INT:
+			return new libcasm_ir::Type( libcasm_ir::Type::ID::INTEGER );
 	    default:
 			assert( 0 && "not implemented function atom identifier type" );
 			return 0;
@@ -720,6 +720,31 @@ T AstToCasmIRPass::visit_derived_function_atom( FunctionAtom* node, T expr )
 	return 0;
 }
 
+
+
+T AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
+{
+	VISIT;
+	printf( "undef\n" );
+	
+	libcasm_ir::Value* ir_const = 0;
+    
+	switch( node->type_.t )
+	{
+	    case TypeType::BOOLEAN:
+			ir_const = libcasm_ir::BooleanConstant::create(); break;
+	    case TypeType::INT:
+			ir_const = libcasm_ir::IntegerConstant::create(); break;
+	    default:
+			assert( 0 && "unimplemented undef constant!" );
+	}
+	
+	assert( ir_const );
+    ast2casmir[ node ] = ir_const;
+	
+	return 0;
+}
+
 T AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
 {
 	VISIT;
@@ -770,17 +795,6 @@ T AstToCasmIRPass::visit_string_atom( StringAtom* node )
 	return 0;
 }
 
-T AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
-{
-	VISIT;
-	printf( "undef\n" );
-	
-	libcasm_ir::Value* ir_const	= libcasm_ir::UndefConstant::create();
-    assert( ir_const );
-    ast2casmir[ node ] = ir_const;
-	
-	return 0;
-}
 	
 T AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
