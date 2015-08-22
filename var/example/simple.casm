@@ -1,0 +1,12 @@
+CASM simple init foo
+
+function x : -> Int
+
+rule foo =
+{
+ {|
+    x := undef
+    x := 123
+    x := x
+ |}
+}

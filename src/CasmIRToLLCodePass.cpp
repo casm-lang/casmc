@@ -68,6 +68,9 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 	
 	Value::SymbolTable& symbols = *Value::getSymbols();
 
+	fprintf( output, "\n" );
+	fprintf( output, "; constants\n" );
+	
 	for( auto value : symbols[".constant"] )
 	{
 		if( Value::isa< BooleanConstant >( value ) )
@@ -87,6 +90,9 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 			assert( 0 );
 		}
 	}
+	
+	fprintf( output, "\n" );
+	fprintf( output, "; functions\n" );
 
 	for( auto value : symbols[".function"] )
 	{
@@ -94,14 +100,24 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 		emit( output, ((Function*)value) );
 	}
 	
+	fprintf( output, "\n" );
+	fprintf( output, "; derived expressions\n" );
+	
+	for( auto value : symbols[".derived"] )
+	{
+		assert( Value::isa< Derived >( value ) );		
+		emit( output, ((Derived*)value) );		
+	}
+	
+	fprintf( output, "\n" );
+	fprintf( output, "; rules\n" );
+	
 	for( auto value : symbols[".rule"] )
 	{
 		assert( Value::isa< Rule >( value ) );		
 		emit( output, ((Rule*)value) );		
 	}
-	
-	
-	
+    
 	return false;
 }
 

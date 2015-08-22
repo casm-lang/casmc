@@ -133,5 +133,6 @@ status:
 		echo "===----------------------------------------------------==="; \
 		echo $$i; \
 		cd $$i; \
-		git status ); \
+		git status; \
+		git describe --always --tags --dirty ); \
 	done 
