@@ -29,7 +29,10 @@ rule syntax =
     z( 7 ) := z( 7 ) xor z( 5 )
     z( 8 ) := z( 7 ) and z( 5 )
     z( 9 ) := not z( 5 )
-    
+
+    z( 10 ) := true
+    z( 11 ) := false
+
     let c = x in
     {
         y( c ) := c

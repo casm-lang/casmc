@@ -39,6 +39,7 @@
 
 #include "AstDumpPass.h"
 #include "AstToCasmIRPass.h"
+#include "CasmIRToLLCodePass.h"
 
 #include "version.h"
 
@@ -56,7 +57,7 @@ int main( int argc, const char *argv[] )
 	const char* file_name = 0;
 	const char* output_name = 0;
 
-	Args options( argc, argv, Args::DEFAULT
+	Args options( argc, argv, Args::ALTERNATE
 	, [&file_name,&options]( const char* arg ) 
 	{
 		static int cnt = 0;
@@ -155,6 +156,7 @@ int main( int argc, const char *argv[] )
 	TypeCheckPass b;
 	AstDumpPass c;
 	AstToCasmIRPass d; 
+    CasmIRToLLCodePass e; 
 	
 	if( !a.run( x ) )
 	{
@@ -166,6 +168,8 @@ int main( int argc, const char *argv[] )
 	c.run( x );
 	
 	d.run( x );
+
+	e.run( x );
 	
 	// transform CASM AST -> IR
 	

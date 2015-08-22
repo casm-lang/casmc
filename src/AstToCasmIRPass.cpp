@@ -87,9 +87,10 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 	{
 		std::getline( cin, input );
 
-		if( input.compare( "s" ) == 0 )
+		if( input.compare( "#" ) == 0 )
 		{
 			assert( 0 );
+			return false;
 		}
 		else
 		{
@@ -101,9 +102,7 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 		}
 	}
 	
-	assert( 0 );
-    //return true;
-	return false;
+    return true;
 }
 
 #define VISIT printf( "===--- %s:%i: %s: %p: %s\n", \
@@ -727,7 +726,7 @@ T AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
 	printf( "%u\n", node->value );
 	
 	libcasm_ir::BooleanConstant* ir_const
-		= new libcasm_ir::BooleanConstant( ( libcasm_ir::Type::Boolean )node->value );
+		= libcasm_ir::BooleanConstant::create( (libcasm_ir::Type::Boolean)node->value );
 	
 	assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -741,7 +740,7 @@ T AstToCasmIRPass::visit_int_atom( IntAtom* node )
 	printf( "%lu\n", node->val_	);
 	
 	libcasm_ir::IntegerConstant* ir_const
-		= new libcasm_ir::IntegerConstant( ( libcasm_ir::Type::Integer )node->val_ );
+		= libcasm_ir::IntegerConstant::create( (libcasm_ir::Type::Integer)node->val_ );
 	
 	assert( ir_const );
     ast2casmir[ node ] = ir_const;
@@ -776,7 +775,7 @@ T AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
 	VISIT;
 	printf( "undef\n" );
 	
-	libcasm_ir::Value* ir_const	= new libcasm_ir::UndefConstant();
+	libcasm_ir::Value* ir_const	= libcasm_ir::UndefConstant::create();
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
 	
@@ -787,7 +786,7 @@ T AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
 	VISIT;
 
-	libcasm_ir::Value* ir_const	= new libcasm_ir::SelfConstant();
+	libcasm_ir::Value* ir_const	= libcasm_ir::SelfConstant::create();
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
 	

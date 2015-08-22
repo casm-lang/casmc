@@ -44,11 +44,11 @@ TARGET=casmc
 
 OBJECTS += obj/casmc.o
 OBJECTS += obj/PassManager.o
-
 OBJECTS += obj/SourceToAstPass.o
 OBJECTS += obj/TypeCheckPass.o
 OBJECTS += obj/AstDumpPass.o
 OBJECTS += obj/AstToCasmIRPass.o
+OBJECTS += obj/CasmIRToLLCodePass.o
 
 INCLUDE += -I src
 INCLUDE += -I src/ir
@@ -56,6 +56,7 @@ INCLUDE += -I obj
 INCLUDE += -I lib/casm-frontend/src
 INCLUDE += -I lib/casm-frontend/build/src
 INCLUDE += -I lib/casm-ir/src
+INCLUDE += -I lib/casm-rt/src
 INCLUDE += -I lib/pass/src
 
 INCLUDE += -I lib
@@ -65,6 +66,7 @@ LIBRARY += lib/casm-frontend/build/libfrontend.a
 LIBRARY += lib/stdhl/libstdhlc.a
 LIBRARY += lib/stdhl/libstdhlcpp.a
 LIBRARY += lib/casm-ir/libcasm-ir.a
+LIBRARY += lib/casm-rt/libcasm-rt.a
 
 
 .PHONY: obj/version.h
@@ -99,6 +101,9 @@ lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
 lib/casm-ir/libcasm-ir.a: lib/casm-ir
 	@cd $<; $(MAKE)
 
+lib/casm-rt/libcasm-rt.a: lib/casm-rt
+	@cd $<; $(MAKE)
+
 obj/version.h: obj
 	@echo "GEN " $@ 
 	@echo "#define VERSION \""`git describe --always --tags --dirty`"\"" > $@
@@ -114,6 +119,7 @@ clean:
 	@echo "RM  " casmc
 	@rm -f casmc
 	$(MAKE) clean -C lib/casm-ir
+	$(MAKE) clean -C lib/casm-rt
 
 stub:
 	PROJECT=casmc LICENSE=NSCA ./lib/stub/stub.sh cpp $(ARG) src
