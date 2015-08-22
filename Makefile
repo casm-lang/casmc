@@ -110,6 +110,7 @@ obj/version.h: obj
 
 $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
 	make -C lib/casm-ir
+	make -C lib/casm-rt
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++
 

@@ -79,10 +79,10 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 	// TODO: PPA: implement the IR translation!!!
 	
 	casm_frontend_destroy();
-
+	// return true;
 	
 	std::string input = "";
-
+	
 	while( input.compare( "q" ) != 0 )
 	{
 		std::getline( cin, input );
