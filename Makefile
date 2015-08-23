@@ -136,3 +136,9 @@ status:
 		git status; \
 		git describe --always --tags --dirty ); \
 	done 
+
+test-%:
+	make; time ./casmc var/example/$*.casm -o out.ll; cat out.ll
+	cat lib/casm-rt/casm-rt.ir out.ll > out.ir.ll
+	llvm-link out.ir.ll lib/stdll/stdll.ll lib/casm-rt/casm-rt.ll -S -o out.cc.ll
+	clang -g -O0 -o out.bin out.cc.ll

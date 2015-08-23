@@ -2,11 +2,13 @@ CASM simple init foo
 
 function x : -> Int
 function y : -> Int
+function z : -> Int
 
 rule foo =
 {
  {|
+    x := 3
     y := undef
-    x := x + 123
+    z := 28 + x
  |}
 }
