@@ -132,6 +132,9 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 			 LF IND ""
 			 LF IND "call void @foo( %%libcasm-rt.updateset* %%uset )"
 			 LF IND ""
+			 LF IND "call i8 @libcasm-rt.updateset.dump( %%libcasm-rt.updateset* %%uset )"
+			 LF IND ""
+			 LF IND "call i8 @stdll.mem.del( %%stdll.mem* %%mem )"
 			 LF IND "ret i8 0"
 			 LF "}"
 			 LF
