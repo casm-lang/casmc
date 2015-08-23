@@ -117,7 +117,26 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 		assert( Value::isa< Rule >( value ) );		
 		emit( output, ((Rule*)value) );		
 	}
-    
+
+#define IND "  "
+#define LF "\n"
+	
+	fprintf( output,
+			 "define i8 @main( i32 %%args, i8** %%argv ) nounwind"
+			 LF "{"
+			 LF "begin:"
+			 LF IND "%%mem  = alloca %%stdll.mem"
+			 LF IND "call i8 @stdll.mem.new( %%stdll.mem* %%mem, i64 1000000 )"
+			 LF IND "%%uset = call %%libcasm-rt.updateset* @libcasm-rt.updateset.new"
+			                  "( %%stdll.mem* %%mem, i32 100 )"
+			 LF IND ""
+			 LF IND "call void @foo( %%libcasm-rt.updateset* %%uset )"
+			 LF IND ""
+			 LF IND "ret i8 0"
+			 LF "}"
+			 LF
+		);
+	
 	return false;
 }
 
