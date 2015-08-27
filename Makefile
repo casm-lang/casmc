@@ -109,8 +109,10 @@ obj/version.h: obj
 	@echo "#define VERSION \""`git describe --always --tags --dirty`"\"" > $@
 
 $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
+	make llvm -C lib/stdll
 	make -C lib/casm-ir
 	make -C lib/casm-rt
+	make llvm -C lib/casm-rt
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++
 
