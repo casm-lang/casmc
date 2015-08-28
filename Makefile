@@ -140,7 +140,7 @@ status:
 	done 
 
 test-%:
-	make; time ./casmc var/example/$*.casm -o out.ll; cat out.ll
-	cat lib/casm-rt/casm-rt.ir out.ll > out.ir.ll
-	llvm-link out.ir.ll lib/stdll/stdll.ll lib/casm-rt/casm-rt.ll -S -o out.cc.ll
-	clang -g -O0 -o out.bin out.cc.ll
+	make; time ./casmc var/example/$*.casm -o obj/out.ll; cat obj/out.ll
+	cat lib/casm-rt/casm-rt.ir obj/out.ll > obj/out.ir.ll
+	llvm-link obj/out.ir.ll lib/stdll/stdll.ll lib/casm-rt/casm-rt.ll -S -o obj/out.cc.ll
+	clang -g -O0 -o obj/out.bin obj/out.cc.ll
