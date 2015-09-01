@@ -61,6 +61,10 @@ static libcasm_ir::Type* getType( Type* type )
 			return new libcasm_ir::Type( libcasm_ir::Type::ID::BOOLEAN );
 	    case TypeType::INT:
 			return new libcasm_ir::Type( libcasm_ir::Type::ID::INTEGER );
+	    case TypeType::RULEREF:
+			return new libcasm_ir::Type( libcasm_ir::Type::ID::RULE_POINTER );
+	    case TypeType::SELF:
+			return new libcasm_ir::Type( libcasm_ir::Type::ID::AGENT );
 	    default:
 			assert( 0 && "not implemented function atom identifier type" );
 			return 0;
@@ -339,7 +343,6 @@ void AstToCasmIRPass::visit_update( UpdateNode* node, T func, T expr )
 	
 	libcasm_ir::ExecutionSemanticsBlock* ir_scope =
 		lookupParent< libcasm_ir::ExecutionSemanticsBlock >( node );
-	
 	assert( ir_scope );
 	
 	libcasm_ir::TrivialStatement* ir_stmt = new libcasm_ir::TrivialStatement( ir_scope );
@@ -511,13 +514,42 @@ void AstToCasmIRPass::visit_pop( PopNode* node )
 	VISIT;
 	FIXME;
 }
-    
+
 void AstToCasmIRPass::visit_ifthenelse( IfThenElseNode* node, T cond )
 {
 	VISIT;
-	FIXME;
-}
+	printf( "%p -> %p\n",      node, node->condition_ );
+	printf( "%p -> %p | %p\n", node, node->then_, node->else_ );
+
+	libcasm_ir::ExecutionSemanticsBlock* ir_scope =
+		lookupParent< libcasm_ir::ExecutionSemanticsBlock >( node );
+	assert( ir_scope );
 	
+	libcasm_ir::BranchStatement* ir_stmt = new libcasm_ir::BranchStatement( ir_scope );
+	assert( ir_stmt );
+	
+	libcasm_ir::Value* ir_cond = lookup< libcasm_ir::Value >( node->condition_ );
+	assert( ir_cond );
+	assert
+	(  libcasm_ir::Value::isa< libcasm_ir::Instruction >( ir_cond )
+	or libcasm_ir::Value::isa< libcasm_ir::BooleanConstant >( ir_cond )
+	);
+	
+	libcasm_ir::Value* ir_case_true = new libcasm_ir::ParallelBlock( ir_scope );
+	assert( ir_case_true );
+	ast2casmir[ node ]             = ir_case_true;
+	ast2parent[ node->then_ ]      = node;
+	
+	libcasm_ir::Value* ir_case_false = new libcasm_ir::ParallelBlock( ir_scope );
+	assert( ir_case_false );
+	ast2casmir[ node->condition_ ] = ir_case_false;
+	ast2parent[ node->else_ ]      = node->condition_;
+	
+	ir_stmt->add( new libcasm_ir::BranchInstruction( ir_cond, ir_case_true, ir_case_false ) );
+	ir_stmt->addBlock( ir_case_true  );
+	ir_stmt->addBlock( ir_case_false );
+}
+
 void AstToCasmIRPass::visit_case( CaseNode* node, T val, const std::vector< T >& case_labels )
 {
 	VISIT;
@@ -738,6 +770,8 @@ T AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
 			ir_const = libcasm_ir::BooleanConstant::create(); break;
 	    case TypeType::INT:
 			ir_const = libcasm_ir::IntegerConstant::create(); break;
+	    case TypeType::RULEREF:
+			ir_const = libcasm_ir::RulePointerConstant::create(); break;
 	    default:
 			assert( 0 && "unimplemented undef constant!" );
 	}
@@ -803,13 +837,13 @@ T AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 {
 	VISIT;
 
-	libcasm_ir::Value* ir_const	= libcasm_ir::SelfConstant::create();
+	libcasm_ir::Value* ir_const	= libcasm_ir::AgentConstant::create( 0 );
     assert( ir_const );
     ast2casmir[ node ] = ir_const;
 	
 	return 0;
 }
-	
+
 T AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
 {
 	VISIT;

@@ -73,7 +73,15 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 	
 	for( auto value : symbols[".constant"] )
 	{
-		if( Value::isa< BooleanConstant >( value ) )
+		if( Value::isa< AgentConstant >( value ) )
+		{
+			emit( output, ((AgentConstant*)value) );
+		}
+		else if( Value::isa< RulePointerConstant >( value ) )
+		{
+			emit( output, ((RulePointerConstant*)value) );
+		}
+		else if( Value::isa< BooleanConstant >( value ) )
 		{
 			emit( output, ((BooleanConstant*)value) );
 		}
@@ -131,41 +139,23 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 			 
 			 LF IND "%%mem  = alloca %%stdll.mem"
 			 LF IND "call i8 @stdll.mem.new( %%stdll.mem* %%mem, i64 %u )"
-			 // LF "loop:"
-			 // LF IND ""
-			 // LF IND "%%.program = call i8* @program.location( i8* null )"
-			 // LF IND "%%.prog = bitcast i8* %%.program to %%libcasm-rt.Rule*"
-			 // LF IND "%%.rule = getelementptr %%libcasm-rt.Rule* %%.prog, i32 0, i32 0"
-			 // LF IND "%%.rdef = getelementptr %%libcasm-rt.Rule* %%.prog, i32 0, i32 1"
-			 // LF IND "%%rule = load void( %%libcasm-rt.updateset* )**"
-			 // LF IND "%%rdef = load i1*"
-			 // LF IND ""
-			 // LF IND "%%uset = call %%libcasm-rt.updateset* @libcasm-rt.updateset.new"
-			 //                  "( %%stdll.mem* %%mem, i32 100 )"
-			 // LF IND ""
-			 // LF IND "call void @foo( %%libcasm-rt.updateset* %%uset )"
-			 // LF IND ""
-			 // LF IND "call i8 @libcasm-rt.updateset.dump( %%libcasm-rt.updateset* %%uset )"
-			 // LF IND ""
-			 // LF IND "call i8 @libcasm-rt.updateset.apply( %%libcasm-rt.updateset* %%uset )"
-			 // LF IND ""
+			 LF IND ""
 			 LF IND "call void @libcasm-rt.main( %%stdll.mem* %%mem )"
+			 LF IND ""
 			 LF IND "%%.x = call i8* @x.location()"
 			 LF IND "%%.y = call i8* @y.location()"
 			 LF IND "%%.z = call i8* @z.location()"
+			 LF IND "%%.cnt = call i8* @cnt.location()"
 			 LF IND ""
 			 LF IND "%%x = bitcast i8* %%.x to %%libcasm-rt.Int*"
 			 LF IND "%%y = bitcast i8* %%.y to %%libcasm-rt.Int*"
 			 LF IND "%%z = bitcast i8* %%.z to %%libcasm-rt.Int*"
+			 LF IND "%%cnt = bitcast i8* %%.cnt to %%libcasm-rt.Int*"
 			 LF IND ""
 			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%x )"
 			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%y )"
 			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%z )"
-			 LF IND ""
-			 LF IND "call void @libcasm-rt.main( %%stdll.mem* %%mem )"
-			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%x )"
-			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%y )"
-			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%z )"
+			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%cnt )"
 			 LF IND ""
 			 LF IND "call i8 @stdll.mem.del( %%stdll.mem* %%mem )"
 			 LF IND "ret i8 0"

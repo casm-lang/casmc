@@ -3,15 +3,36 @@ CASM simple init foo
 function x : -> Int
 function y : -> Int
 function z : -> Int
+function cnt : -> Int
 
 rule foo =
 {
+/*
+ if cnt = undef then
+    cnt := 0
+ else
+    cnt := cnt + 1
+ */
+
+ if cnt = undef then
+    cnt := 0
+ else
+    if cnt > 3100000 then
+    {
+        program( self ) := undef
+    }
+    else
+    {
+        cnt := cnt + 1
+    }
  {|
     x := 1
     y := x
     {
       x := x + 2
     }
-    z := 28 + x
+    z := 28 + x   
  |}
+
+// program( self ) := undef
 }
