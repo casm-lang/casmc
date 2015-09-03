@@ -130,6 +130,10 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 #define LF "\n"
 	
 	fprintf( output,
+			 LF ""
+			 LF "target datalayout = \"e-m:e-i64:64-f80:128-n8:16:32:64-S128\""
+			 LF "target triple = \"x86_64-pc-linux-gnu\""
+			 LF ""
 			 LF "define i8 @main( i32 %%args, i8** %%argv ) nounwind"
 			 LF "{"
 			 LF "begin:"
