@@ -17,7 +17,7 @@ This project is currently in a very early stage and commits are coming ASAP.
 
 * License
 
-Please take a look in the LICENSE.txt file.
+This project is released under the NCSA open source license. Please take a look in the LICENSE.txt file of under http://opensource.org/licenses/NCSA for further information.
 
 * Logo
 

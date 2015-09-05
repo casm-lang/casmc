@@ -113,6 +113,7 @@ $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
 	make -C lib/casm-ir
 	make -C lib/casm-rt
 	make llvm -C lib/casm-rt
+#	make c11  -C lib/casm-rt
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++
 
@@ -150,11 +151,25 @@ test-%:
 	clang    -O2 -o obj/out.bin.O2 obj/out.cc.ll
 	clang    -O3 -o obj/out.bin.O3 obj/out.cc.ll
 
-	opt -adce -always-inline -dse -die -adce -O3 -S -o obj/out.opt.ll obj/out.ir.ll
+	opt -O3 -S -o obj/out.opt.ll obj/out.ir.ll
+	clang -O3 -o obj/out.bin.Oo obj/out.opt.ll
+
+attic-%:
+	cat lib/casm-rt/casm-rt.ir .attic/$*.ll > obj/out.ir.ll
+	llvm-link -S -o obj/out.cc.ll obj/out.ir.ll
+#	clang -g -flto -S -o obj/out.cc.ll obj/out.ir.ll
+#	llvm-link obj/out.ir.ll lib/stdll/stdll.ll lib/casm-rt/casm-rt.ll -S -o obj/out.cc.ll
+	clang -g -O0 -o obj/out.bin    obj/out.cc.ll
+	clang    -O1 -o obj/out.bin.O1 obj/out.cc.ll
+	clang    -O2 -o obj/out.bin.O2 obj/out.cc.ll
+	clang    -O3 -o obj/out.bin.O3 obj/out.cc.ll
+
+	opt -O3 -S -o obj/out.opt.ll obj/out.ir.ll
 	clang -O3 -o obj/out.bin.Oo obj/out.opt.ll
 
 
 opt:
+	@echo OPTS=$(OPTS)
 	@for i in \
 	\
 	adce add-discriminators always-inline argpromotion atomic-ll-sc \
@@ -164,23 +179,28 @@ opt:
 	early-cse \
 	functionattrs \
 	globaldce globalopt globalsmodref-aa gvn \
-	indvars inline inline-cost instcombine instcount instnamer instsimplify internalize intervals ipconstprop ipsccp iv-users \
+	indvars inline inline-cost instcombine instcount instnamer instsimplify intervals ipconstprop ipsccp iv-users \
 	jump-instr-table-info jump-threading \
 	lazy-value-info lcssa libcall-aa licm load-combine \
 	loop-deletion loop-extract loop-extract-single loop-idiom loop-instsimplify \
-	loop-reduce loop-reroll loop-rotate loop-simplify loop-unroll loop-unswitch loop-vectorize -loops \
+	loop-reduce loop-reroll loop-rotate loop-simplify loop-unroll loop-unswitch loop-vectorize loops \
 	lower-expect loweratomic lowerinvoke lowerswitch \
-	mem2reg memcpyopt memdep mergefunc mergereturn metarenamer mldst-motion module-debuginfo msan \
+	mem2reg memcpyopt memdep mergefunc mergereturn mldst-motion module-debuginfo \
 	no-aa notti \
 	partially-inline-libcalls postdomtree prune-eh \
 	reassociate reg2mem regions \
 	scalar-evolution scalarizer scalarrepl scalarrepl-ssa sccp scev-aa \
 	separate-const-offset-from-gep simplifycfg sink slp-vectorizer sroa \
 	strip strip-dead-debug-info strip-dead-prototypes strip-debug-declare strip-nondebug structurizecfg \
-	tailcallelim targetlibinfo tbaa tsan \
+	tailcallelim targetlibinfo tbaa \
 	verify \
 	; do \
-	  opt -mtriple=x86_64-pc-linux-gnu -mcpu=core2 -mattr=+avx2 -$$i -S -o obj/out.opt.ll obj/out.ir.ll; 2> /dev/null \
+	  rm -f obj/out.opt.ll; \
+	  opt \
+	  -mtriple=x86_64-pc-linux-gnu -mcpu=core2 -mattr=+avx2 \
+	  $(OPTS) \
+	  -$$i \
+	  -S -o obj/out.opt.ll obj/out.ir.ll; 2> /dev/null \
 	  clang -O0 -o obj/out.bin.opt obj/out.opt.ll 2> /dev/null; \
 	  for c in 1 2 3; do \
 	    printf "%-30s, " $$i; \
@@ -197,8 +217,17 @@ opt-%:
 	  /usr/bin/time -f "%e, W=%W, c=%c, w=%w, F=%F, R=%R, I=%I, O=%O, k=%k" ./obj/out.bin.OPT > /dev/null; \
 	done
 
+nop:
+	opt -S -o obj/out.OPT.ll obj/out.ir.ll; 2> /dev/null
+	@for c in 0 0 0 1 1 1 2 2 2 3 3 3; do \
+	  @clang -O$$c -o obj/out.bin.OPT obj/out.OPT.ll 2> /dev/null; \
+	  /usr/bin/time -f "%e, W=%W, c=%c, w=%w, F=%F, R=%R, I=%I, O=%O, k=%k" ./obj/out.bin.OPT > /dev/null; \
+	done
+
 # asan asan-module dfsan
 # partial-inliner sample-profile 
+
+# internalize tsan msan metarenamer 
 
 # O1 O2 O3
 # aa-eval lint
