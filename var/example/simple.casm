@@ -1,10 +1,10 @@
 CASM simple init foo
 
-function x : -> Int
-function y : -> Int
-function z : -> Int
+function x : -> Integer
+function y : -> Integer
+function z : -> Integer
 function flag : -> Boolean
-function cnt : -> Int
+function cnt : -> Integer
 
 rule foo =
 {

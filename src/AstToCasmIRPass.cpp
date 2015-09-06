@@ -59,7 +59,7 @@ static libcasm_ir::Type* getType( Type* type )
 	{
 	    case TypeType::BOOLEAN:
 			return new libcasm_ir::Type( libcasm_ir::Type::ID::BOOLEAN );
-	    case TypeType::INT:
+	    case TypeType::INTEGER:
 			return new libcasm_ir::Type( libcasm_ir::Type::ID::INTEGER );
 	    case TypeType::RULEREF:
 			return new libcasm_ir::Type( libcasm_ir::Type::ID::RULE_POINTER );
@@ -768,7 +768,7 @@ T AstToCasmIRPass::visit_undef_atom( UndefAtom* node )
 	{
 	    case TypeType::BOOLEAN:
 			ir_const = libcasm_ir::BooleanConstant::create(); break;
-	    case TypeType::INT:
+	    case TypeType::INTEGER:
 			ir_const = libcasm_ir::IntegerConstant::create(); break;
 	    case TypeType::RULEREF:
 			ir_const = libcasm_ir::RulePointerConstant::create(); break;
@@ -796,7 +796,7 @@ T AstToCasmIRPass::visit_boolean_atom( BooleanAtom* node )
 	return 0;
 }
 
-T AstToCasmIRPass::visit_int_atom( IntAtom* node )
+T AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
 {
 	VISIT;
 	printf( "%lu\n", node->val_	);

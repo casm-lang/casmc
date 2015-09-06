@@ -1,8 +1,8 @@
 CASM foo 
 
 init baz
-//function x : Int -> Int
-function y : Int * Int -> Int
+//function x : Integer -> Integer
+function y : Integer * Integer -> Integer
 
 //derived mai = "asdf"
 derived mac = y(0,2) + 10

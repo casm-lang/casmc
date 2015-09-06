@@ -1,8 +1,8 @@
 CASM bla init foo
 
-//function x : Int(-32 .. 32) -> Int(-128 .. 127)
+//function x : Integer(-32 .. 32) -> Integer(-128 .. 127)
 
-function x : Int -> Int
+function x : Integer -> Integer
 
 // rule bla = x(1) := 1
 

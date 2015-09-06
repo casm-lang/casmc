@@ -1,6 +1,6 @@
 CASM test init foo
 
-function x : Int -> Int
+function x : Integer -> Integer
 
 rule foo =
 {

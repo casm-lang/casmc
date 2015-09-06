@@ -1,9 +1,9 @@
 CASM syntax
 init syntax
 
-function x : -> Int
-function y : Int -> Int
-function z : Int -> Boolean
+function x : -> Integer
+function y : Integer -> Integer
+function z : Integer -> Boolean
 
 derived macro = 10 + 50
 

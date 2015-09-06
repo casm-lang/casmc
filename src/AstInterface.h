@@ -219,7 +219,7 @@ public:
 		return 0;
 	}
     
-	T visit_int_atom( IntAtom* node )
+	T visit_int_atom( IntegerAtom* node )
 	{
 		return 0;
 	}
