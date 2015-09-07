@@ -89,6 +89,10 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 		{
 			emit( output, ((IntegerConstant*)value) );
 		}
+		else if( Value::isa< StringConstant >( value ) )
+		{
+			emit( output, ((StringConstant*)value) );
+		}
 		else if( Value::isa< Identifier >( value ) )
 		{
 		    continue;
@@ -139,33 +143,17 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 			 LF "begin:"
 			 LF IND "%%p = call i8* @program.location( i8* null )"
 			 LF IND "%%r = bitcast i8* %%p to %%libcasm-rt.Rule*"
-			 LF IND "call void @libcasm-rt.set.Rule.ptr( %%libcasm-rt.Rule* %%r, %%libcasm-rt.RuleAddr @%s )"
-			 
+			 LF IND "call void @libcasm-rt.set.Rule.ptr"
+			        "( %%libcasm-rt.Rule* %%r, %%libcasm-rt.RuleAddr @%s )"			 
 			 LF IND "%%mem  = alloca %%stdll.mem"
 			 LF IND "call i8 @stdll.mem.new( %%stdll.mem* %%mem, i64 %u )"
 			 LF IND ""
 			 LF IND "call void @libcasm-rt.main( %%stdll.mem* %%mem )"
-			 LF IND ""
-			 LF IND "%%.x = call i8* @x.location()"
-			 LF IND "%%.y = call i8* @y.location()"
-			 LF IND "%%.z = call i8* @z.location()"
-			 LF IND "%%.cnt = call i8* @cnt.location()"
-			 LF IND ""
-			 LF IND "%%x = bitcast i8* %%.x to %%libcasm-rt.Int*"
-			 LF IND "%%y = bitcast i8* %%.y to %%libcasm-rt.Int*"
-			 LF IND "%%z = bitcast i8* %%.z to %%libcasm-rt.Int*"
-			 LF IND "%%cnt = bitcast i8* %%.cnt to %%libcasm-rt.Int*"
-			 LF IND ""
-			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%x )"
-			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%y )"
-			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%z )"
-			 LF IND "call void @libcasm-rt.dump.Int( %%libcasm-rt.Int* %%cnt )"
-			 LF IND ""
 			 LF IND "call i8 @stdll.mem.del( %%stdll.mem* %%mem )"
 			 LF IND "ret i8 0"
 			 LF "}"
 			 LF
-			 , "foo", 1000000
+			 , "foo", 256000000
 		);
 	
 	return false;

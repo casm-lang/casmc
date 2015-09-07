@@ -3,6 +3,7 @@ CASM simple init foo
 function x : -> Integer
 function y : -> Integer
 function z : -> Integer
+function s : -> String
 function flag : -> Boolean
 function cnt : -> Integer
 
@@ -10,11 +11,25 @@ rule foo =
 {
 
  if cnt = undef then
+ {
+    skip
+    //s := "this is a text"
     cnt := 0
+    //program( self ) := undef
+ }
+ 
  else
     if cnt >= 1234567 then
+    // if cnt >= 1000000000 then
     {
-        program( self ) := undef
+        program( self ) := undef //@epilog
+
+        print x + y + z // print dec( x )
+        print x
+        print y
+        print z
+        //print s
+        print cnt
     }
     else
     {
@@ -24,11 +39,13 @@ rule foo =
     x := 1
     
     y := x
+
     {
       x := x + 2
     }
+    
     {
-      y := y + 1
+      //y := y + 1
       {|
         let a = x + 2 in
         let b = a + 2 in
@@ -37,10 +54,9 @@ rule foo =
         }
       |}
     }
-    z := 28 + x
     
+    z := 28 + x
  |}
-
 
  /*
  x := 0
@@ -57,4 +73,14 @@ rule foo =
 
   flag := true
   */
+}
+
+rule epilog =
+{
+  print x + y + z // print dec( x )
+  print x
+  print y
+  print z
+  print cnt
+  program( self ) := undef
 }

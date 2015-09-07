@@ -167,8 +167,11 @@ int main( int argc, const char *argv[] )
 	{
 		return -1;
 	}
-	
-	b.run( x );
+
+	if( !b.run( x ) )
+	{
+		return -1;
+	}
 	
 	c.run( x );
 	

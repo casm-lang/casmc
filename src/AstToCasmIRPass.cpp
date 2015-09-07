@@ -57,14 +57,16 @@ static libcasm_ir::Type* getType( Type* type )
 	
 	switch( type->t )
 	{
+	    case TypeType::SELF: // Agent!
+			return new libcasm_ir::Type( libcasm_ir::Type::ID::AGENT );
+	    case TypeType::RULEREF:
+			return new libcasm_ir::Type( libcasm_ir::Type::ID::RULE_POINTER );
 	    case TypeType::BOOLEAN:
 			return new libcasm_ir::Type( libcasm_ir::Type::ID::BOOLEAN );
 	    case TypeType::INTEGER:
 			return new libcasm_ir::Type( libcasm_ir::Type::ID::INTEGER );
-	    case TypeType::RULEREF:
-			return new libcasm_ir::Type( libcasm_ir::Type::ID::RULE_POINTER );
-	    case TypeType::SELF:
-			return new libcasm_ir::Type( libcasm_ir::Type::ID::AGENT );
+	    case TypeType::STRING:
+			return new libcasm_ir::Type( libcasm_ir::Type::ID::STRING );
 	    default:
 			assert( 0 && "not implemented function atom identifier type" );
 			return 0;
@@ -420,6 +422,8 @@ void AstToCasmIRPass::visit_print( PrintNode* node, std::vector< T >& args )
 		libcasm_ir::Value* instr = lookup< libcasm_ir::Value >( a );
 		ir_print->add( instr );
 	}
+	ir_print->add( libcasm_ir::StringConstant::create( (const char*)"\n" ) );
+	
 	ir_stmt->add( ir_print );
 }
     
@@ -802,8 +806,7 @@ T AstToCasmIRPass::visit_int_atom( IntegerAtom* node )
 	printf( "%lu\n", node->val_	);
 	
 	libcasm_ir::IntegerConstant* ir_const
-		= libcasm_ir::IntegerConstant::create( (libcasm_ir::Type::Integer)node->val_ );
-	
+		= libcasm_ir::IntegerConstant::create( (libcasm_ir::Type::Integer)node->val_ );	
 	assert( ir_const );
     ast2casmir[ node ] = ir_const;
 	
@@ -827,8 +830,12 @@ T AstToCasmIRPass::visit_rational_atom( RationalAtom* node )
 T AstToCasmIRPass::visit_string_atom( StringAtom* node )
 {
 	VISIT;
+	
+	libcasm_ir::Value* ir_const	= libcasm_ir::StringConstant::create( node->string.c_str() );	
+	assert( ir_const );
+    ast2casmir[ node ] = ir_const;
+	
 	printf( "%s\n", node->string.c_str() );
-	FIXME;
 	return 0;
 }
 
@@ -847,8 +854,13 @@ T AstToCasmIRPass::visit_self_atom( SelfAtom* node )
 T AstToCasmIRPass::visit_rule_atom( RuleAtom* node )
 {
 	VISIT;
+
+	libcasm_ir::Value* ir_const = libcasm_ir::RulePointerConstant::create( node->name.c_str() );
+    assert( ir_const );
+    ast2casmir[ node ] = ir_const;
+	
 	printf( "rule: @%s\n", node->name.c_str() );
-	FIXME;
+	
 	return 0;
 }
 	

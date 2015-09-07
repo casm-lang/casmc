@@ -1,0 +1,18 @@
+CASM let_test
+init foo
+
+function x : -> Int
+
+rule foo =
+{
+  let x = 10 in
+    skip
+  
+  let y = 20 in
+    print a
+    
+  let y = 30 in
+    print a
+
+  program(self):=undef
+}
