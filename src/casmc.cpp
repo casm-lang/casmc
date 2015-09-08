@@ -161,7 +161,7 @@ int main( int argc, const char *argv[] )
 	TypeCheckPass b;
 	AstDumpPass c;
 	AstToCasmIRPass d; 
-    CasmIRToLLCodePass e; 
+	libcasm_be::CasmIRToLLCodePass e; 
 	
 	if( !a.run( x ) )
 	{

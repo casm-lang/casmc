@@ -48,7 +48,7 @@ OBJECTS += obj/SourceToAstPass.o
 OBJECTS += obj/TypeCheckPass.o
 OBJECTS += obj/AstDumpPass.o
 OBJECTS += obj/AstToCasmIRPass.o
-OBJECTS += obj/CasmIRToLLCodePass.o
+#OBJECTS += obj/CasmIRToLLCodePass.o
 
 INCLUDE += -I src
 INCLUDE += -I src/ir
