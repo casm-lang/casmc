@@ -44,10 +44,10 @@ TARGET=casmc
 
 OBJECTS += obj/casmc.o
 OBJECTS += obj/PassManager.o
-OBJECTS += obj/SourceToAstPass.o
-OBJECTS += obj/TypeCheckPass.o
-OBJECTS += obj/AstDumpPass.o
-OBJECTS += obj/AstToCasmIRPass.o
+#OBJECTS += obj/SourceToAstPass.o
+#OBJECTS += obj/TypeCheckPass.o
+#OBJECTS += obj/AstDumpPass.o
+#OBJECTS += obj/AstToCasmIRPass.o
 #OBJECTS += obj/CasmIRToLLCodePass.o
 
 INCLUDE += -I src
@@ -56,16 +56,19 @@ INCLUDE += -I obj
 INCLUDE += -I lib/casm-fe/src
 INCLUDE += -I lib/casm-fe/build/src
 INCLUDE += -I lib/casm-ir/src
+INCLUDE += -I lib/casm-ir/src/analyze
+INCLUDE += -I lib/casm-ir/src/transform
 INCLUDE += -I lib/casm-rt/src
 INCLUDE += -I lib/casm-be/src
+INCLUDE += -I lib/casm-be/src/transform
 INCLUDE += -I lib/pass/src
 
 INCLUDE += -I lib
 #INCLUDE += -I lib/stdhl/c
 
-LIBRARY += lib/casm-fe/build/libfrontend.a
 LIBRARY += lib/stdhl/libstdhlc.a
 LIBRARY += lib/stdhl/libstdhlcpp.a
+#LIBRARY += lib/casm-fe/build/libfrontend.a
 LIBRARY += lib/casm-ir/libcasm-ir.a
 #LIBRARY += lib/casm-rt/libcasm-rt.a
 LIBRARY += lib/casm-be/libcasm-be.a
@@ -94,8 +97,8 @@ obj/%.o: src/%.c
 	@echo "CC  " $<
 	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
 
-lib/casm-fe/build/libfrontend.a: lib/casm-fe
-	@cd $<; $(MAKE)
+#lib/casm-fe/build/libfrontend.a: lib/casm-fe
+#	@cd $<; $(MAKE)
 
 lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
 	@cd $<; $(MAKE)
@@ -116,6 +119,7 @@ obj/version.h: obj
 $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
 	make llvm -C lib/stdll
 	make llvm -C lib/casm-rt
+#	make -C lib/casm-fe
 	make -C lib/casm-ir
 #	make -C lib/casm-rt
 	make -C lib/casm-be
@@ -127,8 +131,9 @@ clean:
 	@rm -rf obj
 	@echo "RM  " casmc
 	@rm -f casmc
-	$(MAKE) clean -C lib/casm-ir
 	$(MAKE) clean -C lib/casm-rt
+#	$(MAKE) clean -C lib/casm-fe
+	$(MAKE) clean -C lib/casm-ir
 	$(MAKE) clean -C lib/casm-be
 
 

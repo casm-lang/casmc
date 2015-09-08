@@ -37,9 +37,15 @@
 
 #include "Pass.h"
 
-#include "AstDumpPass.h"
-#include "AstToCasmIRPass.h"
-#include "CasmIRToLLCodePass.h"
+#include "libcasm-ir.h"
+#include "libcasm-be.h"
+
+#include "analyze/AstDumpPass.h"
+#include "analyze/TypeCheckPass.h"
+
+#include "transform/SourceToAstPass.h"
+#include "transform/AstToCasmIRPass.h"
+#include "transform/CasmIRToLLCodePass.h"
 
 #include "version.h"
 
@@ -47,9 +53,6 @@
     @brief TODO
 
     TODO
-	
-    @author   Philipp Paulweber
-    @date     2015-01-27
 */
 
 int main( int argc, const char *argv[] )
@@ -157,10 +160,10 @@ int main( int argc, const char *argv[] )
 	x.getResults()[ 0 ] = (void*)file_name;
 	x.getResults()[ (void*)1 ] = (void*)output_name;
 	
-	SourceToAstPass a;
-	TypeCheckPass b;
-	AstDumpPass c;
-	AstToCasmIRPass d; 
+	libcasm_ir::SourceToAstPass a;
+	libcasm_ir::TypeCheckPass b;
+	libcasm_ir::AstDumpPass c;
+	libcasm_ir::AstToCasmIRPass d; 
 	libcasm_be::CasmIRToLLCodePass e; 
 	
 	if( !a.run( x ) )
