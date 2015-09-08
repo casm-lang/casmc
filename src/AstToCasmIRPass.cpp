@@ -81,8 +81,15 @@ bool AstToCasmIRPass::run( libpass::PassResult& pr )
 
 	walker.suppress_calls = true;
 	walker.walk_specification( node );
+
+	// PPA: this could be extracted to a 'update and check consistency' Value function?
+	libcasm_ir::Value::SymbolTable& symbols = *libcasm_ir::Value::getSymbols();
+	for( auto value : symbols[".rulepointer"] )
+	{
+		assert( libcasm_ir::Value::isa< libcasm_ir::RulePointerConstant >( value ) );
+		((libcasm_ir::RulePointerConstant*)value)->resolve();
+	}
 	
-	// TODO: PPA: implement the IR translation!!!
 	
 	casm_frontend_destroy();
 	return true;
@@ -124,20 +131,22 @@ __FILE__, __LINE__, __FUNCTION__, node, node->to_str().c_str() )
 
 void AstToCasmIRPass::visit_specification( AstNode* node )
 {
-	VISIT;
-	printf( "CASM specification\n" );
-	//FIXME;
+	// VISIT;
+	// printf( "CASM specification\n" );
+	// //FIXME;
 }
 
 void AstToCasmIRPass::visit_init( UnaryNode* node )
 {
-	VISIT;
-	printf( "init %s\n", global_driver->init_name.c_str() );
-	//FIXME;TODO ASAP!!!
+	// VISIT;
+	// printf( "init %s\n", global_driver->init_name.c_str() );
+	libcasm_ir::RulePointerConstant* ir_init =
+		libcasm_ir::RulePointerConstant::create( global_driver->init_name.c_str() );
 	
-	// libcasm_ir::Value* ir_init =
-	// 	new libcasm_ir::Value( global_driver->init_name.c_str(), 0, libcasm_ir::Value::RULE );
+	libcasm_ir::Agent* ir_agent = new libcasm_ir::Agent();
+	assert( ir_agent );
 	
+	ir_agent->setInitRulePointer( ir_init );
 }
 
 void AstToCasmIRPass::visit_body_elements( AstNode* node )

@@ -53,6 +53,7 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 	// AstNode* node = (AstNode*)pr.getResult< TypeCheckPass >();
 	
 	const char* output_name = (const char*)pr.getResults()[ (void*)1 ];
+	
 	FILE* output = stdout;
 	if( !output_name )
 	{
@@ -68,6 +69,20 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 	
 	Value::SymbolTable& symbols = *Value::getSymbols();
 
+	const char* init_rule = 0;
+	for( auto value : symbols[".agent"] )
+	{
+		RulePointerConstant* rule_ptr = ((Agent*)value)->getInitRulePointer();
+		
+		if( rule_ptr )
+		{
+			assert( rule_ptr->getValue() );
+			assert( !init_rule );
+			init_rule = rule_ptr->getValue()->getName();
+		}
+	}
+	
+	
 	fprintf( output, "\n" );
 	fprintf( output, "; constants\n" );
 	
@@ -134,10 +149,10 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 #define LF "\n"
 	
 	fprintf( output,
-			 LF ""
-			 LF "target datalayout = \"e-m:e-i64:64-f80:128-n8:16:32:64-S128\""
-			 LF "target triple = \"x86_64-pc-linux-gnu\""
-			 LF ""
+			 // LF ""
+			 // LF "target datalayout = \"e-m:e-i64:64-f80:128-n8:16:32:64-S128\""
+			 // LF "target triple = \"x86_64-pc-linux-gnu\""
+			 // LF ""
 			 LF "define i8 @main( i32 %%args, i8** %%argv ) nounwind"
 			 LF "{"
 			 LF "begin:"
@@ -153,7 +168,7 @@ bool CasmIRToLLCodePass::run( libpass::PassResult& pr )
 			 LF IND "ret i8 0"
 			 LF "}"
 			 LF
-			 , "foo", 256000000
+			 , init_rule, 256000000
 		);
 	
 	return false;

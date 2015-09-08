@@ -53,20 +53,22 @@ OBJECTS += obj/CasmIRToLLCodePass.o
 INCLUDE += -I src
 INCLUDE += -I src/ir
 INCLUDE += -I obj
-INCLUDE += -I lib/casm-frontend/src
-INCLUDE += -I lib/casm-frontend/build/src
+INCLUDE += -I lib/casm-fe/src
+INCLUDE += -I lib/casm-fe/build/src
 INCLUDE += -I lib/casm-ir/src
 INCLUDE += -I lib/casm-rt/src
+INCLUDE += -I lib/casm-be/src
 INCLUDE += -I lib/pass/src
 
 INCLUDE += -I lib
 #INCLUDE += -I lib/stdhl/c
 
-LIBRARY += lib/casm-frontend/build/libfrontend.a
+LIBRARY += lib/casm-fe/build/libfrontend.a
 LIBRARY += lib/stdhl/libstdhlc.a
 LIBRARY += lib/stdhl/libstdhlcpp.a
 LIBRARY += lib/casm-ir/libcasm-ir.a
-LIBRARY += lib/casm-rt/libcasm-rt.a
+#LIBRARY += lib/casm-rt/libcasm-rt.a
+LIBRARY += lib/casm-be/libcasm-be.a
 
 
 .PHONY: obj/version.h
@@ -92,7 +94,7 @@ obj/%.o: src/%.c
 	@echo "CC  " $<
 	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
 
-lib/casm-frontend/build/libfrontend.a: lib/casm-frontend
+lib/casm-fe/build/libfrontend.a: lib/casm-fe
 	@cd $<; $(MAKE)
 
 lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
@@ -101,7 +103,10 @@ lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
 lib/casm-ir/libcasm-ir.a: lib/casm-ir
 	@cd $<; $(MAKE)
 
-lib/casm-rt/libcasm-rt.a: lib/casm-rt
+# lib/casm-rt/libcasm-rt.a: lib/casm-rt
+# 	@cd $<; $(MAKE)
+
+lib/casm-be/libcasm-be.a: lib/casm-be
 	@cd $<; $(MAKE)
 
 obj/version.h: obj
@@ -110,10 +115,10 @@ obj/version.h: obj
 
 $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
 	make llvm -C lib/stdll
-	make -C lib/casm-ir
-	make -C lib/casm-rt
 	make llvm -C lib/casm-rt
-#	make c11  -C lib/casm-rt
+	make -C lib/casm-ir
+#	make -C lib/casm-rt
+	make -C lib/casm-be
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++
 
@@ -124,10 +129,7 @@ clean:
 	@rm -f casmc
 	$(MAKE) clean -C lib/casm-ir
 	$(MAKE) clean -C lib/casm-rt
-
-stub:
-	PROJECT=casmc LICENSE=NSCA ./lib/stub/stub.sh cpp $(ARG) src
-
+	$(MAKE) clean -C lib/casm-be
 
 
 git-%:

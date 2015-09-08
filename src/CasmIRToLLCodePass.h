@@ -38,7 +38,7 @@
 #include "Pass.h"
 
 #include "libcasm-ir.h"
-#include "libcasm-rt.h"
+#include "libcasm-be.h"
 
 /**
    @brief    TODO
@@ -47,7 +47,7 @@
 */
 
 
-class CasmIRToLLCodePass : public libpass::Pass, public libcasm_rt::LLCodeBackend
+class CasmIRToLLCodePass : public libpass::Pass, public libcasm_be::LLCodeBackend
 {
 public:
 	static char id;
