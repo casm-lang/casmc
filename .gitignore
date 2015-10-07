@@ -1,6 +1,5 @@
 .attic
 .gimasy
 casmc
-lib
 obj
 var/example/*.dot*

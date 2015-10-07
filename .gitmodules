@@ -1,0 +1,24 @@
+[submodule "lib/casm-be"]
+	path = lib/casm-be
+	url = git@gitlab.swa.univie.ac.at:ppaulweber/libcasm-be.git
+[submodule "lib/casm-ir"]
+	path = lib/casm-ir
+	url = git@gitlab.swa.univie.ac.at:ppaulweber/libcasm-ir.git
+[submodule "lib/casm-rt"]
+	path = lib/casm-rt
+	url = git@gitlab.swa.univie.ac.at:ppaulweber/libcasm-rt.git
+[submodule "lib/stdhl"]
+	path = lib/stdhl
+	url = git@gitlab.swa.univie.ac.at:ppaulweber/libstdhl.git
+[submodule "lib/stdll"]
+	path = lib/stdll
+	url = git@gitlab.swa.univie.ac.at:ppaulweber/libstdll.git
+[submodule "lib/casm-fe"]
+	path = lib/casm-fe
+	url = git@github.com:fhahn/libcasm-frontend.git
+[submodule "lib/pass"]
+	path = lib/pass
+	url = git@gitlab.swa.univie.ac.at:ppaulweber/libpass.git
+[submodule "lib/gtest"]
+	path = lib/gtest
+	url = https://chromium.googlesource.com/external/googletest
