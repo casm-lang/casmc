@@ -1,0 +1,18 @@
+CASM bitexample
+
+init foo
+
+function a : -> Bit(8)
+function b : -> Bit(4)
+function c : -> Integer
+
+rule foo =
+{
+  a := a - a + asBit(3,8) + asBit(0b1100111011,8) + asBit(c,8)
+  
+  b := b * b
+
+  c := c + 7
+  
+  program(self) := undef
+}

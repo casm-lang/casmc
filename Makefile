@@ -66,12 +66,12 @@ INCLUDE += -I lib/pass/src
 INCLUDE += -I lib
 #INCLUDE += -I lib/stdhl/c
 
-LIBRARY += lib/stdhl/libstdhlc.a
+LIBRARY  = lib/stdhl/libstdhlc.a
 LIBRARY += lib/stdhl/libstdhlcpp.a
-#LIBRARY += lib/casm-fe/build/libfrontend.a
 LIBRARY += lib/casm-ir/libcasm-ir.a
 #LIBRARY += lib/casm-rt/libcasm-rt.a
 LIBRARY += lib/casm-be/libcasm-be.a
+LIBRARY += lib/casm-fe/build/libfrontend.a
 
 
 .PHONY: obj/version.h
@@ -97,8 +97,8 @@ obj/%.o: src/%.c
 	@echo "CC  " $<
 	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
 
-#lib/casm-fe/build/libfrontend.a: lib/casm-fe
-#	@cd $<; $(MAKE)
+lib/casm-fe/build/libfrontend.a: lib/casm-fe
+	@cd $<; $(MAKE)
 
 lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
 	@cd $<; $(MAKE)
@@ -117,14 +117,14 @@ obj/version.h: obj
 	@echo "#define VERSION \""`git describe --always --tags --dirty`"\"" > $@
 
 $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
-	make llvm -C lib/stdll
-	make llvm -C lib/casm-rt
-#	make -C lib/casm-fe
-	make -C lib/casm-ir
-#	make -C lib/casm-rt
-	make -C lib/casm-be
+# 	make llvm -C lib/stdll
+# 	make llvm -C lib/casm-rt
+# 	make -C lib/casm-fe
+# 	make -C lib/casm-ir
+# #	make -C lib/casm-rt
+# 	make -C lib/casm-be
 	@echo "LD  " $@
-	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++
+	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++ -lm
 
 clean:
 	@echo "RMD " obj
@@ -132,7 +132,7 @@ clean:
 	@echo "RM  " casmc
 	@rm -f casmc
 	$(MAKE) clean -C lib/casm-rt
-#	$(MAKE) clean -C lib/casm-fe
+	$(MAKE) clean -C lib/casm-fe
 	$(MAKE) clean -C lib/casm-ir
 	$(MAKE) clean -C lib/casm-be
 
