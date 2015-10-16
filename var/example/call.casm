@@ -1,0 +1,19 @@
+CASM test init foo
+
+rule foo( x : Integer ) =
+{
+    case x of
+    default: skip
+    0 : print "false"
+    1 : print "true"
+    endcase
+
+    call foo( 4 )
+
+    let y : RuleRef = @foo in
+    {|
+        call (y)( x )
+
+        print bin( asBit( 0xfeed, 32 ) )
+    |}
+}
