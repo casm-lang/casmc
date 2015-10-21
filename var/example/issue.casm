@@ -1,0 +1,11 @@
+
+CASM issue
+
+init foo
+
+function foo : Integer -> Integer
+
+rule foo =
+{
+    skip
+}
