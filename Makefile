@@ -66,12 +66,17 @@ INCLUDE += -I lib/pass/src
 INCLUDE += -I lib
 #INCLUDE += -I lib/stdhl/c
 
+INCLUDE += -I lib/z3/src/api
+INCLUDE += -I lib/z3/src/api/c++
+
 LIBRARY  = lib/stdhl/libstdhlc.a
 LIBRARY += lib/stdhl/libstdhlcpp.a
 LIBRARY += lib/casm-ir/libcasm-ir.a
 #LIBRARY += lib/casm-rt/libcasm-rt.a
 LIBRARY += lib/casm-be/libcasm-be.a
 LIBRARY += lib/casm-fe/build/libfrontend.a
+
+#LIBRARY += lib/z3/build/libz3.a
 
 
 .PHONY: obj/version.h
@@ -96,6 +101,7 @@ obj/%.o: src/%.cpp
 obj/%.o: src/%.c
 	@echo "CC  " $<
 	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
+
 
 lib/casm-fe/build/libfrontend.a: lib/casm-fe
 	@cd $<; $(MAKE)
@@ -124,7 +130,7 @@ $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
 # #	make -C lib/casm-rt
 # 	make -C lib/casm-be
 	@echo "LD  " $@
-	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) -lstdc++ -lm
+	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) lib/z3/build/libz3.so -lstdc++ -lm
 
 clean:
 	@echo "RMD " obj
