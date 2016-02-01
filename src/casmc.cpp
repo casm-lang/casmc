@@ -42,6 +42,7 @@
 
 #include "analyze/AstDumpPass.h"
 #include "analyze/TypeCheckPass.h"
+#include "analyze/CasmIRDumpPass.h"
 
 #include "transform/SourceToAstPass.h"
 #include "transform/AstToCasmIRPass.h"
@@ -168,7 +169,9 @@ int main( int argc, const char *argv[] )
 	libcasm_ir::TypeCheckPass b;
 	libcasm_ir::AstDumpPass c;
 	libcasm_ir::AstToCasmIRPass d; 
-	libcasm_be::CasmIRToLLCodePass e; 
+	//libcasm_be::CasmIRToLLCodePass e; 
+
+	libcasm_ir::CasmIRDumpPass f; 
 	
 	if( !a.run( x ) )
 	{
@@ -181,10 +184,14 @@ int main( int argc, const char *argv[] )
 	}
 	
 	c.run( x );
-	
+    
 	d.run( x );
 
-	e.run( x );
+	// e.run( x );
+
+	printf( "\n===--- DUMPING CASM IR ---===\n" );
+	
+	f.run( x );
 	
 	// transform CASM AST -> IR
 	

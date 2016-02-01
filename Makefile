@@ -133,7 +133,7 @@ $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
 # 	make llvm -C lib/stdll
 # 	make llvm -C lib/casm-rt
 # 	make -C lib/casm-fe
-# 	make -C lib/casm-ir
+	make -C lib/casm-ir
 # #	make -C lib/casm-rt
 # 	make -C lib/casm-be
 	@echo "LD  " $@

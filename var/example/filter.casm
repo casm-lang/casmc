@@ -1,0 +1,12 @@
+CASM filter_specification init filter
+
+function x : -> Integer
+function y : -> Integer
+
+function c : -> Integer
+
+rule foo =
+{
+    y := ( y + x ) / 2    
+    c := c + 1
+}
