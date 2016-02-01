@@ -62,6 +62,9 @@ INCLUDE += -I lib/casm-rt/src
 INCLUDE += -I lib/casm-be/src
 INCLUDE += -I lib/casm-be/src/transform
 INCLUDE += -I lib/pass/src
+INCLUDE += -I lib/novel/src
+INCLUDE += -I lib/novel/src/analyze
+INCLUDE += -I lib/novel/src/transform
 
 INCLUDE += -I lib
 #INCLUDE += -I lib/stdhl/c
@@ -75,6 +78,7 @@ LIBRARY += lib/casm-ir/libcasm-ir.a
 #LIBRARY += lib/casm-rt/libcasm-rt.a
 LIBRARY += lib/casm-be/libcasm-be.a
 LIBRARY += lib/casm-fe/build/libfrontend.a
+LIBRARY += lib/novel/libnovel.a
 
 #LIBRARY += lib/z3/build/libz3.a
 
@@ -118,6 +122,9 @@ lib/casm-ir/libcasm-ir.a: lib/casm-ir
 lib/casm-be/libcasm-be.a: lib/casm-be
 	@cd $<; $(MAKE)
 
+lib/novel/libnovel.a: lib/novel
+	@cd $<; $(MAKE)
+
 obj/version.h: obj
 	@echo "GEN " $@ 
 	@echo "#define VERSION \""`git describe --always --tags --dirty`"\"" > $@
@@ -141,6 +148,7 @@ clean:
 	$(MAKE) clean -C lib/casm-fe
 	$(MAKE) clean -C lib/casm-ir
 	$(MAKE) clean -C lib/casm-be
+	$(MAKE) clean -C lib/novel
 
 
 git-%:
