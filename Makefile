@@ -135,7 +135,7 @@ $(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
 # 	make -C lib/casm-fe
 	make -C lib/casm-ir
 # #	make -C lib/casm-rt
-# 	make -C lib/casm-be
+	make -C lib/casm-be
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) lib/z3/build/libz3.so -lstdc++ -lm
 

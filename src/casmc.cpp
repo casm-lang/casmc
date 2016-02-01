@@ -52,6 +52,8 @@
 
 #include "analyze/NovelDumpPass.h"
 
+#include "transform/NovelToLLPass.h"
+
 
 #include "version.h"
 
@@ -179,6 +181,7 @@ int main( int argc, const char *argv[] )
 	libcasm_ir::CasmIRDumpPass f; 
 	libcasm_be::CasmIRToNovelPass g; 
 	libnovel::NovelDumpPass h; 
+	libnovel::NovelToLLPass ll; 
 	
 	if( !a.run( x ) )
 	{
@@ -207,6 +210,10 @@ int main( int argc, const char *argv[] )
 	printf( "\n===--- DUMPING NOVEL ---===\n" );
 	
 	h.run( x );
+
+	printf( "\n===--- NOVEL to LL ---===\n" );
+	
+	ll.run( x );
 	
 	// transform CASM AST -> IR
 	
