@@ -1,6 +1,6 @@
 [submodule "lib/casm-fe"]
 	path = lib/casm-fe
-	url = git@github.com:fhahn/libcasm-frontend.git
+	url = git@github.com:ppaulweber/libcasm-fe.git
 [submodule "lib/casm-ir"]
 	path = lib/casm-ir
 	url = git@github.com:ppaulweber/libcasm-ir.git
