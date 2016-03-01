@@ -1,30 +1,27 @@
-[submodule "lib/casm-be"]
-	path = lib/casm-be
-	url = git@gitlab.swa.univie.ac.at:ppaulweber/libcasm-be.git
-[submodule "lib/casm-ir"]
-	path = lib/casm-ir
-	url = git@gitlab.swa.univie.ac.at:ppaulweber/libcasm-ir.git
-[submodule "lib/casm-rt"]
-	path = lib/casm-rt
-	url = git@gitlab.swa.univie.ac.at:ppaulweber/libcasm-rt.git
-[submodule "lib/stdhl"]
-	path = lib/stdhl
-	url = git@gitlab.swa.univie.ac.at:ppaulweber/libstdhl.git
-[submodule "lib/stdll"]
-	path = lib/stdll
-	url = git@gitlab.swa.univie.ac.at:ppaulweber/libstdll.git
 [submodule "lib/casm-fe"]
 	path = lib/casm-fe
 	url = git@github.com:fhahn/libcasm-frontend.git
+[submodule "lib/casm-ir"]
+	path = lib/casm-ir
+	url = git@github.com:ppaulweber/libcasm-ir.git
+[submodule "lib/casm-rt"]
+	path = lib/casm-rt
+	url = git@github.com:ppaulweber/libcasm-rt.git
+[submodule "lib/casm-be"]
+	path = lib/casm-be
+	url = git@github.com:ppaulweber/libcasm-be.git
+[submodule "lib/novel"]
+	path = lib/novel
+	url = git@github.com:ppaulweber/libnovel.git
+[submodule "lib/stdhl"]
+	path = lib/stdhl
+	url = git@github.com:ppaulweber/libstdhl.git
 [submodule "lib/pass"]
 	path = lib/pass
-	url = git@gitlab.swa.univie.ac.at:ppaulweber/libpass.git
+	url = git@github.com:ppaulweber/libpass.git
 [submodule "lib/gtest"]
 	path = lib/gtest
 	url = https://chromium.googlesource.com/external/googletest
 [submodule "lib/z3"]
 	path = lib/z3
 	url = https://github.com/Z3Prover/z3
-[submodule "lib/novel"]
-	path = lib/novel
-	url = git@gitlab.swa.univie.ac.at:ppaulweber/libnovel.git
