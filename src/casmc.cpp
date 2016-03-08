@@ -200,9 +200,9 @@ int main( int argc, const char *argv[] )
 	c.run( x );
     
 	d.run( x );
-
+	
 	// e.run( x );
-
+	
 	printf( "\n===--- DUMPING CASM IR ---===\n" );
 	f.run( x );
 	
@@ -211,7 +211,7 @@ int main( int argc, const char *argv[] )
 	
 	printf( "\n===--- DUMPING NOVEL ---===\n" );
 	h.run( x );
-
+	
 	printf( "\n===--- NOVEL to C11 ---===\n" );
 	c11.run( x );
 	
