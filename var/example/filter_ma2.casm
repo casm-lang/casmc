@@ -1,0 +1,13 @@
+CASM filter_specification
+
+init ma2_filter
+
+function x : -> Integer initially { 10 }
+function m : -> Integer initially { 0 }
+function y : -> Integer
+
+rule ma2_filter =
+{
+    y := ( x + m ) / 2
+    m := x
+}
