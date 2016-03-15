@@ -19,9 +19,6 @@
 [submodule "lib/pass"]
 	path = lib/pass
 	url = git@github.com:ppaulweber/libpass.git
-[submodule "lib/gtest"]
-	path = lib/gtest
-	url = https://chromium.googlesource.com/external/googletest
 [submodule "lib/z3"]
 	path = lib/z3
 	url = https://github.com/Z3Prover/z3
