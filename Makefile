@@ -83,7 +83,7 @@ LIBRARY += lib/novel/libnovel.a
 #LIBRARY += lib/z3/build/libz3.a
 
 
-.PHONY: obj/version.h
+.PHONY: obj/version.h obj/license.h
 
 
 default: $(TARGET)
@@ -129,7 +129,13 @@ obj/version.h: obj
 	@echo "GEN " $@ 
 	@echo "#define VERSION \""`git describe --always --tags --dirty`"\"" > $@
 
-$(TARGET): obj/version.h $(LIBRARY) $(OBJECTS)
+obj/license.h: obj
+	@echo "GEN " $@
+	head -n 19 LICENSE.txt > $@.txt
+	echo "#define LICENSE \\" > $@
+	while read line; do echo "\"$$line\n\" \\"; done < $@.txt >> $@
+
+$(TARGET): obj/version.h obj/license.h $(LIBRARY) $(OBJECTS)
 # 	make llvm -C lib/stdll
 # 	make llvm -C lib/casm-rt
 # 	make -C lib/casm-fe
