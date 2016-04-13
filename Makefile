@@ -40,7 +40,7 @@ INCLUDE += -I src
 INCLUDE += -I src/ir
 INCLUDE += -I obj
 INCLUDE += -I lib/casm-fe/src
-INCLUDE += -I lib/casm-fe/build/src
+INCLUDE += -I lib/casm-fe/obj/src
 INCLUDE += -I lib/casm-ir/src
 INCLUDE += -I lib/casm-ir/src/analyze
 INCLUDE += -I lib/casm-ir/src/transform
@@ -63,7 +63,7 @@ LIBRARY += lib/stdhl/libstdhlcpp.a
 LIBRARY += lib/casm-ir/libcasm-ir.a
 #LIBRARY += lib/casm-rt/libcasm-rt.a
 LIBRARY += lib/casm-be/libcasm-be.a
-LIBRARY += lib/casm-fe/build/libfrontend.a
+LIBRARY += lib/casm-fe/obj/libfrontend.a
 LIBRARY += lib/novel/libnovel.a
 
 #LIBRARY += lib/z3/build/libz3.a
@@ -93,7 +93,7 @@ obj/%.o: src/%.c
 	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
 
 
-lib/casm-fe/build/libfrontend.a: lib/casm-fe
+lib/casm-fe/obj/libfrontend.a: lib/casm-fe
 	@cd $<; $(MAKE)
 
 lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
