@@ -23,15 +23,28 @@
 //  along with this program. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-CASM filter_specification init filter
+CASM filter_specification
 
-function x : -> Integer
+init filter_ma2_c3
+
+function x : -> Integer // initially { 10 }
+function m : -> Integer // initially { 0 }
 function y : -> Integer
-
 function c : -> Integer
 
-rule filter =
+rule setup =
 {
-    y := ( y + x ) / 2    
-    c := c + 1
+    x := 10
+    m := 0
+    c := 0
+    program(self) := @filter_ma2_c3
+}
+
+rule filter_ma2_c3 =
+{
+    y := ( x + m ) / 2
+    m := x
+    
+    if c = 3 then
+       program(self) := undef
 }
