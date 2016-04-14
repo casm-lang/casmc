@@ -123,7 +123,7 @@ obj/license.h: obj
 	@echo "GEN " $@
 	head -n 19 LICENSE.txt > $@.txt
 	echo "#define LICENSE \\" > $@
-	while read line; do echo "\"$$line\n\" \\"; done < $@.txt >> $@
+	while IFS= read -r line; do echo "\"    $$line\n\" \\"; done < $@.txt >> $@
 
 $(TARGET): obj/version.h obj/license.h $(LIBRARY) $(OBJECTS)
 # 	make llvm -C lib/stdll
