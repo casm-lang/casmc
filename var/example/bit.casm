@@ -5,7 +5,7 @@
 //  Developed by: Florian Hahn
 //                Philipp Paulweber
 //                Emmanuel Pescosta
-//                https://github.com/ppaulweber/casmi
+//                https://github.com/ppaulweber/casmc
 //  
 //  This file is part of casmc.
 //  
