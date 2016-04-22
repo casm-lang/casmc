@@ -43,13 +43,12 @@ OBJECTS += obj/PassManager.o
 INCLUDE += -I src
 INCLUDE += -I src/ir
 INCLUDE += -I obj
+INCLUDE += -I lib/pass
 INCLUDE += -I lib/casm-fe
 INCLUDE += -I lib/casm-ir
 INCLUDE += -I lib/casm-be
-INCLUDE += -I lib/pass
+INCLUDE += -I lib/casm-rt
 INCLUDE += -I lib/novel
-
-INCLUDE += -I lib/casm-rt/src
 
 INCLUDE += -I lib
 INCLUDE += -I lib/z3/src/api
@@ -59,7 +58,7 @@ LIBRARY  = lib/stdhl/libstdhlc.a
 LIBRARY += lib/stdhl/libstdhlcpp.a
 LIBRARY += lib/casm-fe/libcasm-fe.a
 LIBRARY += lib/casm-ir/libcasm-ir.a
-#LIBRARY += lib/casm-rt/libcasm-rt.a
+LIBRARY += lib/casm-rt/libcasm-rt.a
 LIBRARY += lib/casm-be/libcasm-be.a
 LIBRARY += lib/novel/libnovel.a
 
@@ -99,8 +98,8 @@ lib/casm-fe/libcasm-fe.a: lib/casm-fe
 lib/casm-ir/libcasm-ir.a: lib/casm-ir
 	@cd $<; $(MAKE)
 
-# lib/casm-rt/libcasm-rt.a: lib/casm-rt
-# 	@cd $<; $(MAKE)
+lib/casm-rt/libcasm-rt.a: lib/casm-rt
+	@cd $<; $(MAKE)
 
 lib/casm-be/libcasm-be.a: lib/casm-be
 	@cd $<; $(MAKE)
@@ -130,7 +129,7 @@ clean:
 	$(MAKE) clean -C lib/casm-fe
 	$(MAKE) clean -C lib/casm-ir
 	$(MAKE) clean -C lib/casm-be
-#	$(MAKE) clean -C lib/casm-rt
+	$(MAKE) clean -C lib/casm-rt
 	$(MAKE) clean -C lib/novel
 
 

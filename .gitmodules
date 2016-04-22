@@ -25,3 +25,6 @@
 [submodule "lib/gtest"]
 	path = lib/gtest
 	url = https://github.com/google/googletest
+[submodule "lib/casm-tc"]
+	path = lib/casm-tc
+	url = git@github.com:ppaulweber/libcasm-tc.git
