@@ -1,5 +1,5 @@
 //  
-//  Copyright (c) 2014-2016 CASM Organization
+//  Copyright (c) 2014-2016 CASM Organization https://github.com/casm-lang
 //  All rights reserved.
 //  
 //  Developed by: Florian Hahn
@@ -20,36 +20,21 @@
 //  GNU General Public License for more details.
 //  
 //  You should have received a copy of the GNU General Public License
-//  along with this program. If not, see <http://www.gnu.org/licenses/>.
+//  along with casmc. If not, see <http://www.gnu.org/licenses/>.
 //  
+
+#include "version.h"
+#include "license.h"
 
 #include "stdhl/cpp/Default.h"
 #include "stdhl/cpp/Args.h"
 
-#include "Pass.h"
-
+#include "libpass.h"
+#include "libcasm-fe.h"
 #include "libcasm-ir.h"
 #include "libcasm-be.h"
+#include "libnovel.h"
 
-#include "analyze/AstDumpPass.h"
-#include "analyze/TypeCheckPass.h"
-#include "analyze/CasmIRDumpPass.h"
-
-#include "transform/SourceToAstPass.h"
-#include "transform/AstToCasmIRPass.h"
-#include "transform/CasmIRToLLCodePass.h"
-
-#include "transform/CasmIRToNovelPass.h"
-
-#include "analyze/NovelDumpPass.h"
-
-#include "transform/NovelToC11Pass.h"
-#include "transform/NovelToLLPass.h"
-#include "transform/NovelToVHDLPass.h"
-
-
-#include "version.h"
-#include "license.h"
 
 /**
     @brief TODO
@@ -170,52 +155,50 @@ int main( int argc, const char *argv[] )
 	x.getResults()[ 0 ] = (void*)file_name;
 	x.getResults()[ (void*)1 ] = (void*)output_name;
 	
-	libcasm_ir::SourceToAstPass a;
-	libcasm_ir::TypeCheckPass b;
-	libcasm_ir::AstDumpPass c;
-	libcasm_ir::AstToCasmIRPass d; 
-	//libcasm_be::CasmIRToLLCodePass e; 
-
-	libcasm_ir::CasmIRDumpPass f; 
-	libcasm_be::CasmIRToNovelPass g; 
-	libnovel::NovelDumpPass h; 
-	libnovel::NovelToC11Pass c11; 
-	libnovel::NovelToLLPass ll; 
-	libnovel::NovelToVHDLPass vhdl; 
-	
-	if( !a.run( x ) )
+	libcasm_fe::SourceToAstPass src2ast;
+	if( !src2ast.run( x ) )
 	{
 		return -1;
 	}
 
-	if( !b.run( x ) )
+	libcasm_fe::TypeCheckPass ast_type;
+	if( !ast_type.run( x ) )
 	{
 		return -1;
 	}
 	
-	c.run( x );
+	libcasm_fe::AstDumpPass ast_dump;
+	ast_dump.run( x );
     
-	d.run( x );
+	libcasm_ir::AstToCasmIRPass ast2ir; 
+	ast2ir.run( x );
 	
-	// e.run( x );
+	//libcasm_be::CasmIRToLLCodePass ir2ll; 
+	// ir2ll.run( x );
 	
+	libcasm_ir::CasmIRDumpPass ir_dump; 
 	printf( "\n===--- DUMPING CASM IR ---===\n" );
-	f.run( x );
+	ir_dump.run( x );
 	
+	libcasm_be::CasmIRToNovelPass ir2novel; 
 	printf( "\n===--- CASM IR to NOVEL ---===\n" );
-	g.run( x );
+	ir2novel.run( x );
 	
+	libnovel::NovelDumpPass novel_dump; 
 	printf( "\n===--- DUMPING NOVEL ---===\n" );
-	h.run( x );
+	novel_dump.run( x );
 	
+	libnovel::NovelToC11Pass novel2c11; 
 	printf( "\n===--- NOVEL to C11 ---===\n" );
-	c11.run( x );
+	novel2c11.run( x );
 	
+	//libnovel::NovelToLLPass novel2ll; 
 	// printf( "\n===--- NOVEL to LL ---===\n" );	
 	// ll.run( x );
 
+	libnovel::NovelToVHDLPass novel2vhdl; 	
 	printf( "\n===--- NOVEL to VHDL ---===\n" );
-	vhdl.run( x );
+	novel2vhdl.run( x );
 	
 	// transform CASM AST -> IR
 	

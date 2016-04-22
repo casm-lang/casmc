@@ -1,5 +1,5 @@
 #   
-#   Copyright (c) 2014-2016 CASM Organization
+#   Copyright (c) 2014-2016 CASM Organization https://github.com/casm-lang
 #   All rights reserved.
 #   
 #   Developed by: Florian Hahn
@@ -20,7 +20,7 @@
 #   GNU General Public License for more details.
 #   
 #   You should have received a copy of the GNU General Public License
-#   along with this program. If not, see <http://www.gnu.org/licenses/>.
+#   along with casmc. If not, see <http://www.gnu.org/licenses/>.
 #   
 
 CPP=clang
@@ -43,31 +43,24 @@ OBJECTS += obj/PassManager.o
 INCLUDE += -I src
 INCLUDE += -I src/ir
 INCLUDE += -I obj
-INCLUDE += -I lib/casm-fe/src
-INCLUDE += -I lib/casm-fe/obj/src
-INCLUDE += -I lib/casm-ir/src
-INCLUDE += -I lib/casm-ir/src/analyze
-INCLUDE += -I lib/casm-ir/src/transform
+INCLUDE += -I lib/casm-fe
+INCLUDE += -I lib/casm-ir
+INCLUDE += -I lib/casm-be
+INCLUDE += -I lib/pass
+INCLUDE += -I lib/novel
+
 INCLUDE += -I lib/casm-rt/src
-INCLUDE += -I lib/casm-be/src
-INCLUDE += -I lib/casm-be/src/transform
-INCLUDE += -I lib/pass/src
-INCLUDE += -I lib/novel/src
-INCLUDE += -I lib/novel/src/analyze
-INCLUDE += -I lib/novel/src/transform
 
 INCLUDE += -I lib
-#INCLUDE += -I lib/stdhl/c
-
 INCLUDE += -I lib/z3/src/api
 INCLUDE += -I lib/z3/src/api/c++
 
 LIBRARY  = lib/stdhl/libstdhlc.a
 LIBRARY += lib/stdhl/libstdhlcpp.a
+LIBRARY += lib/casm-fe/libcasm-fe.a
 LIBRARY += lib/casm-ir/libcasm-ir.a
 #LIBRARY += lib/casm-rt/libcasm-rt.a
 LIBRARY += lib/casm-be/libcasm-be.a
-LIBRARY += lib/casm-fe/obj/libfrontend.a
 LIBRARY += lib/novel/libnovel.a
 
 #LIBRARY += lib/z3/build/libz3.a
@@ -97,10 +90,10 @@ obj/%.o: src/%.c
 	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
 
 
-lib/casm-fe/obj/libfrontend.a: lib/casm-fe
+lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
 	@cd $<; $(MAKE)
 
-lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
+lib/casm-fe/libcasm-fe.a: lib/casm-fe
 	@cd $<; $(MAKE)
 
 lib/casm-ir/libcasm-ir.a: lib/casm-ir
@@ -126,13 +119,6 @@ obj/license.h: obj
 	while IFS= read -r line; do echo "\"    $$line\n\" \\"; done < $@.txt >> $@
 
 $(TARGET): obj/version.h obj/license.h $(LIBRARY) $(OBJECTS)
-# 	make llvm -C lib/stdll
-# 	make llvm -C lib/casm-rt
-# 	make -C lib/casm-fe
-	make -C lib/casm-ir
-# #	make -C lib/casm-rt
-	make -C lib/casm-be
-	make -C lib/novel
 	@echo "LD  " $@
 	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) lib/z3/build/libz3.so -lstdc++ -lm
 
@@ -141,10 +127,10 @@ clean:
 	@rm -rf obj
 	@echo "RM  " casmc
 	@rm -f casmc
-	$(MAKE) clean -C lib/casm-rt
 	$(MAKE) clean -C lib/casm-fe
 	$(MAKE) clean -C lib/casm-ir
 	$(MAKE) clean -C lib/casm-be
+#	$(MAKE) clean -C lib/casm-rt
 	$(MAKE) clean -C lib/novel
 
 
