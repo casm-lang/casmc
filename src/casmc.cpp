@@ -201,15 +201,13 @@ int main( int argc, const char *argv[] )
 	//libnovel::NovelToLLPass novel2ll; 
 	// printf( "\n===--- NOVEL to LL ---===\n" );	
 	// ll.run( x );
-
+	
 	libnovel::NovelToVHDLPass novel2vhdl; 	
 	printf( "\n===--- NOVEL to VHDL ---===\n" );
 	novel2vhdl.run( x );
-
-
-
 	
-	// transform CASM AST -> IR
+	
+    // transform CASM AST -> IR
 	
 	// optimizations (analysis and transformations)
 	
