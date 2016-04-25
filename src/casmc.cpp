@@ -183,6 +183,7 @@ int main( int argc, const char *argv[] )
 	libcasm_be::CasmIRToNovelPass ir2novel; 
 	printf( "\n===--- CASM IR to NOVEL ---===\n" );
 	ir2novel.run( x );
+	libnovel::Module* m = (libnovel::Module*)x.getResult< libcasm_be::CasmIRToNovelPass >();
 	
 	libnovel::NovelDumpPass novel_dump; 
 	printf( "\n===--- DUMPING NOVEL ---===\n" );
@@ -191,6 +192,11 @@ int main( int argc, const char *argv[] )
 	libnovel::NovelToC11Pass novel2c11; 
 	printf( "\n===--- NOVEL to C11 ---===\n" );
 	novel2c11.run( x );
+
+	std::string fnc( "obj/" + std::string( m->getName() ) + ".c" );
+	std::string cmd( "time clang -g " + fnc + " -o " + fnc + ".bin" );
+	printf( "'%s'\n", cmd.c_str() );
+	system( cmd.c_str() );
 	
 	//libnovel::NovelToLLPass novel2ll; 
 	// printf( "\n===--- NOVEL to LL ---===\n" );	
@@ -199,6 +205,9 @@ int main( int argc, const char *argv[] )
 	libnovel::NovelToVHDLPass novel2vhdl; 	
 	printf( "\n===--- NOVEL to VHDL ---===\n" );
 	novel2vhdl.run( x );
+
+
+
 	
 	// transform CASM AST -> IR
 	
@@ -209,9 +218,6 @@ int main( int argc, const char *argv[] )
 	// code-generation: CASM IR --+-> LLVM IR -> exec
 	//                            |
 	//                            +-> LLVM IR (interpretation via lli)
-	
-	
-	
     return 0;
 }
 

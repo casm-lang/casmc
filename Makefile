@@ -58,14 +58,14 @@ LIBRARY  = lib/stdhl/libstdhlc.a
 LIBRARY += lib/stdhl/libstdhlcpp.a
 LIBRARY += lib/casm-fe/libcasm-fe.a
 LIBRARY += lib/casm-ir/libcasm-ir.a
-LIBRARY += lib/casm-rt/libcasm-rt.a
 LIBRARY += lib/casm-be/libcasm-be.a
+LIBRARY += lib/casm-rt/libcasm-rt.a
 LIBRARY += lib/novel/libnovel.a
 
 #LIBRARY += lib/z3/build/libz3.a
 
 
-.PHONY: obj/version.h obj/license.h
+.PHONY: obj/version.h obj/license.h $(LIBRARY)
 
 
 default: $(TARGET)
