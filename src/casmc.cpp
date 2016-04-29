@@ -192,13 +192,20 @@ int main( int argc, const char *argv[] )
 	libnovel::NovelToC11Pass novel2c11; 
 	printf( "\n===--- NOVEL to C11 ---===\n" );
 	novel2c11.run( x );
-
+	
 	std::string fnc( "obj/" + std::string( m->getName() ) + ".c" );
-	std::string cmd( "time clang -g " + fnc + " -o " + fnc + ".bin" );
+	std::string cmd( "time clang -Wall -g -O0 " + fnc + " -o " + fnc + ".bin" );
+    printf( "'%s'\n", cmd.c_str() );
+	system( cmd.c_str() );
+	
+	cmd = std::string( "time clang -O1 " + fnc + " -o " + fnc + ".bin.O1" );
+	printf( "'%s'\n", cmd.c_str() );
+	system( cmd.c_str() );
+	cmd = std::string( "time clang -O3 " + fnc + " -o " + fnc + ".bin.O3" );
 	printf( "'%s'\n", cmd.c_str() );
 	system( cmd.c_str() );
 	
-	//libnovel::NovelToLLPass novel2ll; 
+    //libnovel::NovelToLLPass novel2ll; 
 	// printf( "\n===--- NOVEL to LL ---===\n" );	
 	// ll.run( x );
 	
