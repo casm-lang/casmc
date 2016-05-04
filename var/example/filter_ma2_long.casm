@@ -37,14 +37,14 @@ rule setup =
     x := 10
     m := 0
     c := 0
-    program(self) := @filter_ma2_c3
+    program(self) := @filter_ma2_long
 }
 
-rule filter_ma2_c3 =
+rule filter_ma2_long =
 {
     y := ( x + m ) / 2
     m := x
     c := c + 1
-    if c = 3 then
+    if c = 123456789 then
        program(self) := undef
 }
