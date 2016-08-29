@@ -2,10 +2,10 @@
 //  Copyright (c) 2014-2016 CASM Organization https://github.com/casm-lang
 //  All rights reserved.
 //  
-//  Developed by: Florian Hahn
-//                Philipp Paulweber
+//  Developed by: Philipp Paulweber
 //                Emmanuel Pescosta
-//                https://github.com/ppaulweber/casmc
+//                Florian Hahn
+//                https://github.com/casm-lang/casmc
 //  
 //  This file is part of casmc.
 //  
@@ -33,6 +33,7 @@
 #include "libcasm-fe.all.h"
 #include "libcasm-ir.all.h"
 #include "libcasm-be.all.h"
+#include "libcasm-tc.h"
 #include "libnovel.all.h"
 
 
@@ -51,58 +52,87 @@ int main( int argc, const char *argv[] )
 	const char* file_name = 0;
 	const char* output_name = 0;
 
-	Args options( argc, argv, Args::ALTERNATE
-	, [&file_name,&options]( const char* arg ) 
-	{
-		static int cnt = 0;
-		cnt++;
-		
-		if( cnt > 1 )
-		{
-			options.error( 1, "to many file names passed" );
-		}
-		
-		file_name = arg;
-	});
-	
-	options.add( 'o', 0, Args::REQUIRED, "Place the output into <file>"
+	Args options
+	( argc
+	, argv
+	, Args::DEFAULT
+	, [ &file_name, &options ]( const char* arg ) 
+	  {
+		  static int cnt = 0;
+		  cnt++;
+		  
+		  if( cnt > 1 )
+		  {
+			  options.error( 1, "to many file names passed" );
+		  }
+		  
+		  file_name = arg;
+	  }
+	);
+
+	options.add
+	( "tc"
+	, Args::NONE
+	, "Displays the test case unique identifier and exits."
 	, [&options,&output_name]( const char* option )
 	{
-		static int cnt = 0;
-		cnt++;
-		
-		if( cnt > 1 )
-		{
-			options.error( 1, "to many output names passed" );
-		}
-		
-		output_name = option;
+		printf( "%s\n", libcasm_tc::Profile::get( libcasm_tc::Profile::COMPILER ) );
+		exit( 0 );
 	}
-	, "file");
-
+	);
+	
+	options.add
+	( 'o'
+	, 0
+	, Args::REQUIRED
+	, "Place the output into <file>"
+	, [ &options, &output_name ]( const char* option )
+	  {
+		  static int cnt = 0;
+		  cnt++;
+		  
+		  if( cnt > 1 )
+		  {
+			  options.error( 1, "to many output names passed" );
+		  }
+		  
+		  output_name = option;
+	  }
+	, "file"
+	);
+	
 #define DESCRIPTION											\
 	"Corinthian Abstract State Machine (CASM) Compiler\n"
 	
 	options.add
-	( 'h', "help", Args::NONE, "Display the program usage and synoptis"
-	, [&options]( const char* option )
-	{
-		fprintf( stderr
-		, DESCRIPTION
-		  "\n"
-		  "usage: %s [options] <file>\n"
-		  "\n"
-		  "options:\n"
-		, options.getProgramName()
-		);
+	( 'h'
+	, "help"
+	, Args::NONE
+	, "Display the program usage and synopsis"
+	, [ &options ]( const char* option )
+	  {
+		  fprintf
+		  ( stderr
+		  , DESCRIPTION
+			"\n"
+			"usage: %s [options] <file>\n"
+			"\n"
+			"options:\n"
+		  , options.getProgramName()
+		  );
 		
-		options.usage();
-		
-		exit( 0 );
-	});
+		  options.usage();
+		  
+		  exit( 0 );
+	  }
+	);
 	
-	options.add( 'v', "version", Args::NONE, "Display compiler version information"
-	, [&options]( const char* option )
+	options.add
+	( 'v'
+	, "version"
+	, Args::NONE
+	, "Display compiler version information"
+	, [ &options ]( const char* option )
 	{
 		fprintf
 		( stderr

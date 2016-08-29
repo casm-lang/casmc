@@ -1,18 +1,24 @@
 [submodule "lib/casm-fe"]
 	path = lib/casm-fe
-	url = git@github.com:ppaulweber/libcasm-fe.git
+	url = git@github.com:casm-lang/libcasm-fe.git
 [submodule "lib/casm-ir"]
 	path = lib/casm-ir
-	url = git@github.com:ppaulweber/libcasm-ir.git
+	url = git@github.com:casm-lang/libcasm-ir.git
+[submodule "lib/casm-tc"]
+	path = lib/casm-tc
+	url = git@github.com:casm-lang/libcasm-tc.git
 [submodule "lib/casm-rt"]
 	path = lib/casm-rt
-	url = git@github.com:ppaulweber/libcasm-rt.git
+	url = git@github.com:casm-lang/libcasm-rt.git
 [submodule "lib/casm-be"]
 	path = lib/casm-be
-	url = git@github.com:ppaulweber/libcasm-be.git
+	url = git@github.com:casm-lang/libcasm-be.git
 [submodule "lib/novel"]
 	path = lib/novel
-	url = git@github.com:ppaulweber/libnovel.git
+	url = git@github.com:casm-lang/libnovel.git
+[submodule "lib/gtest"]
+	path = lib/gtest
+	url = https://github.com/google/googletest
 [submodule "lib/stdhl"]
 	path = lib/stdhl
 	url = git@github.com:ppaulweber/libstdhl.git
@@ -22,9 +28,3 @@
 [submodule "lib/z3"]
 	path = lib/z3
 	url = https://github.com/Z3Prover/z3
-[submodule "lib/gtest"]
-	path = lib/gtest
-	url = https://github.com/google/googletest
-[submodule "lib/casm-tc"]
-	path = lib/casm-tc
-	url = git@github.com:ppaulweber/libcasm-tc.git

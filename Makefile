@@ -2,10 +2,10 @@
 #   Copyright (c) 2014-2016 CASM Organization https://github.com/casm-lang
 #   All rights reserved.
 #   
-#   Developed by: Florian Hahn
-#                 Philipp Paulweber
+#   Developed by: Philipp Paulweber
 #                 Emmanuel Pescosta
-#                 https://github.com/ppaulweber/casmc
+#                 Florian Hahn
+#                 https://github.com/casm-lang/casmc
 #   
 #   This file is part of casmc.
 #   
@@ -48,6 +48,7 @@ INCLUDE += -I lib/casm-fe
 INCLUDE += -I lib/casm-ir
 INCLUDE += -I lib/casm-be
 INCLUDE += -I lib/casm-rt
+INCLUDE += -I lib/casm-tc
 INCLUDE += -I lib/novel
 
 INCLUDE += -I lib
