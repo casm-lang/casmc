@@ -43,6 +43,7 @@ OBJECTS += obj/PassManager.o
 INCLUDE += -I src
 INCLUDE += -I src/ir
 INCLUDE += -I obj
+INCLUDE += -I lib/stdhl
 INCLUDE += -I lib/pass
 INCLUDE += -I lib/casm-fe
 INCLUDE += -I lib/casm-ir
@@ -51,7 +52,6 @@ INCLUDE += -I lib/casm-rt
 INCLUDE += -I lib/casm-tc
 INCLUDE += -I lib/novel
 
-INCLUDE += -I lib
 INCLUDE += -I lib/z3/src/api
 INCLUDE += -I lib/z3/src/api/c++
 
