@@ -30,31 +30,27 @@
 
 /**
    @brief    TODO
-   
+
    TODO
 */
 
-class PassManager  
+class PassManager
 {
-public:
-
+  public:
     /**
-	   @brief    TODO
+       @brief    TODO
 
-	   TODO
-	   
-	   @param    arg0    TODO
-	   @return   TODO
-	   @retval   TODO
-	*/
-	
-	
+       TODO
+
+       @param    arg0    TODO
+       @return   TODO
+       @retval   TODO
+    */
 };
 
 #endif /* _CASMC_PASSMANAGER_H_ */
 
-
-//  
+//
 //  Local variables:
 //  mode: c++
 //  indent-tabs-mode: nil
@@ -62,4 +58,4 @@ public:
 //  tab-width: 4
 //  End:
 //  vim:noexpandtab:sw=4:ts=4:
-//  
+//
