@@ -33,7 +33,8 @@
 #include "libcasm-fe.all.h"
 #include "libcasm-ir.all.h"
 #include "libcasm-tc.h"
-#include "libnovel.all.h"
+#include "libcsel-ir.all.h"
+#include "libcsel-be.all.h"
 #include "libpass.h"
 
 /**
@@ -171,19 +172,19 @@ int main( int argc, const char* argv[] )
     printf( "\n===--- DUMPING CASM IR ---===\n" );
     ir_dump.run( x );
 
-    libcasm_be::CasmIRToNovelPass ir2novel;
+    libcasm_be::CasmIRToCselIRPass ir2csel;
     printf( "\n===--- CASM IR to NOVEL ---===\n" );
-    ir2novel.run( x );
-    libnovel::Module* m
-        = (libnovel::Module*)x.getResult< libcasm_be::CasmIRToNovelPass >();
+    ir2csel.run( x );
+    libcsel_ir::Module* m
+        = (libcsel_ir::Module*)x.getResult< libcasm_be::CasmIRToCselIRPass >();
 
-    libnovel::NovelDumpPass novel_dump;
-    printf( "\n===--- DUMPING NOVEL ---===\n" );
-    novel_dump.run( x );
+    libcsel_ir::CselIRDumpPass csel_dump;
+    printf( "\n===--- DUMPING CSEL IR ---===\n" );
+    csel_dump.run( x );
 
-    libnovel::NovelToC11Pass novel2c11;
-    printf( "\n===--- NOVEL to C11 ---===\n" );
-    novel2c11.run( x );
+    libcsel_be::CselIRToC11Pass csel_ir2c11;
+    printf( "\n===--- CSEL IR to C11 ---===\n" );
+    csel_ir2c11.run( x );
 
     std::string fnc( "obj/" + std::string( m->getName() ) + ".c" );
     std::string cmd( "time clang -Wall -g -O0 " + fnc + " -o " + fnc + ".bin" );
@@ -197,13 +198,13 @@ int main( int argc, const char* argv[] )
     printf( "'%s'\n", cmd.c_str() );
     system( cmd.c_str() );
 
-    // libnovel::NovelToLLPass novel2ll;
-    // printf( "\n===--- NOVEL to LL ---===\n" );
+    // libcsel_ir::CselIRToLLPass csel2ll;
+    // printf( "\n===--- CSEL IR to LL ---===\n" );
     // ll.run( x );
 
-    libnovel::NovelToVHDLPass novel2vhdl;
-    printf( "\n===--- NOVEL to VHDL ---===\n" );
-    novel2vhdl.run( x );
+    libcsel_be::CselIRToVHDLPass csel_ir2vhdl;
+    printf( "\n===--- CSEL IR to VHDL ---===\n" );
+    csel_ir2vhdl.run( x );
 
     // transform CASM AST -> IR
 

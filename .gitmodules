@@ -13,9 +13,12 @@
 [submodule "lib/casm-be"]
 	path = lib/casm-be
 	url = git@github.com:casm-lang/libcasm-be.git
-[submodule "lib/novel"]
-	path = lib/novel
-	url = git@github.com:casm-lang/libnovel.git
+[submodule "lib/csel-ir"]
+	path = lib/csel-ir
+	url = git@github.com:casm-lang/libcsel-ir.git
+[submodule "lib/csel-be"]
+	path = lib/csel-be
+	url = git@github.com:casm-lang/libcsel-be.git
 [submodule "lib/gtest"]
 	path = lib/gtest
 	url = https://github.com/google/googletest

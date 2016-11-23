@@ -23,216 +23,225 @@
 #   along with casmc. If not, see <http://www.gnu.org/licenses/>.
 #
 
-CPP=clang
+.PHONY: obj/version.h obj/license.h
+.NOTPARALLEL: obj/version.h obj/license.h
 
-CPPFLAG += -std=c++11
-CPPFLAG += -g -O0
-CPPFLAG += -Wall
-#CPPFLAG += -Wextra
+default: debug
 
-TARGET=casmc
+help:
+	@echo "TODO"
 
-OBJECTS += obj/casmc.o
-OBJECTS += obj/PassManager.o
-#OBJECTS += obj/SourceToAstPass.o
-#OBJECTS += obj/TypeCheckPass.o
-#OBJECTS += obj/AstDumpPass.o
-#OBJECTS += obj/AstToCasmIRPass.o
-#OBJECTS += obj/CasmIRToLLCodePass.o
+REPO = casmc
 
-INCLUDE += -I src
-INCLUDE += -I src/ir
-INCLUDE += -I obj
-INCLUDE += -I lib/stdhl
-INCLUDE += -I lib/pass
-INCLUDE += -I lib/casm-fe
-INCLUDE += -I lib/casm-ir
-INCLUDE += -I lib/casm-be
-INCLUDE += -I lib/casm-rt
-INCLUDE += -I lib/casm-tc
-INCLUDE += -I lib/novel
+TARGET = $(REPO)
 
-INCLUDE += -I lib/z3/src/api
-INCLUDE += -I lib/z3/src/api/c++
-
-LIBRARY  = lib/stdhl/libstdhlc.a
-LIBRARY += lib/stdhl/libstdhlcpp.a
-LIBRARY += lib/casm-fe/libcasm-fe.a
-LIBRARY += lib/casm-ir/libcasm-ir.a
-LIBRARY += lib/casm-be/libcasm-be.a
-LIBRARY += lib/casm-rt/libcasm-rt.a
-LIBRARY += lib/novel/libnovel.a
-
-#LIBRARY += lib/z3/build/libz3.a
+TEST_TARGET = test-$(REPO)
 
 
-.PHONY: obj/version.h obj/license.h $(LIBRARY)
+CP  = $(shell find src -name '*.cpp' | cut -d'.' -f1)
+CO  = $(CP:%=obj/%.o)
+
+CI  = -I src
+CI += -I obj
+CI += -I lib/stdhl
+CI += -I lib/pass
+CI += -I lib/casm-fe
+CI += -I lib/casm-ir
+CI += -I lib/casm-tc
+CI += -I lib/casm-be
+CI += -I lib/casm-rt
+CI += -I lib/csel-ir
+CI += -I lib/csel-be
+CI += -I lib/z3/src/api
+
+CL  = obj/casmc.a
+CL += lib/pass/libpass.a
+CL += lib/stdhl/libstdhlcpp.a
+CL += lib/casm-fe/libcasm-fe.a
+CL += lib/casm-ir/libcasm-ir.a
+CL += lib/casm-be/libcasm-be.a
+CL += lib/casm-rt/libcasm-rt.a
+CL += lib/csel-ir/libcsel-ir.a
+CL += lib/csel-be/libcsel-be.a
+CL += lib/z3/build/libz3.so
+
+CC  =
+CF  =
+
+  %-gcc: CC = gcc
+%-clang: CC = clang
+
+  debug-%: CF += -O0 -g
+release-%: CF += -O3 -DNDEBUG
+
+linux%:  CF += -Wall -std=c++11
+linux%:  XF += -Wall -std=c11
+linux3%: CF += -m32
+linux6%: CF += -m64
 
 
-default: $(TARGET)
+build: config $(TARGET)
+check: build $(TEST_TARGET)
+
+linux32-build: build
+linux64-build: build
+
+linux32-check: check
+linux64-check: check
 
 
-all: clean doxy default
+  debug-build-linux32-gcc:   linux32-build
+  debug-check-linux32-gcc:   linux32-check
+release-build-linux32-gcc:   linux32-build
+release-check-linux32-gcc:   linux32-check
 
-doxy:
-	doxygen
+  debug-build-linux64-gcc:   linux64-build
+  debug-check-linux64-gcc:   linux64-check
+release-build-linux64-gcc:   linux64-build
+release-check-linux64-gcc:   linux64-check
 
-obj:
-	@echo "MKD " obj
-	@mkdir -p obj
+  debug-build-linux32-clang: linux32-build
+  debug-check-linux32-clang: linux32-check
+release-build-linux32-clang: linux32-build
+release-check-linux32-clang: linux32-check
 
-obj/%.o: src/%.cpp
-	@echo "CPP " $<
-	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
-
-obj/%.o: src/%.c
-	@echo "CC  " $<
-	@$(CPP) $(CPPFLAG) $(INCLUDE) -c $< -o $@
+  debug-build-linux64-clang: linux64-build
+  debug-check-linux64-clang: linux64-check
+release-build-linux64-clang: linux64-build
+release-check-linux64-clang: linux64-check
 
 
-lib/stdhl/libstdhlc.a lib/stdhl/libstdhlcpp.a: lib/stdhl
-	@cd $<; $(MAKE)
+  debug:   debug-build-linux64-clang
+release: clean release-build-linux64-clang
+
+test:           debug-check-linux64-clang
+test-release: release-check-linux64-clang
+
+
+all: clean default
+
+#doxy:
+#	doxygen
+
+config: CFG="CC=$(CC) CF=\"$(CF)\" '$(MAKE) $(MFLAGS)'"
+config:
+	@echo "CFG  $(CFG)"
+
+
+obj/%.o: %.cpp
+	@mkdir -p `dirname $@`
+	@echo "C++ " $<
+	@$(CC) $(CF) $(CI) -c $< -o $@
+
+obj/%.o: %.c
+	@mkdir -p `dirname $@`
+	@echo "C   " $<
+	@$(CC) $(CF) $(CI) -c $< -o $@
+
+
+
+lib/pass/libpass.a: lib/pass
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
+
+lib/stdhl/libstdhlcpp.a: lib/stdhl
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
 lib/casm-fe/libcasm-fe.a: lib/casm-fe
-	@cd $<; $(MAKE)
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
 lib/casm-ir/libcasm-ir.a: lib/casm-ir
-	@cd $<; $(MAKE)
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
 lib/casm-rt/libcasm-rt.a: lib/casm-rt
-	@cd $<; $(MAKE)
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
 lib/casm-be/libcasm-be.a: lib/casm-be
-	@cd $<; $(MAKE)
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
-lib/novel/libnovel.a: lib/novel
-	@cd $<; $(MAKE)
+lib/csel-ir/libcsel-ir.a: lib/csel-ir
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
-obj/version.h: obj
+lib/csel-be/libcsel-be.a: lib/csel-be
+	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
+
+
+obj/version.h:
+	@mkdir -p `dirname $@`
 	@echo "GEN " $@ 
 	@echo "#define VERSION \""`git describe --always --tags --dirty`"\"" > $@
 
-obj/license.h: obj
+obj/license.h:
+	@mkdir -p `dirname $@`
 	@echo "GEN " $@
-	head -n 19 LICENSE.txt > $@.txt
-	echo "#define LICENSE \\" > $@
-	while IFS= read -r line; do echo "\"    $$line\n\" \\"; done < $@.txt >> $@
+	echo "#define LICENSE \"TBD\"" > $@
 
-$(TARGET): obj/version.h obj/license.h $(LIBRARY) $(OBJECTS)
+obj/casmc.a: $(CO)
+	@echo "AR  " $@
+	@$(AR) rsc $@ $(filter %.o,$^)
+	@ranlib $@
+
+
+$(TARGET): obj/version.h obj/license.h $(CL)
 	@echo "LD  " $@
-	@$(CPP) $(CPPFLAG) -o $@ $(filter %.o,$^) $(filter %.a,$^) lib/z3/build/libz3.so -lstdc++ -lm
+	@$(CC) $(CF) -o $@ $(CL) -lstdc++ -lm
 
 clean:
+	$(MAKE) $(MFLAGS) clean -C lib/pass
+	$(MAKE) $(MFLAGS) clean -C lib/stdhl
+	$(MAKE) $(MFLAGS) clean -C lib/casm-fe
+	$(MAKE) $(MFLAGS) clean -C lib/casm-ir
+	$(MAKE) $(MFLAGS) clean -C lib/casm-be
+	$(MAKE) $(MFLAGS) clean -C lib/csel-ir
+	$(MAKE) $(MFLAGS) clean -C lib/csel-be
 	@echo "RMD " obj
 	@rm -rf obj
-	@echo "RM  " casmc
-	@rm -f casmc
-	$(MAKE) clean -C lib/casm-fe
-	$(MAKE) clean -C lib/casm-ir
-	$(MAKE) clean -C lib/casm-be
-	$(MAKE) clean -C lib/casm-rt
-	$(MAKE) clean -C lib/novel
+	@echo "RM  " $(TARGET)
+	@rm -f $(TARGET)
+	@echo "RM  " $(TEST_TARGET)
+	@rm -f $(TEST_TARGET)
 
 
-git-%:
-	git $*
-	@for i in lib/*; do ( \
-		echo "===----------------------------------------------------==="; \
-		echo $$i; \
-		cd $$i; \
-		git $*; \
-		git describe --always --tags --dirty ); \
-	done 
+TF   = $(shell find uts -name '*.cpp' | cut -d'.' -f1)
+TO = $(TF:%=obj/%.o)
 
-test-%:
-	make; time ./casmc var/example/$*.casm -o obj/out.ll; cat obj/out.ll
-	cat lib/casm-rt/casm-rt.ir obj/out.ll > obj/out.ir.ll
-	llvm-link -S -o obj/out.cc.ll obj/out.ir.ll
-#	clang -g -flto -S -o obj/out.cc.ll obj/out.ir.ll
-#	llvm-link obj/out.ir.ll lib/stdll/stdll.ll lib/casm-rt/casm-rt.ll -S -o obj/out.cc.ll
-	clang -g -O0 -o obj/out.bin    obj/out.cc.ll
-	clang    -O1 -o obj/out.bin.O1 obj/out.cc.ll
-	clang    -O2 -o obj/out.bin.O2 obj/out.cc.ll
-	clang    -O3 -o obj/out.bin.O3 obj/out.cc.ll
+TI  = -I lib/gtest/googletest/include
+TI += -I lib/gtest/googletest
+TS  = lib/gtest/googletest/src/gtest-all.cc
+TS += lib/gtest/googletest/src/gtest_main.cc
 
-	opt -O3 -S -o obj/out.opt.ll obj/out.ir.ll
-	clang -O3 -o obj/out.bin.Oo obj/out.opt.ll
+TL  = -lstdc++
+TL += -lm
+TL += -lpthread
 
-attic-%:
-	cat lib/casm-rt/casm-rt.ir .attic/$*.ll > obj/out.ir.ll
-	llvm-link -S -o obj/out.cc.ll obj/out.ir.ll
-#	clang -g -flto -S -o obj/out.cc.ll obj/out.ir.ll
-#	llvm-link obj/out.ir.ll lib/stdll/stdll.ll lib/casm-rt/casm-rt.ll -S -o obj/out.cc.ll
-	clang -g -O0 -o obj/out.bin    obj/out.cc.ll
-	clang    -O1 -o obj/out.bin.O1 obj/out.cc.ll
-	clang    -O2 -o obj/out.bin.O2 obj/out.cc.ll
-	clang    -O3 -o obj/out.bin.O3 obj/out.cc.ll
+obj/uts/%.o: uts/%.cpp
+	@mkdir -p `dirname $@`
+	@echo "C++ " $<
+	@$(CC) $(CF) $(TI) $(CI) -c $< -o $@
 
-	opt -O3 -S -o obj/out.opt.ll obj/out.ir.ll
-	clang -O3 -o obj/out.bin.Oo obj/out.opt.ll
+$(TEST_TARGET): $(TO) $(CO) $(CL) $(TARGET)
+	@echo "LD  " $@
+	@$(CC) \
+	  $(CF) \
+	  $(TI) \
+	  $(CI) \
+	  $(TL) \
+	  -o $@ \
+	  $(TO) \
+	  $(TS)
+	@echo "RUN " $@
+	@./$@
+	@echo "RUN " $@
+	CASM=`pwd`/$(TARGET) $(MAKE) $(MFLAGS) test-run -C lib/casm-tc
 
 
-opt:
-	@echo OPTS=$(OPTS)
-	@for i in \
-	\
-	adce add-discriminators always-inline argpromotion atomic-ll-sc \
-	barrier basicaa basiccg bb-vectorize block-freq bounds-checking branch-prob break-crit-edges \
-	codegenprepare consthoist constmerge constprop correlated-propagation cost-model count-aa \
-	da dce deadargelim delinearize die domfrontier domtree dse \
-	early-cse \
-	functionattrs \
-	globaldce globalopt globalsmodref-aa gvn \
-	indvars inline inline-cost instcombine instcount instnamer instsimplify intervals ipconstprop ipsccp iv-users \
-	jump-instr-table-info jump-threading \
-	lazy-value-info lcssa libcall-aa licm load-combine \
-	loop-deletion loop-extract loop-extract-single loop-idiom loop-instsimplify \
-	loop-reduce loop-reroll loop-rotate loop-simplify loop-unroll loop-unswitch loop-vectorize loops \
-	lower-expect loweratomic lowerinvoke lowerswitch \
-	mem2reg memcpyopt memdep mergefunc mergereturn mldst-motion module-debuginfo \
-	no-aa notti \
-	partially-inline-libcalls postdomtree prune-eh \
-	reassociate reg2mem regions \
-	scalar-evolution scalarizer scalarrepl scalarrepl-ssa sccp scev-aa \
-	separate-const-offset-from-gep simplifycfg sink slp-vectorizer sroa \
-	strip strip-dead-debug-info strip-dead-prototypes strip-debug-declare strip-nondebug structurizecfg \
-	tailcallelim targetlibinfo tbaa \
-	verify \
-	; do \
-	  rm -f obj/out.opt.ll; \
-	  opt \
-	  -mtriple=x86_64-pc-linux-gnu -mcpu=core2 -mattr=+avx2 \
-	  $(OPTS) \
-	  -$$i \
-	  -S -o obj/out.opt.ll obj/out.ir.ll; 2> /dev/null \
-	  clang -O0 -o obj/out.bin.opt obj/out.opt.ll 2> /dev/null; \
-	  for c in 1 2 3; do \
-	    printf "%-30s, " $$i; \
-	    /usr/bin/time -f "%e, W=%W, c=%c, w=%w, F=%F, R=%R, I=%I, O=%O, k=%k" ./obj/out.bin.opt > /dev/null; \
-	  done; \
-	done
+info:
+	@echo $(CWD) 
 
-opt-%:
-	opt -mtriple=x86_64-pc-linux-gnu -mcpu=core2 -mattr=+avx2 \
-	$* \
-	-S -o obj/out.OPT.ll obj/out.ir.ll; 2> /dev/null
-	@for c in 0 1 2 3; do \
-	  @clang -O$$c -o obj/out.bin.OPT obj/out.OPT.ll 2> /dev/null; \
-	  /usr/bin/time -f "%e, W=%W, c=%c, w=%w, F=%F, R=%R, I=%I, O=%O, k=%k" ./obj/out.bin.OPT > /dev/null; \
-	done
-
-nop:
-	opt -S -o obj/out.OPT.ll obj/out.ir.ll; 2> /dev/null
-	@for c in 0 0 0 1 1 1 2 2 2 3 3 3; do \
-	  @clang -O$$c -o obj/out.bin.OPT obj/out.OPT.ll 2> /dev/null; \
-	  /usr/bin/time -f "%e, W=%W, c=%c, w=%w, F=%F, R=%R, I=%I, O=%O, k=%k" ./obj/out.bin.OPT > /dev/null; \
-	done
-
-# asan asan-module dfsan
-# partial-inliner sample-profile 
-
-# internalize tsan msan metarenamer 
-
-# O1 O2 O3
-# aa-eval lint
-
+# # test: $(TARGET) $(TEST_TARGET) default
+# # 	@rm -f $@
+# # 	@echo "LD  " $@
+# # 	@$(CC) $(CF) $(TI) $(CI) $(TL) -o $@ \
+# # 		-Wl,--whole-archive $(TEST_TARGET) $(TARGET) -Wl,--no-whole-archive \
+# # 		 ../gtest/googletest/src/gtest-all.cc ../gtest/googletest/src/gtest_main.cc 
+# # 	@echo "RUN " $@
+# # 	@./$@
