@@ -33,8 +33,8 @@
 #include "libcasm-fe.all.h"
 #include "libcasm-ir.all.h"
 #include "libcasm-tc.h"
-#include "libcsel-ir.all.h"
 #include "libcsel-be.all.h"
+#include "libcsel-ir.all.h"
 #include "libpass.h"
 
 /**
@@ -65,9 +65,9 @@ int main( int argc, const char* argv[] )
             file_name = arg;
         } );
 
-    options.add( "tc", Args::NONE,
-        "Displays the test case unique identifier and exits.",
-        [&options, &output_name]( const char* option ) {
+    options.add( 't', "test-case-profile", Args::NONE,
+        "Display the unique test profile identifier and exit.",
+        [&options]( const char* option ) {
             printf( "%s\n",
                 libcasm_tc::Profile::get( libcasm_tc::Profile::COMPILER ) );
             exit( 0 );
@@ -130,10 +130,7 @@ int main( int argc, const char* argv[] )
         }
 
         options.add( pi.getPassArgChar(), pi.getPassArgString(), Args::NONE,
-            pi.getPassDescription(), [&pi]( const char* option ) {
-                printf( "add: %s:%s\n", pi.getPassName(), option );
-                // add to PassManager the selected pass to run!
-            } );
+            pi.getPassDescription(), pi.getPassArgAction() );
     }
 
     options.parse();
@@ -143,69 +140,170 @@ int main( int argc, const char* argv[] )
         options.error( 1, "no input file provided" );
     }
 
+    // TODO: FIXME: the following code should be implemented in the PassManager
+    // structure
+    // to allow dynamic and possible pass calls etc.
+
     libpass::PassResult x;
     x.getResults()[ 0 ] = (void*)file_name;
-    x.getResults()[ (void*)1 ] = (void*)output_name;
+    x.getResults()[ (void*)1 ] = (void*)output_name; // TODO: PPA: this will be
+                                                     // removed and changed to a
+                                                     // pass setter option
 
-    libcasm_fe::SourceToAstPass src2ast;
-    if( !src2ast.run( x ) )
+    libpass::PassInfo ast_parse
+        = libpass::PassRegistry::getPassInfo< libcasm_fe::SourceToAstPass >();
+    if( ast_parse.constructPass()->run( x ) )
+    {
+        if( ast_parse.isPassArgSelected() )
+        {
+            return 0;
+        }
+    }
+    else
     {
         return -1;
     }
 
-    libcasm_fe::TypeCheckPass ast_type;
-    if( !ast_type.run( x ) )
+    libpass::PassInfo ast_check
+        = libpass::PassRegistry::getPassInfo< libcasm_fe::TypeCheckPass >();
+    if( ast_check.constructPass()->run( x ) )
+    {
+        if( ast_check.isPassArgSelected() )
+        {
+            return 0;
+        }
+    }
+    else
     {
         return -1;
     }
 
-    libcasm_fe::AstDumpPass ast_dump;
-    ast_dump.run( x );
+    libpass::PassInfo ast_dump
+        = libpass::PassRegistry::getPassInfo< libcasm_fe::AstDumpPass >();
+    if( ast_dump.isPassArgSelected() )
+    {
+        return ast_dump.constructPass()->run( x ) ? 0 : -1;
+    }
 
-    libcasm_ir::AstToCasmIRPass ast2ir;
-    ast2ir.run( x );
+    libpass::PassInfo ast_exec_sym = libpass::PassRegistry::
+        getPassInfo< libcasm_fe::SymbolicExecutionPass >();
+    if( ast_exec_sym.isPassArgSelected() )
+    {
+        return ast_exec_sym.constructPass()->run( x ) ? 0 : -1;
+    }
 
-    // libcasm_be::CasmIRToLLCodePass ir2ll;
-    // ir2ll.run( x );
+    libpass::PassInfo ast_exec_num = libpass::PassRegistry::
+        getPassInfo< libcasm_fe::NumericExecutionPass >();
+    if( ast_exec_num.isPassArgSelected() )
+    {
+        return ast_exec_num.constructPass()->run( x ) ? 0 : -1;
+    }
+    
+    libpass::PassInfo ast_to_ir = libpass::PassRegistry::
+        getPassInfo< libcasm_ir::AstToCasmIRPass >();
+    if( not ast_to_ir.constructPass()->run( x ) )
+    {
+        if( ast_to_ir.isPassArgSelected() )
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return -1;
+    }
 
-    libcasm_ir::CasmIRDumpPass ir_dump;
-    printf( "\n===--- DUMPING CASM IR ---===\n" );
-    ir_dump.run( x );
+    libpass::PassInfo ir_dump
+        = libpass::PassRegistry::getPassInfo< libcasm_ir::CasmIRDumpPass >();
+    if( ir_dump.isPassArgSelected() )
+    {
+        return ir_dump.constructPass()->run( x ) ? 0 : -1;
+    }
+    
+    libpass::PassInfo ir_to_el = libpass::PassRegistry::
+        getPassInfo< libcasm_be::CasmIRToCselIRPass >();
+    if( not ir_to_el.constructPass()->run( x ) )
+    {
+        if( ir_to_el.isPassArgSelected() )
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return -1;
+    }
 
-    libcasm_be::CasmIRToCselIRPass ir2csel;
-    printf( "\n===--- CASM IR to NOVEL ---===\n" );
-    ir2csel.run( x );
-    libcsel_ir::Module* m
-        = (libcsel_ir::Module*)x.getResult< libcasm_be::CasmIRToCselIRPass >();
+    libpass::PassInfo el_dump
+        = libpass::PassRegistry::getPassInfo< libcsel_ir::CselIRDumpPass >();
+    if( el_dump.isPassArgSelected() )
+    {
+        return el_dump.constructPass()->run( x ) ? 0 : -1;
+    }
+    
+    libpass::PassInfo el_to_c11
+        = libpass::PassRegistry::getPassInfo< libcsel_be::CselIRToC11Pass >();
+    if( el_to_c11.isPassArgSelected() )
+    {
+        return el_to_c11.constructPass()->run( x ) ? 0 : -1;
+    }
 
-    libcsel_ir::CselIRDumpPass csel_dump;
-    printf( "\n===--- DUMPING CSEL IR ---===\n" );
-    csel_dump.run( x );
+    libpass::PassInfo el_to_vhdl
+        = libpass::PassRegistry::getPassInfo< libcsel_be::CselIRToVHDLPass >();
+    if( el_to_vhdl.isPassArgSelected() )
+    {
+        return el_to_vhdl.constructPass()->run( x ) ? 0 : -1;
+    }
 
-    libcsel_be::CselIRToC11Pass csel_ir2c11;
-    printf( "\n===--- CSEL IR to C11 ---===\n" );
-    csel_ir2c11.run( x );
+    libpass::PassInfo el_to_ll
+        = libpass::PassRegistry::getPassInfo< libcsel_be::CselIRToLLPass >();
+    if( el_to_ll.isPassArgSelected() )
+    {
+        return el_to_ll.constructPass()->run( x ) ? 0 : -1;
+    }
+    
+    
+    // // libcasm_be::CasmIRToLLCodePass ir2ll;
+    // // ir2ll.run( x );
 
-    std::string fnc( "obj/" + std::string( m->getName() ) + ".c" );
-    std::string cmd( "time clang -Wall -g -O0 " + fnc + " -o " + fnc + ".bin" );
-    printf( "'%s'\n", cmd.c_str() );
-    system( cmd.c_str() );
+    // libcasm_ir::CasmIRDumpPass ir_dump;
+    // printf( "\n===--- DUMPING CASM IR ---===\n" );
+    // ir_dump.run( x );
 
-    cmd = std::string( "time clang -O1 " + fnc + " -o " + fnc + ".bin.O1" );
-    printf( "'%s'\n", cmd.c_str() );
-    system( cmd.c_str() );
-    cmd = std::string( "time clang -O3 " + fnc + " -o " + fnc + ".bin.O3" );
-    printf( "'%s'\n", cmd.c_str() );
-    system( cmd.c_str() );
+    // libcasm_be::CasmIRToCselIRPass ir2csel;
+    // printf( "\n===--- CASM IR to NOVEL ---===\n" );
+    // ir2csel.run( x );
+    // libcsel_ir::Module* m
+    //     = (libcsel_ir::Module*)x.getResult< libcasm_be::CasmIRToCselIRPass >();
 
-    // libcsel_ir::CselIRToLLPass csel2ll;
-    // printf( "\n===--- CSEL IR to LL ---===\n" );
-    // ll.run( x );
+    // libcsel_ir::CselIRDumpPass csel_dump;
+    // printf( "\n===--- DUMPING CSEL IR ---===\n" );
+    // csel_dump.run( x );
 
-    libcsel_be::CselIRToVHDLPass csel_ir2vhdl;
-    printf( "\n===--- CSEL IR to VHDL ---===\n" );
-    csel_ir2vhdl.run( x );
+    // libcsel_be::CselIRToC11Pass csel_ir2c11;
+    // printf( "\n===--- CSEL IR to C11 ---===\n" );
+    // csel_ir2c11.run( x );
 
+    // std::string fnc( "obj/" + std::string( m->getName() ) + ".c" );
+    // std::string cmd( "time clang -Wall -g -O0 " + fnc + " -o " + fnc + ".bin" );
+    // printf( "'%s'\n", cmd.c_str() );
+    // system( cmd.c_str() );
+
+    // cmd = std::string( "time clang -O1 " + fnc + " -o " + fnc + ".bin.O1" );
+    // printf( "'%s'\n", cmd.c_str() );
+    // system( cmd.c_str() );
+    // cmd = std::string( "time clang -O3 " + fnc + " -o " + fnc + ".bin.O3" );
+    // printf( "'%s'\n", cmd.c_str() );
+    // system( cmd.c_str() );
+
+    // // libcsel_ir::CselIRToLLPass csel2ll;
+    // // printf( "\n===--- CSEL IR to LL ---===\n" );
+    // // ll.run( x );
+
+    // libcsel_be::CselIRToVHDLPass csel_ir2vhdl;
+    // printf( "\n===--- CSEL IR to VHDL ---===\n" );
+    // csel_ir2vhdl.run( x );
+    
     // transform CASM AST -> IR
 
     // optimizations (analysis and transformations)
@@ -215,6 +313,7 @@ int main( int argc, const char* argv[] )
     // code-generation: CASM IR --+-> LLVM IR -> exec
     //                            |
     //                            +-> LLVM IR (interpretation via lli)
+    
     return 0;
 }
 

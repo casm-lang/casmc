@@ -24,6 +24,7 @@
 #
 
 .PHONY: obj/version.h obj/license.h
+
 .NOTPARALLEL: obj/version.h obj/license.h
 
 default: debug
@@ -164,6 +165,7 @@ lib/csel-ir/libcsel-ir.a: lib/csel-ir
 lib/csel-be/libcsel-be.a: lib/csel-be
 	@cd $<; $(MAKE) $(MFLAGS) build CC="$(CC)" CF="$(CF)"
 
+.PHONY: $(CI)
 
 obj/version.h:
 	@mkdir -p `dirname $@`
@@ -190,6 +192,7 @@ clean:
 	$(MAKE) $(MFLAGS) clean -C lib/stdhl
 	$(MAKE) $(MFLAGS) clean -C lib/casm-fe
 	$(MAKE) $(MFLAGS) clean -C lib/casm-ir
+	$(MAKE) $(MFLAGS) clean -C lib/casm-rt
 	$(MAKE) $(MFLAGS) clean -C lib/casm-be
 	$(MAKE) $(MFLAGS) clean -C lib/csel-ir
 	$(MAKE) $(MFLAGS) clean -C lib/csel-be
