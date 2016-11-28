@@ -23,21 +23,25 @@
 //  along with casmc. If not, see <http://www.gnu.org/licenses/>.
 //
 
-CASM let_test
+CASM
 init foo
 
-function x : -> Int
+function x : -> Integer
 
 rule foo =
 {
-  let x = 10 in
-    skip
+  let a = 10 in
+    print a
   
-  let y = 20 in
-    print a
-    
-  let y = 30 in
-    print a
-
+  let b = 20 in
+  {
+    print b
+  }
+  
+  let c = 30 in
+  {|
+    print c
+  |}
+  
   program(self):=undef
 }

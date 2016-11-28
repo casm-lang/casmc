@@ -180,10 +180,11 @@ int main( int argc, const char* argv[] )
 
     libpass::PassInfo ast_dump
         = libpass::PassRegistry::getPassInfo< libcasm_fe::AstDumpPass >();
-    if( ast_dump.isPassArgSelected() )
-    {
-        return ast_dump.constructPass()->run( x ) ? 0 : -1;
-    }
+    // if( ast_dump.isPassArgSelected() )
+    // {
+    //     return ast_dump.constructPass()->run( x ) ? 0 : -1;
+    // }
+    ast_dump.constructPass()->run( x );
 
     libpass::PassInfo ast_exec_sym = libpass::PassRegistry::
         getPassInfo< libcasm_fe::SymbolicExecutionPass >();
@@ -198,10 +199,11 @@ int main( int argc, const char* argv[] )
     {
         return ast_exec_num.constructPass()->run( x ) ? 0 : -1;
     }
-    
-    libpass::PassInfo ast_to_ir = libpass::PassRegistry::
-        getPassInfo< libcasm_ir::AstToCasmIRPass >();
-    if( not ast_to_ir.constructPass()->run( x ) )
+
+    libpass::PassInfo ast_to_ir
+        = libpass::PassRegistry::getPassInfo< libcasm_fe::AstToCasmIRPass >();
+    printf( "\n===--- AST to CASM IR ---===\n" );
+    if( ast_to_ir.constructPass()->run( x ) )
     {
         if( ast_to_ir.isPassArgSelected() )
         {
@@ -215,14 +217,18 @@ int main( int argc, const char* argv[] )
 
     libpass::PassInfo ir_dump
         = libpass::PassRegistry::getPassInfo< libcasm_ir::CasmIRDumpPass >();
-    if( ir_dump.isPassArgSelected() )
-    {
-        return ir_dump.constructPass()->run( x ) ? 0 : -1;
-    }
-    
+    // if( ir_dump.isPassArgSelected() )
+    // {
+    //     printf( "===--- CASM IR DUMP ---===\n" );
+    //     return ir_dump.constructPass()->run( x ) ? 0 : -1;
+    // }
+    printf( "\n===--- CASM IR Dump Pass ---===\n" );
+    ir_dump.constructPass()->run( x );
+
     libpass::PassInfo ir_to_el = libpass::PassRegistry::
         getPassInfo< libcasm_be::CasmIRToCselIRPass >();
-    if( not ir_to_el.constructPass()->run( x ) )
+    printf( "\n===--- CASM IR to CSEL IR ---===\n" );
+    if( ir_to_el.constructPass()->run( x ) )
     {
         if( ir_to_el.isPassArgSelected() )
         {
@@ -236,11 +242,14 @@ int main( int argc, const char* argv[] )
 
     libpass::PassInfo el_dump
         = libpass::PassRegistry::getPassInfo< libcsel_ir::CselIRDumpPass >();
-    if( el_dump.isPassArgSelected() )
-    {
-        return el_dump.constructPass()->run( x ) ? 0 : -1;
-    }
-    
+    // if( el_dump.isPassArgSelected() )
+    // {
+    //     printf( "===--- CSEL IR DUMP ---===\n" );
+    //     return el_dump.constructPass()->run( x ) ? 0 : -1;
+    // }
+    printf( "\n===--- CSEL IR DUMP ---===\n" );
+    el_dump.constructPass()->run( x );
+
     libpass::PassInfo el_to_c11
         = libpass::PassRegistry::getPassInfo< libcsel_be::CselIRToC11Pass >();
     if( el_to_c11.isPassArgSelected() )
@@ -261,8 +270,7 @@ int main( int argc, const char* argv[] )
     {
         return el_to_ll.constructPass()->run( x ) ? 0 : -1;
     }
-    
-    
+
     // // libcasm_be::CasmIRToLLCodePass ir2ll;
     // // ir2ll.run( x );
 
@@ -274,7 +282,8 @@ int main( int argc, const char* argv[] )
     // printf( "\n===--- CASM IR to NOVEL ---===\n" );
     // ir2csel.run( x );
     // libcsel_ir::Module* m
-    //     = (libcsel_ir::Module*)x.getResult< libcasm_be::CasmIRToCselIRPass >();
+    //     = (libcsel_ir::Module*)x.getResult< libcasm_be::CasmIRToCselIRPass
+    //     >();
 
     // libcsel_ir::CselIRDumpPass csel_dump;
     // printf( "\n===--- DUMPING CSEL IR ---===\n" );
@@ -285,7 +294,8 @@ int main( int argc, const char* argv[] )
     // csel_ir2c11.run( x );
 
     // std::string fnc( "obj/" + std::string( m->getName() ) + ".c" );
-    // std::string cmd( "time clang -Wall -g -O0 " + fnc + " -o " + fnc + ".bin" );
+    // std::string cmd( "time clang -Wall -g -O0 " + fnc + " -o " + fnc + ".bin"
+    // );
     // printf( "'%s'\n", cmd.c_str() );
     // system( cmd.c_str() );
 
@@ -303,7 +313,7 @@ int main( int argc, const char* argv[] )
     // libcsel_be::CselIRToVHDLPass csel_ir2vhdl;
     // printf( "\n===--- CSEL IR to VHDL ---===\n" );
     // csel_ir2vhdl.run( x );
-    
+
     // transform CASM AST -> IR
 
     // optimizations (analysis and transformations)
@@ -313,7 +323,7 @@ int main( int argc, const char* argv[] )
     // code-generation: CASM IR --+-> LLVM IR -> exec
     //                            |
     //                            +-> LLVM IR (interpretation via lli)
-    
+
     return 0;
 }
 
