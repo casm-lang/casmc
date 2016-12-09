@@ -53,18 +53,18 @@ CI += -I lib/casm-be
 CI += -I lib/casm-rt
 CI += -I lib/csel-ir
 CI += -I lib/csel-be
-CI += -I lib/z3/src/api
+#CI += -I lib/z3/src/api
 
 CL  = obj/casmc.a
-CL += lib/pass/libpass.a
 CL += lib/stdhl/libstdhlcpp.a
+CL += lib/pass/libpass.a
 CL += lib/casm-fe/libcasm-fe.a
 CL += lib/casm-ir/libcasm-ir.a
 CL += lib/casm-be/libcasm-be.a
 CL += lib/casm-rt/libcasm-rt.a
 CL += lib/csel-ir/libcsel-ir.a
 CL += lib/csel-be/libcsel-be.a
-CL += lib/z3/build/libz3.so
+#CL += lib/z3/build/libz3.so
 
 CC  =
 CF  =

@@ -26,8 +26,8 @@
 #include "license.h"
 #include "version.h"
 
-#include "cpp/Args.h"
-#include "cpp/Default.h"
+#include "libstdhlcpp.h"
+#include "libpass.h"
 
 #include "libcasm-be.all.h"
 #include "libcasm-fe.all.h"
@@ -35,7 +35,6 @@
 #include "libcasm-tc.h"
 #include "libcsel-be.all.h"
 #include "libcsel-ir.all.h"
-#include "libpass.h"
 
 /**
     @brief TODO
@@ -43,17 +42,25 @@
     TODO
 */
 
-void z3_example( void );
+// void z3_example( void );
 
 int main( int argc, const char* argv[] )
 {
-    z3_example();
+    // z3_example();
 
     const char* file_name = 0;
     const char* output_name = 0;
 
-    Args options(
-        argc, argv, Args::DEFAULT, [&file_name, &options]( const char* arg ) {
+    
+    libstdhl::Log::error( "asdf" );
+
+    libstdhl::Log::DefaultSource = libstdhl::Log::Source( [&argv]( void* arg ) -> const char* { return argv[0]; } );
+    
+    libstdhl::Log::error( "asdf" );
+    
+    
+    libstdhl::Args options(
+        argc, argv, libstdhl::Args::DEFAULT, [&file_name, &options]( const char* arg ) {
             static int cnt = 0;
             cnt++;
 
@@ -65,7 +72,7 @@ int main( int argc, const char* argv[] )
             file_name = arg;
         } );
 
-    options.add( 't', "test-case-profile", Args::NONE,
+    options.add( 't', "test-case-profile", libstdhl::Args::NONE,
         "Display the unique test profile identifier and exit.",
         [&options]( const char* option ) {
             printf( "%s\n",
@@ -73,7 +80,7 @@ int main( int argc, const char* argv[] )
             exit( 0 );
         } );
 
-    options.add( 'o', 0, Args::REQUIRED, "Place the output into <file>",
+    options.add( 'o', 0, libstdhl::Args::REQUIRED, "Place the output into <file>",
         [&options, &output_name]( const char* option ) {
             static int cnt = 0;
             cnt++;
@@ -89,7 +96,7 @@ int main( int argc, const char* argv[] )
 
 #define DESCRIPTION "Corinthian Abstract State Machine (CASM) Compiler\n"
 
-    options.add( 'h', "help", Args::NONE,
+    options.add( 'h', "help", libstdhl::Args::NONE,
         "Display the program usage and synopsis",
         [&options]( const char* option ) {
             fprintf( stderr, DESCRIPTION
@@ -104,7 +111,7 @@ int main( int argc, const char* argv[] )
             exit( 0 );
         } );
 
-    options.add( 'v', "version", Args::NONE,
+    options.add( 'v', "version", libstdhl::Args::NONE,
         "Display compiler version information",
         [&options]( const char* option ) {
             fprintf( stderr, DESCRIPTION
@@ -129,7 +136,7 @@ int main( int argc, const char* argv[] )
             continue;
         }
 
-        options.add( pi.getPassArgChar(), pi.getPassArgString(), Args::NONE,
+        options.add( pi.getPassArgChar(), pi.getPassArgString(), libstdhl::Args::NONE,
             pi.getPassDescription(), pi.getPassArgAction() );
     }
 
@@ -145,10 +152,19 @@ int main( int argc, const char* argv[] )
     // to allow dynamic and possible pass calls etc.
 
     libpass::PassResult x;
-    x.getResults()[ 0 ] = (void*)file_name;
+    // x.getResults()[ 0 ] = (void*)file_name;
     x.getResults()[ (void*)1 ] = (void*)output_name; // TODO: PPA: this will be
                                                      // removed and changed to a
                                                      // pass setter option
+
+    libpass::LoadFilePass& load_file_pass
+        = static_cast< libpass::LoadFilePass& >(
+            *libpass::PassRegistry::getPassInfo< libpass::LoadFilePass >()
+                 .constructPass() );
+    if( not load_file_pass.setFileName( file_name ).run( x ) )
+    {
+        return -1;
+    }
 
     libpass::PassInfo ast_parse
         = libpass::PassRegistry::getPassInfo< libcasm_fe::SourceToAstPass >();
@@ -327,148 +343,141 @@ int main( int argc, const char* argv[] )
     return 0;
 }
 
-#include <setjmp.h>
+// // #include <setjmp.h>
+// // #include "z3.h"
 
-#include "z3.h"
+// void exitf( const char* message )
+// {
+//     fprintf( stderr, "BUG: %s.\n", message );
+//     exit( 1 );
+// }
 
-/**
-   \brief exit gracefully in case of error.
-*/
-void exitf( const char* message )
-{
-    fprintf( stderr, "BUG: %s.\n", message );
-    exit( 1 );
-}
+// void error_handler( Z3_context c, Z3_error_code e )
+// {
+//     printf( "Error code: %d\n", e );
+//     exitf( "incorrect use of Z3" );
+// }
 
-/**
-   \brief Simpler error handler.
-*/
-void error_handler( Z3_context c, Z3_error_code e )
-{
-    printf( "Error code: %d\n", e );
-    exitf( "incorrect use of Z3" );
-}
+// /**
+//    \brief Create a logical context.
 
-/**
-   \brief Create a logical context.
+//    Enable model construction. Other configuration parameters can be passed in
+//    the cfg variable.
 
-   Enable model construction. Other configuration parameters can be passed in
-   the cfg variable.
+//    Also enable tracing to stderr and register custom error handler.
+// */
+// Z3_context mk_context_custom( Z3_config cfg, Z3_error_handler err )
+// {
+//     Z3_context ctx;
 
-   Also enable tracing to stderr and register custom error handler.
-*/
-Z3_context mk_context_custom( Z3_config cfg, Z3_error_handler err )
-{
-    Z3_context ctx;
+//     Z3_set_param_value( cfg, "model", "true" );
+//     ctx = Z3_mk_context( cfg );
+//     Z3_set_error_handler( ctx, err );
 
-    Z3_set_param_value( cfg, "model", "true" );
-    ctx = Z3_mk_context( cfg );
-    Z3_set_error_handler( ctx, err );
+//     return ctx;
+// }
 
-    return ctx;
-}
+// Z3_context mk_context()
+// {
+//     Z3_config cfg;
+//     Z3_context ctx;
+//     cfg = Z3_mk_config();
+//     ctx = mk_context_custom( cfg, error_handler );
+//     Z3_del_config( cfg );
+//     return ctx;
+// }
 
-Z3_context mk_context()
-{
-    Z3_config cfg;
-    Z3_context ctx;
-    cfg = Z3_mk_config();
-    ctx = mk_context_custom( cfg, error_handler );
-    Z3_del_config( cfg );
-    return ctx;
-}
+// /**
+//    \brief Create a variable using the given name and type.
+// */
+// Z3_ast mk_var( Z3_context ctx, const char* name, Z3_sort ty )
+// {
+//     Z3_symbol s = Z3_mk_string_symbol( ctx, name );
+//     return Z3_mk_const( ctx, s, ty );
+// }
 
-/**
-   \brief Create a variable using the given name and type.
-*/
-Z3_ast mk_var( Z3_context ctx, const char* name, Z3_sort ty )
-{
-    Z3_symbol s = Z3_mk_string_symbol( ctx, name );
-    return Z3_mk_const( ctx, s, ty );
-}
+// /**
+//    \brief Create a boolean variable using the given name.
+// */
+// Z3_ast mk_bool_var( Z3_context ctx, const char* name )
+// {
+//     Z3_sort ty = Z3_mk_bool_sort( ctx );
+//     return mk_var( ctx, name, ty );
+// }
 
-/**
-   \brief Create a boolean variable using the given name.
-*/
-Z3_ast mk_bool_var( Z3_context ctx, const char* name )
-{
-    Z3_sort ty = Z3_mk_bool_sort( ctx );
-    return mk_var( ctx, name, ty );
-}
+// /**
+//    \brief Create an integer variable using the given name.
+// */
+// Z3_ast mk_int_var( Z3_context ctx, const char* name )
+// {
+//     Z3_sort ty = Z3_mk_int_sort( ctx );
+//     return mk_var( ctx, name, ty );
+// }
 
-/**
-   \brief Create an integer variable using the given name.
-*/
-Z3_ast mk_int_var( Z3_context ctx, const char* name )
-{
-    Z3_sort ty = Z3_mk_int_sort( ctx );
-    return mk_var( ctx, name, ty );
-}
+// void z3_example( void )
+// {
+//     return;
+//     // std::cout << "substitute example\n";
+//     // context c;
+//     // expr x(c);
+//     // x = c.int_const("x");
+//     // expr f(c);
+//     // f = (x == 2) || (x == 1);
+//     // std::cout << f << std::endl;
 
-void z3_example( void )
-{
-    return;
-    // std::cout << "substitute example\n";
-    // context c;
-    // expr x(c);
-    // x = c.int_const("x");
-    // expr f(c);
-    // f = (x == 2) || (x == 1);
-    // std::cout << f << std::endl;
+//     // expr two(c), three(c);
+//     // two   = c.int_val(2);
+//     // three = c.int_val(3);
+//     // Z3_ast from[] = { two };
+//     // Z3_ast to[]   = { three };
+//     // expr new_f(c);
+//     // new_f = to_expr(c, Z3_substitute(c, f, 1, from, to));
 
-    // expr two(c), three(c);
-    // two   = c.int_val(2);
-    // three = c.int_val(3);
-    // Z3_ast from[] = { two };
-    // Z3_ast to[]   = { three };
-    // expr new_f(c);
-    // new_f = to_expr(c, Z3_substitute(c, f, 1, from, to));
+//     // std::cout << new_f << std::endl;
 
-    // std::cout << new_f << std::endl;
+//     Z3_context ctx;
+//     Z3_sort int_ty;
+//     Z3_ast x0, x1;
+//     Z3_ast a, b, gb;
+//     Z3_func_decl f;
+//     Z3_func_decl g;
+//     Z3_ast f01, ff010, r;
 
-    Z3_context ctx;
-    Z3_sort int_ty;
-    Z3_ast x0, x1;
-    Z3_ast a, b, gb;
-    Z3_func_decl f;
-    Z3_func_decl g;
-    Z3_ast f01, ff010, r;
+//     printf( "\nsubstitute_vars_example\n" );
 
-    printf( "\nsubstitute_vars_example\n" );
+//     ctx = mk_context();
+//     int_ty = Z3_mk_int_sort( ctx );
+//     x0 = Z3_mk_bound( ctx, 0, int_ty );
+//     x1 = Z3_mk_bound( ctx, 1, int_ty );
+//     {
+//         Z3_sort f_domain[ 2 ] = { int_ty, int_ty };
+//         f = Z3_mk_func_decl(
+//             ctx, Z3_mk_string_symbol( ctx, "f" ), 2, f_domain, int_ty );
+//     }
+//     g = Z3_mk_func_decl(
+//         ctx, Z3_mk_string_symbol( ctx, "g" ), 1, &int_ty, int_ty );
+//     {
+//         Z3_ast args[ 2 ] = { x0, x1 };
+//         f01 = Z3_mk_app( ctx, f, 2, args );
+//     }
+//     {
+//         Z3_ast args[ 2 ] = { f01, x0 };
+//         ff010 = Z3_mk_app( ctx, f, 2, args );
+//     }
+//     a = mk_int_var( ctx, "a" );
+//     b = mk_int_var( ctx, "b" );
+//     gb = Z3_mk_app( ctx, g, 1, &b );
+//     // Replace x0 -> a, x1 -> g(b) in f(f(x0,x1),x0)
+//     {
+//         Z3_ast to[ 2 ] = { a, gb };
+//         r = Z3_substitute_vars( ctx, ff010, 2, to );
+//     }
+//     // Display r
+//     printf( "substitution result: %s\n", Z3_ast_to_string( ctx, r ) );
+//     Z3_del_context( ctx );
+// }
 
-    ctx = mk_context();
-    int_ty = Z3_mk_int_sort( ctx );
-    x0 = Z3_mk_bound( ctx, 0, int_ty );
-    x1 = Z3_mk_bound( ctx, 1, int_ty );
-    {
-        Z3_sort f_domain[ 2 ] = { int_ty, int_ty };
-        f = Z3_mk_func_decl(
-            ctx, Z3_mk_string_symbol( ctx, "f" ), 2, f_domain, int_ty );
-    }
-    g = Z3_mk_func_decl(
-        ctx, Z3_mk_string_symbol( ctx, "g" ), 1, &int_ty, int_ty );
-    {
-        Z3_ast args[ 2 ] = { x0, x1 };
-        f01 = Z3_mk_app( ctx, f, 2, args );
-    }
-    {
-        Z3_ast args[ 2 ] = { f01, x0 };
-        ff010 = Z3_mk_app( ctx, f, 2, args );
-    }
-    a = mk_int_var( ctx, "a" );
-    b = mk_int_var( ctx, "b" );
-    gb = Z3_mk_app( ctx, g, 1, &b );
-    // Replace x0 -> a, x1 -> g(b) in f(f(x0,x1),x0)
-    {
-        Z3_ast to[ 2 ] = { a, gb };
-        r = Z3_substitute_vars( ctx, ff010, 2, to );
-    }
-    // Display r
-    printf( "substitution result: %s\n", Z3_ast_to_string( ctx, r ) );
-    Z3_del_context( ctx );
-}
-
-// std::string fn( file_name );
+// Std::string fn( file_name );
 // fn += ".dot";
 
 // std::ofstream fd;
