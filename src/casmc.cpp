@@ -26,8 +26,8 @@
 #include "license.h"
 #include "version.h"
 
-#include "libstdhlcpp.h"
 #include "libpass.h"
+#include "libstdhlcpp.h"
 
 #include "libcasm-be.all.h"
 #include "libcasm-fe.all.h"
@@ -46,21 +46,14 @@
 
 int main( int argc, const char* argv[] )
 {
-    // z3_example();
-
     const char* file_name = 0;
     const char* output_name = 0;
-
     
-    libstdhl::Log::error( "asdf" );
-
-    libstdhl::Log::DefaultSource = libstdhl::Log::Source( [&argv]( void* arg ) -> const char* { return argv[0]; } );
+    libstdhl::Log::DefaultSource = libstdhl::Log::Source(
+        [&argv]( void* arg ) -> const char* { return argv[ 0 ]; } );
     
-    libstdhl::Log::error( "asdf" );
-    
-    
-    libstdhl::Args options(
-        argc, argv, libstdhl::Args::DEFAULT, [&file_name, &options]( const char* arg ) {
+    libstdhl::Args options( argc, argv, libstdhl::Args::DEFAULT,
+        [&file_name, &options]( const char* arg ) {
             static int cnt = 0;
             cnt++;
 
@@ -80,7 +73,8 @@ int main( int argc, const char* argv[] )
             exit( 0 );
         } );
 
-    options.add( 'o', 0, libstdhl::Args::REQUIRED, "Place the output into <file>",
+    options.add( 'o', 0, libstdhl::Args::REQUIRED,
+        "Place the output into <file>",
         [&options, &output_name]( const char* option ) {
             static int cnt = 0;
             cnt++;
@@ -136,8 +130,9 @@ int main( int argc, const char* argv[] )
             continue;
         }
 
-        options.add( pi.getPassArgChar(), pi.getPassArgString(), libstdhl::Args::NONE,
-            pi.getPassDescription(), pi.getPassArgAction() );
+        options.add( pi.getPassArgChar(), pi.getPassArgString(),
+            libstdhl::Args::NONE, pi.getPassDescription(),
+            pi.getPassArgAction() );
     }
 
     options.parse();
@@ -157,11 +152,11 @@ int main( int argc, const char* argv[] )
                                                      // removed and changed to a
                                                      // pass setter option
 
-    libpass::LoadFilePass& load_file_pass
-        = static_cast< libpass::LoadFilePass& >(
-            *libpass::PassRegistry::getPassInfo< libpass::LoadFilePass >()
-                 .constructPass() );
-    if( not load_file_pass.setFileName( file_name ).run( x ) )
+    auto load_file_pass = std::dynamic_pointer_cast< libpass::LoadFilePass >(
+        libpass::PassRegistry::getPassInfo< libpass::LoadFilePass >()
+            .constructPass() );
+    load_file_pass->setFileName( file_name );
+    if( not load_file_pass->run( x ) )
     {
         return -1;
     }
