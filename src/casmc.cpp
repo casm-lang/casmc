@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2014-2016 CASM Organization
+//  Copyright (c) 2014-2017 CASM Organization
 //  All rights reserved.
 //
 //  Developed by: Philipp Paulweber
@@ -48,10 +48,10 @@ int main( int argc, const char* argv[] )
 {
     const char* file_name = 0;
     const char* output_name = 0;
-    
+
     libstdhl::Log::DefaultSource = libstdhl::Log::Source(
         [&argv]( void* arg ) -> const char* { return argv[ 0 ]; } );
-    
+
     libstdhl::Args options( argc, argv, libstdhl::Args::DEFAULT,
         [&file_name, &options]( const char* arg ) {
             static int cnt = 0;
@@ -68,7 +68,7 @@ int main( int argc, const char* argv[] )
     options.add( 't', "test-case-profile", libstdhl::Args::NONE,
         "Display the unique test profile identifier and exit.",
         [&options]( const char* option ) {
-            printf( "%s\n",
+            fprintf( stderr, "%s\n",
                 libcasm_tc::Profile::get( libcasm_tc::Profile::COMPILER ) );
             exit( 0 );
         } );
@@ -213,7 +213,7 @@ int main( int argc, const char* argv[] )
 
     libpass::PassInfo ast_to_ir
         = libpass::PassRegistry::getPassInfo< libcasm_fe::AstToCasmIRPass >();
-    printf( "\n===--- AST to CASM IR ---===\n" );
+    fprintf( stderr, "\n===--- AST to CASM IR ---===\n" );
     if( ast_to_ir.constructPass()->run( x ) )
     {
         if( ast_to_ir.isPassArgSelected() )
@@ -230,15 +230,23 @@ int main( int argc, const char* argv[] )
         = libpass::PassRegistry::getPassInfo< libcasm_ir::CasmIRDumpPass >();
     // if( ir_dump.isPassArgSelected() )
     // {
-    //     printf( "===--- CASM IR DUMP ---===\n" );
+    //     fprintf( stderr, "===--- CASM IR DUMP ---===\n" );
     //     return ir_dump.constructPass()->run( x ) ? 0 : -1;
     // }
-    printf( "\n===--- CASM IR Dump Pass ---===\n" );
+    fprintf( stderr, "\n===--- CASM IR Dump Pass ---===\n" );
     ir_dump.constructPass()->run( x );
+
+    libpass::PassInfo ir_to_src = libpass::PassRegistry::
+        getPassInfo< libcasm_ir::CasmIRToSourcePass >();
+    if( ir_to_src.isPassArgSelected() )
+    {
+        fprintf( stderr, "\n===--- CASM IR to Source ---===\n" );
+        return ir_to_src.constructPass()->run( x ) ? 0 : -1;
+    }
 
     libpass::PassInfo ir_to_el = libpass::PassRegistry::
         getPassInfo< libcasm_be::CasmIRToCselIRPass >();
-    printf( "\n===--- CASM IR to CSEL IR ---===\n" );
+    fprintf( stderr, "\n===--- CASM IR to CSEL IR ---===\n" );
     if( ir_to_el.constructPass()->run( x ) )
     {
         if( ir_to_el.isPassArgSelected() )
@@ -255,10 +263,10 @@ int main( int argc, const char* argv[] )
         = libpass::PassRegistry::getPassInfo< libcsel_ir::CselIRDumpPass >();
     // if( el_dump.isPassArgSelected() )
     // {
-    //     printf( "===--- CSEL IR DUMP ---===\n" );
+    //     fprintf( stderr, "===--- CSEL IR DUMP ---===\n" );
     //     return el_dump.constructPass()->run( x ) ? 0 : -1;
     // }
-    printf( "\n===--- CSEL IR DUMP ---===\n" );
+    fprintf( stderr, "\n===--- CSEL IR DUMP ---===\n" );
     el_dump.constructPass()->run( x );
 
     libpass::PassInfo el_to_c11
@@ -286,43 +294,43 @@ int main( int argc, const char* argv[] )
     // // ir2ll.run( x );
 
     // libcasm_ir::CasmIRDumpPass ir_dump;
-    // printf( "\n===--- DUMPING CASM IR ---===\n" );
+    // fprintf( stderr, "\n===--- DUMPING CASM IR ---===\n" );
     // ir_dump.run( x );
 
     // libcasm_be::CasmIRToCselIRPass ir2csel;
-    // printf( "\n===--- CASM IR to NOVEL ---===\n" );
+    // fprintf( stderr, "\n===--- CASM IR to NOVEL ---===\n" );
     // ir2csel.run( x );
     // libcsel_ir::Module* m
     //     = (libcsel_ir::Module*)x.getResult< libcasm_be::CasmIRToCselIRPass
     //     >();
 
     // libcsel_ir::CselIRDumpPass csel_dump;
-    // printf( "\n===--- DUMPING CSEL IR ---===\n" );
+    // fprintf( stderr, "\n===--- DUMPING CSEL IR ---===\n" );
     // csel_dump.run( x );
 
     // libcsel_be::CselIRToC11Pass csel_ir2c11;
-    // printf( "\n===--- CSEL IR to C11 ---===\n" );
+    // fprintf( stderr, "\n===--- CSEL IR to C11 ---===\n" );
     // csel_ir2c11.run( x );
 
     // std::string fnc( "obj/" + std::string( m->getName() ) + ".c" );
     // std::string cmd( "time clang -Wall -g -O0 " + fnc + " -o " + fnc + ".bin"
     // );
-    // printf( "'%s'\n", cmd.c_str() );
+    // fprintf( stderr, "'%s'\n", cmd.c_str() );
     // system( cmd.c_str() );
 
     // cmd = std::string( "time clang -O1 " + fnc + " -o " + fnc + ".bin.O1" );
-    // printf( "'%s'\n", cmd.c_str() );
+    // fprintf( stderr, "'%s'\n", cmd.c_str() );
     // system( cmd.c_str() );
     // cmd = std::string( "time clang -O3 " + fnc + " -o " + fnc + ".bin.O3" );
-    // printf( "'%s'\n", cmd.c_str() );
+    // fprintf( stderr, "'%s'\n", cmd.c_str() );
     // system( cmd.c_str() );
 
     // // libcsel_ir::CselIRToLLPass csel2ll;
-    // // printf( "\n===--- CSEL IR to LL ---===\n" );
+    // // fprintf( stderr, "\n===--- CSEL IR to LL ---===\n" );
     // // ll.run( x );
 
     // libcsel_be::CselIRToVHDLPass csel_ir2vhdl;
-    // printf( "\n===--- CSEL IR to VHDL ---===\n" );
+    // fprintf( stderr, "\n===--- CSEL IR to VHDL ---===\n" );
     // csel_ir2vhdl.run( x );
 
     // transform CASM AST -> IR
@@ -349,7 +357,7 @@ int main( int argc, const char* argv[] )
 
 // void error_handler( Z3_context c, Z3_error_code e )
 // {
-//     printf( "Error code: %d\n", e );
+//     fprintf( stderr, "Error code: %d\n", e );
 //     exitf( "incorrect use of Z3" );
 // }
 
@@ -438,7 +446,7 @@ int main( int argc, const char* argv[] )
 //     Z3_func_decl g;
 //     Z3_ast f01, ff010, r;
 
-//     printf( "\nsubstitute_vars_example\n" );
+//     fprintf( stderr, "\nsubstitute_vars_example\n" );
 
 //     ctx = mk_context();
 //     int_ty = Z3_mk_int_sort( ctx );
@@ -468,7 +476,7 @@ int main( int argc, const char* argv[] )
 //         r = Z3_substitute_vars( ctx, ff010, 2, to );
 //     }
 //     // Display r
-//     printf( "substitution result: %s\n", Z3_ast_to_string( ctx, r ) );
+//     fprintf( stderr, "substitution result: %s\n", Z3_ast_to_string( ctx, r ) );
 //     Z3_del_context( ctx );
 // }
 
