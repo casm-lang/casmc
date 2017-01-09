@@ -31,7 +31,7 @@
 
 #include "libcasm-be.all.h"
 #include "libcasm-fe.all.h"
-#include "libcasm-ir.all.h"
+#include "libcasm-ir.h"
 #include "libcasm-tc.h"
 #include "libcsel-be.all.h"
 #include "libcsel-ir.all.h"
