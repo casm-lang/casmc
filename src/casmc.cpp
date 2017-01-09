@@ -29,12 +29,13 @@
 #include "libpass.h"
 #include "libstdhlcpp.h"
 
-#include "libcasm-be.all.h"
-#include "libcasm-fe.all.h"
+#include "libcasm-be.h"
+#include "libcasm-fe.h"
 #include "libcasm-ir.h"
 #include "libcasm-tc.h"
-#include "libcsel-be.all.h"
-#include "libcsel-ir.all.h"
+
+#include "libcsel-be.h"
+#include "libcsel-ir.h"
 
 /**
     @brief TODO
@@ -476,7 +477,8 @@ int main( int argc, const char* argv[] )
 //         r = Z3_substitute_vars( ctx, ff010, 2, to );
 //     }
 //     // Display r
-//     fprintf( stderr, "substitution result: %s\n", Z3_ast_to_string( ctx, r ) );
+//     fprintf( stderr, "substitution result: %s\n", Z3_ast_to_string( ctx, r )
+//     );
 //     Z3_del_context( ctx );
 // }
 
