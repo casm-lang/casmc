@@ -40,6 +40,7 @@ foreach( DEPENDENCY
     casm-rt
     casm-be
     casm-tc
+    csel-rt
     csel-be
     )
   if( NOT TARGET ${DEPENDENCY} )
@@ -70,6 +71,7 @@ include_directories(
   ${LIBS}/casm-be
   ${LIBS}/casm-tc
   ${LIBS}/csel-ir
+  ${LIBS}/csel-rt
   ${LIBS}/csel-be
 )
 
@@ -96,6 +98,7 @@ add_custom_command(
 )
 
 
+
 add_executable( ${TARGET}
   ${VERSION}
   ${LICENSE}
@@ -109,6 +112,7 @@ target_link_libraries( ${TARGET}
   casm-rt
   csel-ir
   csel-be
+  csel-rt
   pass
   stdhl
 )
@@ -130,6 +134,7 @@ add_executable( ${TARGET}-check
   $<TARGET_OBJECTS:casm-be-test>
   $<TARGET_OBJECTS:casm-tc-test>
   $<TARGET_OBJECTS:csel-ir-test>
+  $<TARGET_OBJECTS:csel-rt-test>
   $<TARGET_OBJECTS:csel-be-test>
 )
 
@@ -139,6 +144,7 @@ target_link_libraries( ${TARGET}-check
   casm-rt
   casm-be
   csel-ir
+  csel-rt
   csel-be
   pass
   stdhl

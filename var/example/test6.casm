@@ -25,20 +25,13 @@
 
 CASM init foo
 
-function x : -> Integer initially { 5 }
-
-derived macro( y ) : Integer = y * y
+function x : -> Bit( 8 )
+function y : -> Bit( 24 )
 
 rule foo =
 {
-    x := macro( x )
-
-    print x 
-    program(self) := @bar
-}
-
-rule bar =
-{
-    print x 
+    x := asBit( 1, 8 )
+    y := asBit( 1, 24 )
+    
     program(self) := undef
 }

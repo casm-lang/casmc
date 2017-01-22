@@ -60,7 +60,7 @@ int main( int argc, const char* argv[] )
 
             if( cnt > 1 )
             {
-                options.error( 1, "to many file names passed" );
+                options.error( 1, "too many file names passed" );
             }
 
             file_name = arg;
@@ -82,7 +82,7 @@ int main( int argc, const char* argv[] )
 
             if( cnt > 1 )
             {
-                options.error( 1, "to many output names passed" );
+                options.error( 1, "too many output names passed" );
             }
 
             output_name = option;
@@ -346,6 +346,7 @@ int main( int argc, const char* argv[] )
 
     return 0;
 }
+
 
 // // #include <setjmp.h>
 // // #include "z3.h"

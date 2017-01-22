@@ -34,3 +34,9 @@
 [submodule "lib/hayai"]
 	path = lib/hayai
 	url = https://github.com/nickbruun/hayai
+[submodule "lib/asmjit"]
+	path = lib/asmjit
+	url = git@github.com:asmjit/asmjit.git
+[submodule "lib/csel-rt"]
+	path = lib/csel-rt
+	url = git@github.com:casm-lang/libcsel-rt.git
