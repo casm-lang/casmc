@@ -60,7 +60,7 @@ int main( int argc, const char* argv[] )
 
             if( cnt > 1 )
             {
-                options.error( 1, "too many file names passed" );
+                options.m_error( 1, "too many file names passed" );
             }
 
             file_name = arg;
@@ -82,7 +82,7 @@ int main( int argc, const char* argv[] )
 
             if( cnt > 1 )
             {
-                options.error( 1, "too many output names passed" );
+                options.m_error( 1, "too many output names passed" );
             }
 
             output_name = option;
@@ -99,9 +99,9 @@ int main( int argc, const char* argv[] )
                 "usage: %s [options] <file>\n"
                 "\n"
                 "options:\n",
-                options.getProgramName() );
+                options.programName() );
 
-            options.usage();
+            options.m_usage();
 
             exit( 0 );
         } );
@@ -114,33 +114,33 @@ int main( int argc, const char* argv[] )
                 "%s: version: %s [ %s %s ]\n"
                 "\n"
                 "%s\n",
-                options.getProgramName(), VERSION, __DATE__, __TIME__,
+                options.programName(), VERSION, __DATE__, __TIME__,
                 LICENSE );
 
             exit( 0 );
         } );
 
-    for( auto& p : libpass::PassRegistry::getRegisteredPasses() )
+    for( auto& p : libpass::PassRegistry::registeredPasses() )
     {
         // PassId    id = p.first;
         libpass::PassInfo& pi = *p.second;
 
-        if( pi.getPassArgChar() == 0 && pi.getPassArgString() == 0 )
+        if( pi.argChar() == 0 && pi.argString() == 0 )
         {
             // internal pass, do not register a cmd line flag
             continue;
         }
 
-        options.add( pi.getPassArgChar(), pi.getPassArgString(),
-            libstdhl::Args::NONE, pi.getPassDescription(),
-            pi.getPassArgAction() );
+        options.add( pi.argChar(), pi.argString(),
+            libstdhl::Args::NONE, pi.description(),
+            pi.argAction() );
     }
 
     options.parse();
 
     if( !file_name )
     {
-        options.error( 1, "no input file provided" );
+        options.m_error( 1, "no input file provided" );
     }
 
     // TODO: FIXME: the following code should be implemented in the PassManager
@@ -148,13 +148,12 @@ int main( int argc, const char* argv[] )
     // to allow dynamic and possible pass calls etc.
 
     libpass::PassResult x;
-    // x.getResults()[ 0 ] = (void*)file_name;
-    x.getResults()[ (void*)1 ] = (void*)output_name; // TODO: PPA: this will be
+    x.results()[ (void*)1 ] = (void*)output_name; // TODO: PPA: this will be
                                                      // removed and changed to a
                                                      // pass setter option
 
     auto load_file_pass = std::dynamic_pointer_cast< libpass::LoadFilePass >(
-        libpass::PassRegistry::getPassInfo< libpass::LoadFilePass >()
+        libpass::PassRegistry::passInfo< libpass::LoadFilePass >()
             .constructPass() );
     load_file_pass->setFileName( file_name );
     if( not load_file_pass->run( x ) )
@@ -163,10 +162,10 @@ int main( int argc, const char* argv[] )
     }
 
     libpass::PassInfo ast_parse
-        = libpass::PassRegistry::getPassInfo< libcasm_fe::SourceToAstPass >();
+        = libpass::PassRegistry::passInfo< libcasm_fe::SourceToAstPass >();
     if( ast_parse.constructPass()->run( x ) )
     {
-        if( ast_parse.isPassArgSelected() )
+        if( ast_parse.isArgSelected() )
         {
             return 0;
         }
@@ -177,10 +176,10 @@ int main( int argc, const char* argv[] )
     }
 
     libpass::PassInfo ast_check
-        = libpass::PassRegistry::getPassInfo< libcasm_fe::TypeCheckPass >();
+        = libpass::PassRegistry::passInfo< libcasm_fe::TypeCheckPass >();
     if( ast_check.constructPass()->run( x ) )
     {
-        if( ast_check.isPassArgSelected() )
+        if( ast_check.isArgSelected() )
         {
             return 0;
         }
@@ -191,33 +190,32 @@ int main( int argc, const char* argv[] )
     }
 
     libpass::PassInfo ast_dump
-        = libpass::PassRegistry::getPassInfo< libcasm_fe::AstDumpPass >();
-    // if( ast_dump.isPassArgSelected() )
-    // {
-    //     return ast_dump.constructPass()->run( x ) ? 0 : -1;
-    // }
-    ast_dump.constructPass()->run( x );
+        = libpass::PassRegistry::passInfo< libcasm_fe::AstDumpPass >();
+    if( ast_dump.isArgSelected() )
+    {
+        return ast_dump.constructPass()->run( x ) ? 0 : -1;
+    }
 
     libpass::PassInfo ast_exec_sym = libpass::PassRegistry::
-        getPassInfo< libcasm_fe::SymbolicExecutionPass >();
-    if( ast_exec_sym.isPassArgSelected() )
+        passInfo< libcasm_fe::SymbolicExecutionPass >();
+    if( ast_exec_sym.isArgSelected() )
     {
         return ast_exec_sym.constructPass()->run( x ) ? 0 : -1;
     }
 
     libpass::PassInfo ast_exec_num = libpass::PassRegistry::
-        getPassInfo< libcasm_fe::NumericExecutionPass >();
-    if( ast_exec_num.isPassArgSelected() )
+        passInfo< libcasm_fe::NumericExecutionPass >();
+    if( ast_exec_num.isArgSelected() )
     {
         return ast_exec_num.constructPass()->run( x ) ? 0 : -1;
     }
 
     libpass::PassInfo ast_to_ir
-        = libpass::PassRegistry::getPassInfo< libcasm_fe::AstToCasmIRPass >();
-    fprintf( stderr, "\n===--- AST to CASM IR ---===\n" );
+        = libpass::PassRegistry::passInfo< libcasm_fe::AstToCasmIRPass >();
+    // fprintf( stderr, "\n===--- AST to CASM IR ---===\n" );
     if( ast_to_ir.constructPass()->run( x ) )
     {
-        if( ast_to_ir.isPassArgSelected() )
+        if( ast_to_ir.isArgSelected() )
         {
             return 0;
         }
@@ -228,29 +226,42 @@ int main( int argc, const char* argv[] )
     }
 
     libpass::PassInfo ir_dump
-        = libpass::PassRegistry::getPassInfo< libcasm_ir::CasmIRDumpPass >();
-    // if( ir_dump.isPassArgSelected() )
+        = libpass::PassRegistry::passInfo< libcasm_ir::CasmIRDumpPass >();
+    if( ir_dump.isArgSelected() )
+    {
+        fprintf( stderr, "===--- CASM IR DUMP ---===\n" );
+        return ir_dump.constructPass()->run( x ) ? 0 : -1;
+    }
+
+    // libpass::PassInfo ir_cf = libpass::PassRegistry::
+    //     passInfo< libcasm_ir::ConstantFoldingPass >();
+    // if( ir_cf.isArgSelected() )
     // {
-    //     fprintf( stderr, "===--- CASM IR DUMP ---===\n" );
-    //     return ir_dump.constructPass()->run( x ) ? 0 : -1;
+    //     fprintf( stderr, "===--- CASM IR Constant Folding Pass ---===\n" );
+    //     if( not ir_cf.constructPass()->run( x ) )
+    //     {
+    //         return -1;
+    //     }
     // }
-    fprintf( stderr, "\n===--- CASM IR Dump Pass ---===\n" );
-    ir_dump.constructPass()->run( x );
 
     libpass::PassInfo ir_to_src = libpass::PassRegistry::
-        getPassInfo< libcasm_ir::CasmIRToSourcePass >();
-    if( ir_to_src.isPassArgSelected() )
+        passInfo< libcasm_ir::CasmIRToSourcePass >();
+
+    fprintf( stderr, "===--- CASM IR to Source (after CF) ---===\n" );
+    return ir_to_src.constructPass()->run( x ) ? 0 : -1;
+    
+    if( ir_to_src.isArgSelected() )
     {
-        fprintf( stderr, "\n===--- CASM IR to Source ---===\n" );
+        fprintf( stderr, "\n===--- CASM IR to Source Pass ---===\n" );
         return ir_to_src.constructPass()->run( x ) ? 0 : -1;
     }
 
     libpass::PassInfo ir_to_el = libpass::PassRegistry::
-        getPassInfo< libcasm_be::CasmIRToCselIRPass >();
+        passInfo< libcasm_be::CasmIRToCselIRPass >();
     fprintf( stderr, "\n===--- CASM IR to CSEL IR ---===\n" );
     if( ir_to_el.constructPass()->run( x ) )
     {
-        if( ir_to_el.isPassArgSelected() )
+        if( ir_to_el.isArgSelected() )
         {
             return 0;
         }
@@ -261,8 +272,8 @@ int main( int argc, const char* argv[] )
     }
 
     libpass::PassInfo el_dump
-        = libpass::PassRegistry::getPassInfo< libcsel_ir::CselIRDumpPass >();
-    // if( el_dump.isPassArgSelected() )
+        = libpass::PassRegistry::passInfo< libcsel_ir::CselIRDumpPass >();
+    // if( el_dump.isArgSelected() )
     // {
     //     fprintf( stderr, "===--- CSEL IR DUMP ---===\n" );
     //     return el_dump.constructPass()->run( x ) ? 0 : -1;
@@ -271,22 +282,22 @@ int main( int argc, const char* argv[] )
     el_dump.constructPass()->run( x );
 
     libpass::PassInfo el_to_c11
-        = libpass::PassRegistry::getPassInfo< libcsel_be::CselIRToC11Pass >();
-    if( el_to_c11.isPassArgSelected() )
+        = libpass::PassRegistry::passInfo< libcsel_be::CselIRToC11Pass >();
+    if( el_to_c11.isArgSelected() )
     {
         return el_to_c11.constructPass()->run( x ) ? 0 : -1;
     }
 
     libpass::PassInfo el_to_vhdl
-        = libpass::PassRegistry::getPassInfo< libcsel_be::CselIRToVHDLPass >();
-    if( el_to_vhdl.isPassArgSelected() )
+        = libpass::PassRegistry::passInfo< libcsel_be::CselIRToVHDLPass >();
+    if( el_to_vhdl.isArgSelected() )
     {
         return el_to_vhdl.constructPass()->run( x ) ? 0 : -1;
     }
 
     libpass::PassInfo el_to_ll
-        = libpass::PassRegistry::getPassInfo< libcsel_be::CselIRToLLPass >();
-    if( el_to_ll.isPassArgSelected() )
+        = libpass::PassRegistry::passInfo< libcsel_be::CselIRToLLPass >();
+    if( el_to_ll.isArgSelected() )
     {
         return el_to_ll.constructPass()->run( x ) ? 0 : -1;
     }
@@ -346,7 +357,6 @@ int main( int argc, const char* argv[] )
 
     return 0;
 }
-
 
 // // #include <setjmp.h>
 // // #include "z3.h"

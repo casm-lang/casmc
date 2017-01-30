@@ -110,9 +110,9 @@ target_link_libraries( ${TARGET}
   casm-fe
   casm-be
   casm-rt
-  csel-ir
   csel-be
   csel-rt
+  csel-ir
   pass
   stdhl
 )
@@ -143,9 +143,9 @@ target_link_libraries( ${TARGET}-check
   casm-fe
   casm-rt
   casm-be
-  csel-ir
-  csel-rt
   csel-be
+  csel-rt
+  csel-ir
   pass
   stdhl
   pthread
