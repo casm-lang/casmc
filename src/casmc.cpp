@@ -27,7 +27,7 @@
 #include "version.h"
 
 #include "libpass.h"
-#include "libstdhlcpp.h"
+#include "libstdhl.h"
 
 #include "libcasm-be.h"
 #include "libcasm-fe.h"
@@ -233,16 +233,16 @@ int main( int argc, const char* argv[] )
         return ir_dump.constructPass()->run( x ) ? 0 : -1;
     }
 
-    // libpass::PassInfo ir_cf = libpass::PassRegistry::
-    //     passInfo< libcasm_ir::ConstantFoldingPass >();
-    // if( ir_cf.isArgSelected() )
-    // {
-    //     fprintf( stderr, "===--- CASM IR Constant Folding Pass ---===\n" );
-    //     if( not ir_cf.constructPass()->run( x ) )
-    //     {
-    //         return -1;
-    //     }
-    // }
+    libpass::PassInfo ir_cf = libpass::PassRegistry::
+        passInfo< libcasm_ir::ConstantFoldingPass >();
+    if( ir_cf.isArgSelected() )
+    {
+        fprintf( stderr, "===--- CASM IR Constant Folding Pass ---===\n" );
+        if( not ir_cf.constructPass()->run( x ) )
+        {
+            return -1;
+        }
+    }
 
     libpass::PassInfo ir_to_src = libpass::PassRegistry::
         passInfo< libcasm_ir::CasmIRToSourcePass >();
