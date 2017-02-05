@@ -32,7 +32,9 @@ ENV_FLAGS = CASM=$(OBJ)/$(TARGET) CASM_ARG_PRE=--ast-exec-num
 
 version: $(OBJ)/version.h
 $(OBJ)/version.h: $(OBJ)
-	@echo "const char VERSION[] = \""`git describe --always --tags --dirty`"\"" > $@
+	@echo "const char VERSION[] =" > $@
+	@echo "\""`git describe --always --tags --dirty`"\"" >> $@
+	@echo ";" >> $@
 
 license: $(OBJ)/license.h
 $(OBJ)/license.h: $(OBJ) LICENSE.txt
