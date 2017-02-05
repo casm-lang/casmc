@@ -113,7 +113,7 @@ int main( int argc, const char* argv[] )
                 "\n"
                 "%s: version: %s [ %s %s ]\n"
                 "\n"
-                "%s\n",
+                "%s",
                 options.programName(), VERSION, __DATE__, __TIME__,
                 LICENSE );
 

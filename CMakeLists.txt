@@ -87,6 +87,7 @@ set( VERSION ${CMAKE_CURRENT_SOURCE_DIR}/obj/version.h )
 add_custom_command(
   OUTPUT  ${VERSION}
   COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} version
+  DEPENDS ${LICENSE}
   COMMENT "Generating license ${VERSION}"
 )
 
@@ -94,9 +95,9 @@ set( LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/obj/license.h )
 add_custom_command(
   OUTPUT  ${LICENSE}
   COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR} license
+  DEPENDS ${VERSION}
   COMMENT "Generating license ${LICENSE}"
 )
-
 
 
 add_executable( ${TARGET}
