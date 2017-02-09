@@ -106,10 +106,10 @@ add_executable( ${TARGET}
 )
 
 target_link_libraries( ${TARGET}
-  casm-ir
-  casm-fe
   casm-be
+  casm-fe
   casm-rt
+  casm-ir
   csel-be
   csel-rt
   csel-ir
@@ -139,10 +139,11 @@ add_executable( ${TARGET}-check
 )
 
 target_link_libraries( ${TARGET}-check
-  casm-ir
   casm-fe
-  casm-rt
   casm-be
+  casm-rt
+  casm-fe
+  casm-ir
   csel-be
   csel-rt
   csel-ir
