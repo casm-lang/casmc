@@ -45,316 +45,201 @@
 
 // void z3_example( void );
 
+static const std::string DESCRIPTION
+    = "Corinthian Abstract State Machine (CASM) Compiler\n";
+
 int main( int argc, const char* argv[] )
 {
-    const char* file_name = 0;
-    const char* output_name = 0;
+    libpass::PassManager pm;
+    libstdhl::Logger log( pm.stream() );
+    log.setSource(
+        libstdhl::make< libstdhl::Log::Source >( argv[ 0 ], DESCRIPTION ) );
 
-    libstdhl::Log::DefaultSource = libstdhl::Log::Source(
-        [&argv]( void* arg ) -> const char* { return argv[ 0 ]; } );
+    auto flush = [&pm, &argv]() {
+        libstdhl::Log::ApplicationFormatter f( argv[ 0 ] );
+        libstdhl::Log::OutputStreamSink c( std::cerr, f );
+        pm.stream().flush( c );
+    };
+
+    std::vector< std::string > files_input;
+    std::vector< std::string > files_output;
 
     libstdhl::Args options( argc, argv, libstdhl::Args::DEFAULT,
-        [&file_name, &options]( const char* arg ) {
-            static int cnt = 0;
-            cnt++;
+        [&log, &files_input]( const char* arg ) {
 
-            if( cnt > 1 )
+            if( files_input.size() > 0 )
             {
-                options.m_error( 1, "too many file names passed" );
+                log.error( "too many files, input file '" + files_input.front()
+                           + "' cannot be combined with file '"
+                           + arg
+                           + "'" );
+                return 1;
             }
 
-            file_name = arg;
+            files_input.emplace_back( arg );
+            return 0;
         } );
 
     options.add( 't', "test-case-profile", libstdhl::Args::NONE,
-        "Display the unique test profile identifier and exit.",
-        [&options]( const char* option ) {
-            fprintf( stderr, "%s\n",
-                libcasm_tc::Profile::get( libcasm_tc::Profile::COMPILER ) );
-            exit( 0 );
+        "display the unique test profile identifier",
+        [&options]( const char* ) {
+
+            std::cout << libcasm_tc::Profile::get(
+                             libcasm_tc::Profile::COMPILER )
+                      << "\n";
+
+            return -1;
         } );
 
-    options.add( 'o', 0, libstdhl::Args::REQUIRED,
-        "Place the output into <file>",
-        [&options, &output_name]( const char* option ) {
-            static int cnt = 0;
-            cnt++;
-
-            if( cnt > 1 )
-            {
-                options.m_error( 1, "too many output names passed" );
-            }
-
-            output_name = option;
-        },
-        "file" );
-
-#define DESCRIPTION "Corinthian Abstract State Machine (CASM) Compiler\n"
-
     options.add( 'h', "help", libstdhl::Args::NONE,
-        "Display the program usage and synopsis",
-        [&options]( const char* option ) {
-            fprintf( stderr, DESCRIPTION
-                "\n"
-                "usage: %s [options] <file>\n"
-                "\n"
-                "options:\n",
-                options.programName() );
+        "display usage and synopsis", [&log, &options]( const char* ) {
 
-            options.m_usage();
+            log.output( "\n" + DESCRIPTION + "\n" + log.source()->name()
+                        + ": usage: [options] <file>\n"
+                        + "\n"
+                        + "options: \n"
+                        + options.usage()
+                        + "\n" );
 
-            exit( 0 );
+            return -1;
         } );
 
     options.add( 'v', "version", libstdhl::Args::NONE,
-        "Display compiler version information",
-        [&options]( const char* option ) {
-            fprintf( stderr, DESCRIPTION
-                "\n"
-                "%s: version: %s [ %s %s ]\n"
-                "\n"
-                "%s",
-                options.programName(), VERSION, __DATE__, __TIME__,
-                LICENSE );
+        "display version information", [&log]( const char* ) {
 
-            exit( 0 );
+            log.output( "\n" + DESCRIPTION + "\n" + log.source()->name()
+                        + ": version: "
+                        + VERSION
+                        + " [ "
+                        + __DATE__
+                        + " "
+                        + __TIME__
+                        + " ]\n"
+                        + "\n"
+                        + LICENSE );
+
+            return -1;
         } );
+
+    options.add( 'o', 0, libstdhl::Args::REQUIRED, "set output <file> path",
+        [&log, &files_output]( const char* arg ) {
+            if( files_output.size() > 0 )
+            {
+                log.error( "too many output names passed" );
+                return 1;
+            }
+
+            files_output.emplace_back( arg );
+            return 0;
+        },
+        "file" );
 
     for( auto& p : libpass::PassRegistry::registeredPasses() )
     {
-        // PassId    id = p.first;
         libpass::PassInfo& pi = *p.second;
 
-        if( pi.argChar() == 0 && pi.argString() == 0 )
+        if( pi.argChar() or pi.argString() )
         {
-            // internal pass, do not register a cmd line flag
-            continue;
+            options.add( pi.argChar(), pi.argString(), libstdhl::Args::NONE,
+                pi.description(), pi.argAction() );
         }
-
-        options.add( pi.argChar(), pi.argString(),
-            libstdhl::Args::NONE, pi.description(),
-            pi.argAction() );
     }
 
-    options.parse();
-
-    if( !file_name )
+    if( auto ret = options.parse( log ) )
     {
-        options.m_error( 1, "no input file provided" );
-    }
+        flush();
 
-    // TODO: FIXME: the following code should be implemented in the PassManager
-    // structure
-    // to allow dynamic and possible pass calls etc.
-
-    libpass::PassResult x;
-    x.results()[ (void*)1 ] = (void*)output_name; // TODO: PPA: this will be
-                                                     // removed and changed to a
-                                                     // pass setter option
-
-    auto load_file_pass = std::dynamic_pointer_cast< libpass::LoadFilePass >(
-        libpass::PassRegistry::passInfo< libpass::LoadFilePass >()
-            .constructPass() );
-    load_file_pass->setFileName( file_name );
-    if( not load_file_pass->run( x ) )
-    {
-        return -1;
-    }
-
-    libpass::PassInfo ast_parse
-        = libpass::PassRegistry::passInfo< libcasm_fe::SourceToAstPass >();
-    if( ast_parse.constructPass()->run( x ) )
-    {
-        if( ast_parse.isArgSelected() )
+        if( ret >= 0 )
+        {
+            return 1;
+        }
+        else
         {
             return 0;
         }
     }
-    else
+
+    if( files_input.size() == 0 )
     {
+        log.error( "no input file provided" );
+        flush();
+        return 2;
+    }
+
+    // register all wanted passes
+    // and configure their setup hooks if desired
+
+    pm.add< libpass::LoadFilePass >(
+        [&files_input]( libpass::LoadFilePass& pass ) {
+            pass.setFilename( files_input.front() );
+
+        } );
+
+    // pm.setDefaultPass< TODO >();
+
+    //
+    // CASM Front-end
+    //
+
+    pm.add< libcasm_fe::SourceToAstPass >();
+    pm.add< libcasm_fe::AttributionPass >();
+    pm.add< libcasm_fe::SymbolResolverPass >();
+    pm.add< libcasm_fe::TypeInferencePass >();
+    pm.add< libcasm_fe::AstDumpDotPass >();
+    // pm.add< libcasm_fe::AstDumpSourcePass >();
+    // pm.add< libcasm_fe::NumericExecutionPass >(
+    //     [&flag_dump_updates]( libcasm_fe::NumericExecutionPass& pass ) {
+    //         pass.setDumpUpdates( flag_dump_updates );
+
+    //     } );
+    // pm.add< libcasm_fe::SymbolicExecutionPass >();
+
+    // pm.add< libcasm_fe::AstToCasmIRPass >();
+
+    //
+    // CASM Intermediate Representation
+    //
+
+    pm.add< libcasm_ir::ConsistencyCheckPass >();
+    pm.add< libcasm_ir::IRDumpDebugPass >();
+    pm.add< libcasm_ir::IRDumpDotPass >();
+    pm.add< libcasm_ir::IRDumpSourcePass >();
+    // pm.add< libcasm_ir::BranchEliminationPass >();
+    // pm->add< libcasm_ir::ConstantFoldingPass >();
+
+    //
+    // CASM Back-end
+    //
+
+    pm.add< libcasm_be::CasmIRToCselIRPass >();
+
+    //
+    // CSEL Intermediate Representation
+    //
+
+    // TODO: PPA: add passes
+
+    //
+    // CSEL Back-end
+    //
+
+    pm.add< libcsel_be::CselIRToC11Pass >();
+    pm.add< libcsel_be::CselIRToVHDLPass >();
+    pm.add< libcsel_be::CselIRToLLPass >();
+    // pm.add< libcsel_be::CselIRTo*Pass >();
+
+    try
+    {
+        pm.run( flush );
+    }
+    catch( std::exception& e )
+    {
+        log.error( e.what() );
+        flush();
         return -1;
     }
 
-    libpass::PassInfo ast_check
-        = libpass::PassRegistry::passInfo< libcasm_fe::TypeCheckPass >();
-    if( ast_check.constructPass()->run( x ) )
-    {
-        if( ast_check.isArgSelected() )
-        {
-            return 0;
-        }
-    }
-    else
-    {
-        return -1;
-    }
-
-    libpass::PassInfo ast_dump
-        = libpass::PassRegistry::passInfo< libcasm_fe::AstDumpPass >();
-    if( ast_dump.isArgSelected() )
-    {
-        return ast_dump.constructPass()->run( x ) ? 0 : -1;
-    }
-
-    libpass::PassInfo ast_exec_sym = libpass::PassRegistry::
-        passInfo< libcasm_fe::SymbolicExecutionPass >();
-    if( ast_exec_sym.isArgSelected() )
-    {
-        return ast_exec_sym.constructPass()->run( x ) ? 0 : -1;
-    }
-
-    libpass::PassInfo ast_exec_num = libpass::PassRegistry::
-        passInfo< libcasm_fe::NumericExecutionPass >();
-    if( ast_exec_num.isArgSelected() )
-    {
-        return ast_exec_num.constructPass()->run( x ) ? 0 : -1;
-    }
-
-    libpass::PassInfo ast_to_ir
-        = libpass::PassRegistry::passInfo< libcasm_fe::AstToCasmIRPass >();
-    // fprintf( stderr, "\n===--- AST to CASM IR ---===\n" );
-    if( ast_to_ir.constructPass()->run( x ) )
-    {
-        if( ast_to_ir.isArgSelected() )
-        {
-            return 0;
-        }
-    }
-    else
-    {
-        return -1;
-    }
-
-    libpass::PassInfo ir_dump
-        = libpass::PassRegistry::passInfo< libcasm_ir::CasmIRDumpPass >();
-    if( ir_dump.isArgSelected() )
-    {
-        fprintf( stderr, "===--- CASM IR DUMP ---===\n" );
-        return ir_dump.constructPass()->run( x ) ? 0 : -1;
-    }
-
-    libpass::PassInfo ir_cf = libpass::PassRegistry::
-        passInfo< libcasm_ir::ConstantFoldingPass >();
-    if( ir_cf.isArgSelected() )
-    {
-        fprintf( stderr, "===--- CASM IR Constant Folding Pass ---===\n" );
-        if( not ir_cf.constructPass()->run( x ) )
-        {
-            return -1;
-        }
-    }
-
-    libpass::PassInfo ir_to_src = libpass::PassRegistry::
-        passInfo< libcasm_ir::CasmIRToSourcePass >();
-
-    fprintf( stderr, "===--- CASM IR to Source (after CF) ---===\n" );
-    return ir_to_src.constructPass()->run( x ) ? 0 : -1;
-    
-    if( ir_to_src.isArgSelected() )
-    {
-        fprintf( stderr, "\n===--- CASM IR to Source Pass ---===\n" );
-        return ir_to_src.constructPass()->run( x ) ? 0 : -1;
-    }
-
-    libpass::PassInfo ir_to_el = libpass::PassRegistry::
-        passInfo< libcasm_be::CasmIRToCselIRPass >();
-    fprintf( stderr, "\n===--- CASM IR to CSEL IR ---===\n" );
-    if( ir_to_el.constructPass()->run( x ) )
-    {
-        if( ir_to_el.isArgSelected() )
-        {
-            return 0;
-        }
-    }
-    else
-    {
-        return -1;
-    }
-
-    libpass::PassInfo el_dump
-        = libpass::PassRegistry::passInfo< libcsel_ir::CselIRDumpPass >();
-    // if( el_dump.isArgSelected() )
-    // {
-    //     fprintf( stderr, "===--- CSEL IR DUMP ---===\n" );
-    //     return el_dump.constructPass()->run( x ) ? 0 : -1;
-    // }
-    fprintf( stderr, "\n===--- CSEL IR DUMP ---===\n" );
-    el_dump.constructPass()->run( x );
-
-    libpass::PassInfo el_to_c11
-        = libpass::PassRegistry::passInfo< libcsel_be::CselIRToC11Pass >();
-    if( el_to_c11.isArgSelected() )
-    {
-        return el_to_c11.constructPass()->run( x ) ? 0 : -1;
-    }
-
-    libpass::PassInfo el_to_vhdl
-        = libpass::PassRegistry::passInfo< libcsel_be::CselIRToVHDLPass >();
-    if( el_to_vhdl.isArgSelected() )
-    {
-        return el_to_vhdl.constructPass()->run( x ) ? 0 : -1;
-    }
-
-    libpass::PassInfo el_to_ll
-        = libpass::PassRegistry::passInfo< libcsel_be::CselIRToLLPass >();
-    if( el_to_ll.isArgSelected() )
-    {
-        return el_to_ll.constructPass()->run( x ) ? 0 : -1;
-    }
-
-    // // libcasm_be::CasmIRToLLCodePass ir2ll;
-    // // ir2ll.run( x );
-
-    // libcasm_ir::CasmIRDumpPass ir_dump;
-    // fprintf( stderr, "\n===--- DUMPING CASM IR ---===\n" );
-    // ir_dump.run( x );
-
-    // libcasm_be::CasmIRToCselIRPass ir2csel;
-    // fprintf( stderr, "\n===--- CASM IR to NOVEL ---===\n" );
-    // ir2csel.run( x );
-    // libcsel_ir::Module* m
-    //     = (libcsel_ir::Module*)x.getResult< libcasm_be::CasmIRToCselIRPass
-    //     >();
-
-    // libcsel_ir::CselIRDumpPass csel_dump;
-    // fprintf( stderr, "\n===--- DUMPING CSEL IR ---===\n" );
-    // csel_dump.run( x );
-
-    // libcsel_be::CselIRToC11Pass csel_ir2c11;
-    // fprintf( stderr, "\n===--- CSEL IR to C11 ---===\n" );
-    // csel_ir2c11.run( x );
-
-    // std::string fnc( "obj/" + std::string( m->getName() ) + ".c" );
-    // std::string cmd( "time clang -Wall -g -O0 " + fnc + " -o " + fnc + ".bin"
-    // );
-    // fprintf( stderr, "'%s'\n", cmd.c_str() );
-    // system( cmd.c_str() );
-
-    // cmd = std::string( "time clang -O1 " + fnc + " -o " + fnc + ".bin.O1" );
-    // fprintf( stderr, "'%s'\n", cmd.c_str() );
-    // system( cmd.c_str() );
-    // cmd = std::string( "time clang -O3 " + fnc + " -o " + fnc + ".bin.O3" );
-    // fprintf( stderr, "'%s'\n", cmd.c_str() );
-    // system( cmd.c_str() );
-
-    // // libcsel_ir::CselIRToLLPass csel2ll;
-    // // fprintf( stderr, "\n===--- CSEL IR to LL ---===\n" );
-    // // ll.run( x );
-
-    // libcsel_be::CselIRToVHDLPass csel_ir2vhdl;
-    // fprintf( stderr, "\n===--- CSEL IR to VHDL ---===\n" );
-    // csel_ir2vhdl.run( x );
-
-    // transform CASM AST -> IR
-
-    // optimizations (analysis and transformations)
-
-    // interpretation: CASM-based
-
-    // code-generation: CASM IR --+-> LLVM IR -> exec
-    //                            |
-    //                            +-> LLVM IR (interpretation via lli)
-
+    flush();
     return 0;
 }
 

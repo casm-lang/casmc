@@ -41,6 +41,8 @@ $(OBJ)/license.h: $(OBJ) LICENSE.txt
 	@echo "const char LICENSE[] =" > $@
 	@head -n `grep -ne "------" LICENSE.txt | grep -Eo "[0-9]*"` LICENSE.txt | \
 		sed "/-----/d" | \
+		sed "/This file is part of/d" | \
+		sed "s/^/    /" | \
 		sed "s/^/\"/g" | \
 		sed "s/$$/\\\n\"/g" >> $@
 	@echo ";" >> $@
