@@ -3,7 +3,8 @@ pipeline {
   stages {
     stage('') {
       steps {
-        sh 'make'
+        sh '''ls -al
+'''
       }
     }
   }
