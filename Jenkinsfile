@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('') {
       steps {
-        timestamps()
+        sh 'make'
       }
     }
   }
