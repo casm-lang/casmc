@@ -32,6 +32,7 @@
 #include "libcasm-be.h"
 #include "libcasm-fe.h"
 #include "libcasm-ir.h"
+#include "libcasm-rt.h"
 #include "libcasm-tc.h"
 
 #include "libcsel-be.h"
@@ -204,8 +205,8 @@ int main( int argc, const char* argv[] )
     pm.add< libcasm_ir::IRDumpDebugPass >();
     pm.add< libcasm_ir::IRDumpDotPass >();
     pm.add< libcasm_ir::IRDumpSourcePass >();
-    // pm.add< libcasm_ir::BranchEliminationPass >();
-    // pm->add< libcasm_ir::ConstantFoldingPass >();
+    pm.add< libcasm_ir::BranchEliminationPass >();
+    // pm.add< libcasm_ir::ConstantFoldingPass >();
 
     //
     // CASM Back-end
