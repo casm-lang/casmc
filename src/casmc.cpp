@@ -35,8 +35,8 @@
 #include "libcasm-rt.h"
 #include "libcasm-tc.h"
 
-#include "libcsel-be.h"
-#include "libcsel-ir.h"
+#include "libcjel-be.h"
+#include "libcjel-ir.h"
 
 /**
     @brief TODO
@@ -212,22 +212,22 @@ int main( int argc, const char* argv[] )
     // CASM Back-end
     //
 
-    pm.add< libcasm_be::CasmIRToCselIRPass >();
+    pm.add< libcasm_be::CasmIRToCjelIRPass >();
 
     //
-    // CSEL Intermediate Representation
+    // CJEL Intermediate Representation
     //
 
     // TODO: PPA: add passes
 
     //
-    // CSEL Back-end
+    // CJEL Back-end
     //
 
-    pm.add< libcsel_be::CselIRToC11Pass >();
-    pm.add< libcsel_be::CselIRToVHDLPass >();
-    pm.add< libcsel_be::CselIRToLLPass >();
-    // pm.add< libcsel_be::CselIRTo*Pass >();
+    pm.add< libcjel_be::CjelIRToC11Pass >();
+    pm.add< libcjel_be::CjelIRToVHDLPass >();
+    pm.add< libcjel_be::CjelIRToLLPass >();
+    // pm.add< libcjel_be::CjelIRTo*Pass >();
 
     try
     {

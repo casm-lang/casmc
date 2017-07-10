@@ -13,12 +13,12 @@
 [submodule "lib/casm-be"]
 	path = lib/casm-be
 	url = git@github.com:casm-lang/libcasm-be.git
-[submodule "lib/csel-ir"]
-	path = lib/csel-ir
-	url = git@github.com:casm-lang/libcsel-ir.git
-[submodule "lib/csel-be"]
-	path = lib/csel-be
-	url = git@github.com:casm-lang/libcsel-be.git
+[submodule "lib/cjel-ir"]
+	path = lib/cjel-ir
+	url = git@github.com:casm-lang/libcjel-ir.git
+[submodule "lib/cjel-be"]
+	path = lib/cjel-be
+	url = git@github.com:casm-lang/libcjel-be.git
 [submodule "lib/gtest"]
 	path = lib/gtest
 	url = https://github.com/google/googletest
@@ -37,6 +37,6 @@
 [submodule "lib/asmjit"]
 	path = lib/asmjit
 	url = git@github.com:ppaulweber/libasmjit.git
-[submodule "lib/csel-rt"]
-	path = lib/csel-rt
-	url = git@github.com:casm-lang/libcsel-rt.git
+[submodule "lib/cjel-rt"]
+	path = lib/cjel-rt
+	url = git@github.com:casm-lang/libcjel-rt.git

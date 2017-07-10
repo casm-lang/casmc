@@ -36,12 +36,12 @@ foreach( DEPENDENCY
     pass
     casm-ir
     casm-fe
-    csel-ir
+    cjel-ir
     casm-rt
     casm-be
     casm-tc
-    csel-rt
-    csel-be
+    cjel-rt
+    cjel-be
     )
   if( NOT TARGET ${DEPENDENCY} )
     add_subdirectory( ${LIBS}/${DEPENDENCY} lib/${DEPENDENCY} )
@@ -70,9 +70,9 @@ include_directories(
   ${LIBS}/casm-rt
   ${LIBS}/casm-be
   ${LIBS}/casm-tc
-  ${LIBS}/csel-ir
-  ${LIBS}/csel-rt
-  ${LIBS}/csel-be
+  ${LIBS}/cjel-ir
+  ${LIBS}/cjel-rt
+  ${LIBS}/cjel-be
 )
 
 
@@ -110,9 +110,9 @@ target_link_libraries( ${TARGET}
   casm-fe
   casm-rt
   casm-ir
-  csel-be
-  csel-rt
-  csel-ir
+  cjel-be
+  cjel-rt
+  cjel-ir
   pass
   stdhl
 )
@@ -133,9 +133,9 @@ add_executable( ${TARGET}-check
   $<TARGET_OBJECTS:casm-rt-test>
   $<TARGET_OBJECTS:casm-be-test>
   $<TARGET_OBJECTS:casm-tc-test>
-  $<TARGET_OBJECTS:csel-ir-test>
-  $<TARGET_OBJECTS:csel-rt-test>
-  $<TARGET_OBJECTS:csel-be-test>
+  $<TARGET_OBJECTS:cjel-ir-test>
+  $<TARGET_OBJECTS:cjel-rt-test>
+  $<TARGET_OBJECTS:cjel-be-test>
 )
 
 target_link_libraries( ${TARGET}-check
@@ -144,9 +144,9 @@ target_link_libraries( ${TARGET}-check
   casm-rt
   casm-fe
   casm-ir
-  csel-be
-  csel-rt
-  csel-ir
+  cjel-be
+  cjel-rt
+  cjel-ir
   pass
   stdhl
   pthread
