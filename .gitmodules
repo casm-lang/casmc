@@ -1,42 +1,56 @@
-[submodule "lib/casm-fe"]
-	path = lib/casm-fe
-	url = git@github.com:casm-lang/libcasm-fe.git
+[submodule "lib/gtest"]
+	path = lib/gtest
+	url = https://github.com/casm-lang/libgtest.git
+	branch = master
+[submodule "lib/hayai"]
+	path = lib/hayai
+	url = https://github.com/casm-lang/libhayai.git
+	branch = master
+[submodule "lib/stdhl"]
+	path = lib/stdhl
+	url = https://github.com/casm-lang/libstdhl.git
+	branch = master
+[submodule "lib/pass"]
+	path = lib/pass
+	url = https://github.com/casm-lang/libpass.git
+	branch = master
 [submodule "lib/casm-ir"]
 	path = lib/casm-ir
 	url = git@github.com:casm-lang/libcasm-ir.git
-[submodule "lib/casm-tc"]
-	path = lib/casm-tc
-	url = git@github.com:casm-lang/libcasm-tc.git
+	branch = master
 [submodule "lib/casm-rt"]
 	path = lib/casm-rt
 	url = git@github.com:casm-lang/libcasm-rt.git
+	branch = master
+[submodule "lib/casm-fe"]
+	path = lib/casm-fe
+	url = git@github.com:casm-lang/libcasm-fe.git
+	branch = master
 [submodule "lib/casm-be"]
 	path = lib/casm-be
 	url = git@github.com:casm-lang/libcasm-be.git
+	branch = master
+[submodule "lib/casm-tc"]
+	path = lib/casm-tc
+	url = git@github.com:casm-lang/libcasm-tc.git
+	branch = master
 [submodule "lib/cjel-ir"]
 	path = lib/cjel-ir
 	url = git@github.com:casm-lang/libcjel-ir.git
-[submodule "lib/cjel-be"]
-	path = lib/cjel-be
-	url = git@github.com:casm-lang/libcjel-be.git
-[submodule "lib/gtest"]
-	path = lib/gtest
-	url = https://github.com/google/googletest
-[submodule "lib/stdhl"]
-	path = lib/stdhl
-	url = git@github.com:ppaulweber/libstdhl.git
-[submodule "lib/pass"]
-	path = lib/pass
-	url = git@github.com:ppaulweber/libpass.git
-[submodule "lib/z3"]
-	path = lib/z3
-	url = https://github.com/Z3Prover/z3
-[submodule "lib/hayai"]
-	path = lib/hayai
-	url = https://github.com/nickbruun/hayai
-[submodule "lib/asmjit"]
-	path = lib/asmjit
-	url = git@github.com:ppaulweber/libasmjit.git
+	branch = master
 [submodule "lib/cjel-rt"]
 	path = lib/cjel-rt
 	url = git@github.com:casm-lang/libcjel-rt.git
+	branch = master
+[submodule "lib/cjel-be"]
+	path = lib/cjel-be
+	url = git@github.com:casm-lang/libcjel-be.git
+	branch = master
+[submodule "lib/asmjit"]
+	path = lib/asmjit
+	url = https://github.com/casm-lang/libasmjit.git
+	branch = master
+[submodule "lib/z3"]
+	path = lib/z3
+	url = https://github.com/Z3Prover/z3.git
+	branch = master
