@@ -25,24 +25,15 @@
 
 TARGET = casmc
 
-include .config.mk
+FORMAT  = src
+FORMAT += src/*
+FORMAT += src/*/*
+FORMAT += etc
+FORMAT += etc/*
+FORMAT += etc/*/*
 
-ENV_FLAGS = CASM=$(OBJ)/$(TARGET) CASM_ARG_PRE=--ast-exec-num
+UPDATE_ROOT = ../../lib/stdhl
 
+include .cmake/config.mk
 
-version: $(OBJ)/version.h
-$(OBJ)/version.h: $(OBJ)
-	@echo "const char VERSION[] =" > $@
-	@echo "\""`git describe --always --tags --dirty`"\"" >> $@
-	@echo ";" >> $@
-
-license: $(OBJ)/license.h
-$(OBJ)/license.h: $(OBJ) LICENSE.txt
-	@echo "const char LICENSE[] =" > $@
-	@head -n `grep -ne "------" LICENSE.txt | grep -Eo "[0-9]*"` LICENSE.txt | \
-		sed "/-----/d" | \
-		sed "/This file is part of/d" | \
-		sed "s/^/    /" | \
-		sed "s/^/\"/g" | \
-		sed "s/$$/\\\n\"/g" >> $@
-	@echo ";" >> $@
+# ENV_FLAGS = CASM=$(OBJ)/$(TARGET) CASM_ARG_PRE=--ast-exec-num
