@@ -23,20 +23,17 @@
 //  along with casmc. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "license.h"
-#include "version.h"
+#include <casmc/Version>
 
-#include "libpass.h"
-#include "libstdhl.h"
+#include <libcasm-be/libcasm-be>
+#include <libcasm-fe/libcasm-fe>
+#include <libcasm-ir/libcasm-ir>
 
-#include "libcasm-be.h"
-#include "libcasm-fe.h"
-#include "libcasm-ir.h"
-#include "libcasm-rt.h"
-#include "libcasm-tc.h"
+#include <libcjel-be/libcjel-be>
+#include <libcjel-ir/libcjel-ir>
 
-#include "libcjel-be.h"
-#include "libcjel-ir.h"
+#include <libpass/libpass>
+#include <libstdhl/libstdhl>
 
 /**
     @brief TODO
@@ -46,83 +43,78 @@
 
 // void z3_example( void );
 
-static const std::string DESCRIPTION
-    = "Corinthian Abstract State Machine (CASM) Compiler\n";
+static const std::string DESCRIPTION = "Corinthian Abstract State Machine (CASM) Compiler\n";
+static const std::string PROFILE = "casmc";
 
 int main( int argc, const char* argv[] )
 {
+    assert( argc > 0 );
+    const std::string app_name = argv[ 0 ];
+
     libpass::PassManager pm;
     libstdhl::Logger log( pm.stream() );
-    log.setSource(
-        libstdhl::make< libstdhl::Log::Source >( argv[ 0 ], DESCRIPTION ) );
+    log.setSource( libstdhl::Memory::make< libstdhl::Log::Source >( app_name, DESCRIPTION ) );
 
-    auto flush = [&pm, &argv]() {
-        libstdhl::Log::ApplicationFormatter f( argv[ 0 ] );
+    auto flush = [&pm, &app_name]() {
+        libstdhl::Log::ApplicationFormatter f( app_name );
         libstdhl::Log::OutputStreamSink c( std::cerr, f );
         pm.stream().flush( c );
     };
 
-    std::vector< std::string > files_input;
+    std::vector< std::string > files;
     std::vector< std::string > files_output;
+    u1 flag_dump_updates = false;
 
-    libstdhl::Args options( argc, argv, libstdhl::Args::DEFAULT,
-        [&log, &files_input]( const char* arg ) {
+    libstdhl::Args options( argc, argv, libstdhl::Args::DEFAULT, [&files, &log]( const char* arg ) {
+        if( files.size() > 0 )
+        {
+            log.error(
+                "too many files, input file '" + files.front() +
+                "' cannot be combined with file '" + arg + "'" );
+            return 1;
+        }
 
-            if( files_input.size() > 0 )
-            {
-                log.error( "too many files, input file '" + files_input.front()
-                           + "' cannot be combined with file '"
-                           + arg
-                           + "'" );
-                return 1;
-            }
+        files.emplace_back( arg );
+        return 0;
+    } );
 
-            files_input.emplace_back( arg );
-            return 0;
-        } );
-
-    options.add( 't', "test-case-profile", libstdhl::Args::NONE,
+    options.add(
+        't',
+        "test-case-profile",
+        libstdhl::Args::NONE,
         "display the unique test profile identifier",
-        [&options]( const char* ) {
+        []( const char* ) {
+            std::cout << PROFILE << "\n";
+            return -1;
+        } );
 
-            std::cout << libcasm_tc::Profile::get(
-                             libcasm_tc::Profile::COMPILER )
-                      << "\n";
+    options.add(
+        'h',
+        "help",
+        libstdhl::Args::NONE,
+        "display usage and synopsis",
+        [&log, &options]( const char* ) {
+            log.output(
+                "\n" + DESCRIPTION + "\n" + log.source()->name() + ": usage: [options] <file>\n" +
+                "\n" + "options: \n" + options.usage() + "\n" );
 
             return -1;
         } );
 
-    options.add( 'h', "help", libstdhl::Args::NONE,
-        "display usage and synopsis", [&log, &options]( const char* ) {
-
-            log.output( "\n" + DESCRIPTION + "\n" + log.source()->name()
-                        + ": usage: [options] <file>\n"
-                        + "\n"
-                        + "options: \n"
-                        + options.usage()
-                        + "\n" );
+    options.add(
+        'v', "version", libstdhl::Args::NONE, "display version information", [&log]( const char* ) {
+            log.output(
+                "\n" + DESCRIPTION + "\n" + log.source()->name() + ": version: " + casmc::REVTAG +
+                " [ " + __DATE__ + " " + __TIME__ + " ]\n" + "\n" + casmc::NOTICE );
 
             return -1;
         } );
 
-    options.add( 'v', "version", libstdhl::Args::NONE,
-        "display version information", [&log]( const char* ) {
-
-            log.output( "\n" + DESCRIPTION + "\n" + log.source()->name()
-                        + ": version: "
-                        + VERSION
-                        + " [ "
-                        + __DATE__
-                        + " "
-                        + __TIME__
-                        + " ]\n"
-                        + "\n"
-                        + LICENSE );
-
-            return -1;
-        } );
-
-    options.add( 'o', 0, libstdhl::Args::REQUIRED, "set output <file> path",
+    options.add(
+        'o',
+        0,
+        libstdhl::Args::REQUIRED,
+        "set output <file> path",
         [&log, &files_output]( const char* arg ) {
             if( files_output.size() > 0 )
             {
@@ -135,16 +127,30 @@ int main( int argc, const char* argv[] )
         },
         "file" );
 
-    for( auto& p : libpass::PassRegistry::registeredPasses() )
+    // add passes to the pass manager to setup command-line options
+
+    pm.add< libcasm_fe::AstDumpDotPass >();
+
+    pm.add< libcjel_be::CjelIRToC11Pass >();
+    pm.add< libcjel_be::CjelIRToLLPass >();
+    pm.add< libcjel_be::CjelIRToVHDLPass >();
+
+    for( auto id : pm.passes() )
     {
-        libpass::PassInfo& pi = *p.second;
+        libpass::PassInfo& pi = libpass::PassRegistry::passInfo( id );
 
         if( pi.argChar() or pi.argString() )
         {
-            options.add( pi.argChar(), pi.argString(), libstdhl::Args::NONE,
-                pi.description(), pi.argAction() );
+            options.add(
+                pi.argChar(),
+                pi.argString(),
+                libstdhl::Args::NONE,
+                pi.description(),
+                pi.argAction() );
         }
     }
+
+    // parse the command-line
 
     if( auto ret = options.parse( log ) )
     {
@@ -160,83 +166,27 @@ int main( int argc, const char* argv[] )
         }
     }
 
-    if( files_input.size() == 0 )
+    if( files.size() == 0 )
     {
         log.error( "no input file provided" );
         flush();
         return 2;
     }
 
-    // register all wanted passes
-    // and configure their setup hooks if desired
+    // set default settings
 
-    pm.add< libpass::LoadFilePass >(
-        [&files_input]( libpass::LoadFilePass& pass ) {
-            pass.setFilename( files_input.front() );
+    libpass::PassResult pr;
+    pr.setInput< libpass::LoadFilePass >( files.front() );
 
-        } );
+    pm.setDefaultResult( pr );
+    pm.setDefaultPass< libcjel_be::CjelIRToC11Pass >();
 
-    // pm.setDefaultPass< TODO >();
+    // set pass-specific configurations
 
-    //
-    // CASM Front-end
-    //
+    // run pass pipeline
 
-    pm.add< libcasm_fe::SourceToAstPass >();
-    pm.add< libcasm_fe::AttributionPass >();
-    pm.add< libcasm_fe::SymbolResolverPass >();
-    pm.add< libcasm_fe::TypeInferencePass >();
-    pm.add< libcasm_fe::AstDumpDotPass >();
-    // pm.add< libcasm_fe::AstDumpSourcePass >();
-    // pm.add< libcasm_fe::NumericExecutionPass >(
-    //     [&flag_dump_updates]( libcasm_fe::NumericExecutionPass& pass ) {
-    //         pass.setDumpUpdates( flag_dump_updates );
-
-    //     } );
-    // pm.add< libcasm_fe::SymbolicExecutionPass >();
-
-    // pm.add< libcasm_fe::AstToCasmIRPass >();
-
-    //
-    // CASM Intermediate Representation
-    //
-
-    pm.add< libcasm_ir::ConsistencyCheckPass >();
-    pm.add< libcasm_ir::IRDumpDebugPass >();
-    pm.add< libcasm_ir::IRDumpDotPass >();
-    pm.add< libcasm_ir::IRDumpSourcePass >();
-    pm.add< libcasm_ir::BranchEliminationPass >();
-    // pm.add< libcasm_ir::ConstantFoldingPass >();
-
-    //
-    // CASM Back-end
-    //
-
-    pm.add< libcasm_be::CasmIRToCjelIRPass >();
-
-    //
-    // CJEL Intermediate Representation
-    //
-
-    // TODO: PPA: add passes
-
-    //
-    // CJEL Back-end
-    //
-
-    pm.add< libcjel_be::CjelIRToC11Pass >();
-    pm.add< libcjel_be::CjelIRToVHDLPass >();
-    pm.add< libcjel_be::CjelIRToLLPass >();
-    // pm.add< libcjel_be::CjelIRTo*Pass >();
-
-    try
+    if( not pm.run( flush ) )
     {
-        pm.run( flush );
-    }
-    catch( std::exception& e )
-    {
-        log.error( e.what() );
-        flush();
         return -1;
     }
 

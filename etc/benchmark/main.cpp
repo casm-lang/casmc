@@ -23,8 +23,18 @@
 //  along with casmc. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "gtest/gtest.h"
+#include <hayai/hayai.hpp>
 
-TEST( libcasm_fe__subject, example )
+BENCHMARK( casmc, main, 0, 0 )
 {
 }
+
+//
+//  Local variables:
+//  mode: c++
+//  indent-tabs-mode: nil
+//  c-basic-offset: 4
+//  tab-width: 4
+//  End:
+//  vim:noexpandtab:sw=4:ts=4:
+//

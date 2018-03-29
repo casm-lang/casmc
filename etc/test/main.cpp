@@ -23,32 +23,18 @@
 //  along with casmc. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _CASMC_PASSMANAGER_H_
-#define _CASMC_PASSMANAGER_H_
+#include "main.h"
 
-#include "libpass.h"
-
-/**
-   @brief    TODO
-
-   TODO
-*/
-
-class PassManager
+void casmc_main_dummy( void )
 {
-  public:
-    /**
-       @brief    TODO
+    const auto source = libstdhl::Memory::make< libstdhl::Log::Source >( "casmc", "CASMC" );
 
-       TODO
+    libstdhl::Log::defaultSource( source );
+}
 
-       @param    arg0    TODO
-       @return   TODO
-       @retval   TODO
-    */
-};
-
-#endif /* _CASMC_PASSMANAGER_H_ */
+TEST( casmc_main, empty )
+{
+}
 
 //
 //  Local variables:

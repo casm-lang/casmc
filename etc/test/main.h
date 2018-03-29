@@ -23,15 +23,12 @@
 //  along with casmc. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "PassManager.h"
+#ifndef _CASMC_TEST_MAIN_H_
+#define _CASMC_TEST_MAIN_H_
 
-/**
-   @brief TODO
+#include <libstdhl/Test>
 
-   TODO
-*/
-
-// TODO
+#endif  // _CASMC_TEST_MAIN_H_
 
 //
 //  Local variables:
