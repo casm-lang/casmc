@@ -22,59 +22,73 @@
 #   You should have received a copy of the GNU General Public License
 #   along with casmc. If not, see <http://www.gnu.org/licenses/>.
 #
-[submodule "lib/gtest"]
-	path = lib/gtest
-	url = https://github.com/casm-lang/libgtest.git
-	branch = master
-[submodule "lib/hayai"]
-	path = lib/hayai
-	url = https://github.com/casm-lang/libhayai.git
-	branch = master
+
 [submodule "lib/stdhl"]
 	path = lib/stdhl
 	url = https://github.com/casm-lang/libstdhl.git
 	branch = master
+
 [submodule "lib/pass"]
 	path = lib/pass
 	url = https://github.com/casm-lang/libpass.git
 	branch = master
+
 [submodule "lib/casm-ir"]
 	path = lib/casm-ir
 	url = https://github.com/casm-lang/libcasm-ir.git
 	branch = master
+
 [submodule "lib/casm-rt"]
 	path = lib/casm-rt
 	url = https://github.com/casm-lang/libcasm-rt.git
 	branch = master
+
 [submodule "lib/casm-fe"]
 	path = lib/casm-fe
 	url = https://github.com/casm-lang/libcasm-fe.git
 	branch = master
+
 [submodule "lib/casm-be"]
 	path = lib/casm-be
 	url = https://github.com/casm-lang/libcasm-be.git
 	branch = master
+
 [submodule "lib/casm-tc"]
 	path = lib/casm-tc
 	url = https://github.com/casm-lang/libcasm-tc.git
 	branch = master
+
 [submodule "lib/cjel-ir"]
 	path = lib/cjel-ir
 	url = https://github.com/casm-lang/libcjel-ir.git
 	branch = master
+
 [submodule "lib/cjel-rt"]
 	path = lib/cjel-rt
 	url = https://github.com/casm-lang/libcjel-rt.git
 	branch = master
+
 [submodule "lib/cjel-be"]
 	path = lib/cjel-be
 	url = https://github.com/casm-lang/libcjel-be.git
 	branch = master
+
+[submodule "lib/gtest"]
+	path = lib/gtest
+	url = https://github.com/casm-lang/libgtest.git
+	branch = master
+
+[submodule "lib/hayai"]
+	path = lib/hayai
+	url = https://github.com/casm-lang/libhayai.git
+	branch = master
+
+[submodule "lib/z3"] # external
+	path = lib/z3
+	url = https://github.com/casm-lang/libz3.git
+	branch = master
+
 [submodule "lib/asmjit"]
 	path = lib/asmjit
 	url = https://github.com/casm-lang/libasmjit.git
-	branch = master
-[submodule "lib/z3"]
-	path = lib/z3
-	url = https://github.com/casm-lang/libz3.git
 	branch = master
