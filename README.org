@@ -22,12 +22,12 @@
 # 
 
 #+begin_html
-<h3>
+<h4>
 ⚠️
 This repository has been archived and its development work moved to the
 <a href="https://github.com/sealangdotorg/sea">SEA language</a> project.
 <hr>
-</h3>
+</h4>
 #+end_html
 
 [[https://github.com/casm-lang/casm-lang.logo/raw/master/etc/headline.png]]
